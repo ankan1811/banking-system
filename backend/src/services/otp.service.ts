@@ -32,9 +32,9 @@ export async function sendOtp(email: string): Promise<void> {
 
   const resend = getResendClient();
   await resend.emails.send({
-    from: process.env.EMAIL_FROM || 'Horizon Bank <noreply@example.com>',
+    from: process.env.EMAIL_FROM || "Ankan's Bank <noreply@example.com>",
     to: email,
-    subject: 'Your Horizon login code',
+    subject: "Your Ankan's Bank login code",
     text: `Your verification code is: ${otp}. It expires in ${OTP_EXPIRY_MINUTES} minutes.`,
   });
 }

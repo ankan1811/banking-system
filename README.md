@@ -1,4 +1,4 @@
-# Horizon Bank
+# Ankan's Bank
 
 A modern, full-stack fintech banking application with a glassmorphic dark UI, passwordless authentication, bank account linking, and fund transfers.
 
@@ -106,13 +106,6 @@ npm run install:all
 2. Create a project
 3. Go to Settings > Database > Connection string (URI)
 
-#### Option C: Local PostgreSQL
-```bash
-brew install postgresql@16
-brew services start postgresql@16
-createdb horizon_bank
-```
-
 > **Why Neon is recommended over Supabase (for this project)**
 >
 > Both are hosted PostgreSQL, and this project supports either — but **Neon is the better fit** when you only need a database:
@@ -146,7 +139,7 @@ OTP_EXPIRY_MINUTES=5
 
 # EMAIL (optional — MASTER_OTP skips email in dev)
 RESEND_API_KEY=
-EMAIL_FROM=Horizon Bank <noreply@yourdomain.com>
+EMAIL_FROM=Ankan's Bank <noreply@yourdomain.com>
 
 # PLAID (get from https://dashboard.plaid.com)
 PLAID_CLIENT_ID=
@@ -327,8 +320,9 @@ This project uses **Prisma ORM**, which works with any PostgreSQL provider. To s
 |----------|------------------------|
 | **Neon** | `postgresql://user:pass@ep-xxx.region.neon.tech/neondb?sslmode=require` |
 | **Supabase** | `postgresql://postgres.ref:pass@aws-0-region.pooler.supabase.com:6543/postgres` |
-| **Local** | `postgresql://postgres:postgres@localhost:5432/horizon_bank` |
+| **Aiven** | `postgresql://user:pass@host.aivencloud.com:port/defaultdb?sslmode=require` |
 | **Render** | `postgresql://user:pass@host.render.com/dbname` |
+| **Local** | `postgresql://postgres:postgres@localhost:5432/ankans_bank` |
 
 No code changes needed. Just swap the URL.
 
@@ -422,4 +416,4 @@ If you're evaluating managed PostgreSQL providers beyond Neon and Supabase, here
 This project is for educational and portfolio purposes.
 
 Original template by [Adrian Hajdin](https://github.com/adrianhajdin/banking) — heavily modified with custom auth, separate frontend/backend architecture, Razorpay integration, and glassmorphic redesign.
-# banking-system
+# Ankan's Banking System

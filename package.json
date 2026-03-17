@@ -1,5 +1,5 @@
 {
-  "name": "horizon-bank",
+  "name": "ankans-bank",
   "private": true,
   "scripts": {
     "dev:frontend": "cd frontend && npm run dev",

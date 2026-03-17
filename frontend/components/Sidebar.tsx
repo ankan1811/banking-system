@@ -15,8 +15,8 @@ const Sidebar = ({ user }: SiderbarProps) => {
     <section className="group sidebar">
       <nav className="flex flex-col h-full">
         <Link href="/" className="flex items-center gap-3 px-5 py-5 mb-2">
-          <Image src="/icons/logo.svg" width={28} height={28} alt="Horizon" className="shrink-0" />
-          <h1 className="sidebar-label text-xl font-bold font-ibm-plex-serif text-white">Horizon</h1>
+          <Image src="/icons/logo.svg" width={28} height={28} alt="Ankan's Bank" className="shrink-0" />
+          <h1 className="sidebar-label text-xl font-bold font-ibm-plex-serif text-white">Ankan's Bank</h1>
         </Link>
 
         <div className="flex flex-col gap-1 px-3 flex-1">

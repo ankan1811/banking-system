@@ -20,7 +20,7 @@ export default async function RootLayout({
         <div className="root-layout">
           <div className="flex items-center gap-2">
             <Image src="/icons/logo.svg" width={28} height={28} alt="logo" />
-            <span className="text-lg font-bold font-ibm-plex-serif text-white">Horizon</span>
+            <span className="text-lg font-bold font-ibm-plex-serif text-white">Ankan's Bank</span>
           </div>
           <div>
             <MobileNav user={loggedIn} />
