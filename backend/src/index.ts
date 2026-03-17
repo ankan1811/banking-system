@@ -11,6 +11,8 @@ import banksRoutes from './routes/banks.routes.js';
 import transactionsRoutes from './routes/transactions.routes.js';
 import plaidRoutes from './routes/plaid.routes.js';
 import transfersRoutes from './routes/transfers.routes.js';
+import aiRoutes from './routes/ai.routes.js';
+import chatRoutes from './routes/chat.routes.js';
 import { requireAuth } from './middleware/auth.js';
 
 const app = express();
@@ -31,6 +33,8 @@ app.use('/api/banks', requireAuth, banksRoutes);
 app.use('/api/transactions', requireAuth, transactionsRoutes);
 app.use('/api/plaid', requireAuth, plaidRoutes);
 app.use('/api/transfers', requireAuth, transfersRoutes);
+app.use('/api/ai', requireAuth, aiRoutes);
+app.use('/api/chat', requireAuth, chatRoutes);
 
 // Health check
 app.get('/health', (_req, res) => {

@@ -2,12 +2,14 @@ import { cookies } from 'next/headers';
 
 const API_URL = process.env.API_URL || 'http://localhost:8787';
 
-export async function serverApiRequest<T>(path: string): Promise<T> {
+export async function serverApiRequest<T>(path: string, options?: RequestInit): Promise<T> {
   const token = cookies().get('session-token')?.value;
   const res = await fetch(`${API_URL}${path}`, {
+    ...options,
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { Cookie: `session-token=${token}` } : {}),
+      ...options?.headers,
     },
     cache: 'no-store',
   });

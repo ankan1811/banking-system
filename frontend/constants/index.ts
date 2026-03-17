@@ -19,6 +19,11 @@ export const sidebarLinks = [
     route: "/payment-transfer",
     label: "Transfer Funds",
   },
+  {
+    imgURL: "/icons/monitor.svg",
+    route: "/insights",
+    label: "AI Insights",
+  },
 ];
 
 // good_user / good_password - Bank of America
@@ -48,6 +53,82 @@ export const ITEMS = [
     accountId: "x1GQb1lDrDHWX4BwkqQbI4qpQP1lL6tJ3VVo9",
   },
 ];
+
+export const aiCategoryColors: Record<string, string> = {
+  'Food & Dining': '#f43f5e',
+  'Transport': '#8b5cf6',
+  'Shopping': '#f59e0b',
+  'Entertainment': '#ec4899',
+  'Bills & Utilities': '#6366f1',
+  'Health': '#10b981',
+  'Education': '#06b6d4',
+  'Income': '#22c55e',
+  'Transfers': '#64748b',
+  'Other': '#78716c',
+};
+
+export const aiCategoryStyles: Record<string, { borderColor: string; backgroundColor: string; textColor: string; chipBackgroundColor: string }> = {
+  'Food & Dining': {
+    borderColor: 'border-rose-500/30',
+    backgroundColor: 'bg-rose-400',
+    textColor: 'text-rose-300',
+    chipBackgroundColor: 'bg-rose-500/10',
+  },
+  'Transport': {
+    borderColor: 'border-violet-500/30',
+    backgroundColor: 'bg-violet-400',
+    textColor: 'text-violet-300',
+    chipBackgroundColor: 'bg-violet-500/10',
+  },
+  'Shopping': {
+    borderColor: 'border-amber-500/30',
+    backgroundColor: 'bg-amber-400',
+    textColor: 'text-amber-300',
+    chipBackgroundColor: 'bg-amber-500/10',
+  },
+  'Entertainment': {
+    borderColor: 'border-pink-500/30',
+    backgroundColor: 'bg-pink-400',
+    textColor: 'text-pink-300',
+    chipBackgroundColor: 'bg-pink-500/10',
+  },
+  'Bills & Utilities': {
+    borderColor: 'border-indigo-500/30',
+    backgroundColor: 'bg-indigo-400',
+    textColor: 'text-indigo-300',
+    chipBackgroundColor: 'bg-indigo-500/10',
+  },
+  'Health': {
+    borderColor: 'border-emerald-500/30',
+    backgroundColor: 'bg-emerald-400',
+    textColor: 'text-emerald-300',
+    chipBackgroundColor: 'bg-emerald-500/10',
+  },
+  'Education': {
+    borderColor: 'border-cyan-500/30',
+    backgroundColor: 'bg-cyan-400',
+    textColor: 'text-cyan-300',
+    chipBackgroundColor: 'bg-cyan-500/10',
+  },
+  'Income': {
+    borderColor: 'border-green-500/30',
+    backgroundColor: 'bg-green-400',
+    textColor: 'text-green-300',
+    chipBackgroundColor: 'bg-green-500/10',
+  },
+  'Transfers': {
+    borderColor: 'border-slate-500/30',
+    backgroundColor: 'bg-slate-400',
+    textColor: 'text-slate-300',
+    chipBackgroundColor: 'bg-slate-500/10',
+  },
+  'Other': {
+    borderColor: 'border-stone-500/30',
+    backgroundColor: 'bg-stone-400',
+    textColor: 'text-stone-300',
+    chipBackgroundColor: 'bg-stone-500/10',
+  },
+};
 
 export const topCategoryStyles = {
   "Food and Drink": {

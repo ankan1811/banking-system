@@ -72,6 +72,17 @@ model Transaction {
   @@map("transactions")
 }
 
+model CachedCategory {
+  id              String   @id @default(uuid())
+  transactionHash String   @unique
+  originalName    String
+  aiCategory      String
+  createdAt       DateTime @default(now())
+
+  @@index([transactionHash])
+  @@map("cached_categories")
+}
+
 model OtpCode {
   id        String   @id @default(uuid())
   email     String

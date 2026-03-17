@@ -1,3 +1,4 @@
+import CategoryBreakdownChart from '@/components/CategoryBreakdownChart';
 import HeaderBox from '@/components/HeaderBox'
 import RecentTransactions from '@/components/RecentTransactions';
 import RightSidebar from '@/components/RightSidebar';
@@ -31,6 +32,10 @@ const Home = async ({ searchParams: { id, page } }: SearchParamProps) => {
           totalBanks={accounts?.totalBanks}
           totalCurrentBalance={accounts?.totalCurrentBalance}
         />
+
+        {account?.transactions?.length > 0 && (
+          <CategoryBreakdownChart transactions={account.transactions} />
+        )}
 
         <RecentTransactions
           accounts={accountsData}

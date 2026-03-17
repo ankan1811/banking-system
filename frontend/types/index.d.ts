@@ -62,6 +62,8 @@ declare type Transaction = {
   amount: number;
   pending: boolean;
   category: string;
+  aiCategory?: string;
+  merchantName?: string;
   date: string;
   image: string;
   createdAt: string;

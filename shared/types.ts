@@ -72,6 +72,45 @@ export type TransferParams = {
   amount: string;
 };
 
+export type AICategory =
+  | 'Food & Dining'
+  | 'Transport'
+  | 'Shopping'
+  | 'Entertainment'
+  | 'Bills & Utilities'
+  | 'Health'
+  | 'Education'
+  | 'Income'
+  | 'Transfers'
+  | 'Other';
+
+export type SpendingInsight = {
+  summary: string;
+  monthComparison: {
+    category: string;
+    currentAmount: number;
+    previousAmount: number;
+    changePercent: number;
+  }[];
+  topCategories: {
+    category: string;
+    amount: number;
+    transactionCount: number;
+  }[];
+  anomalies: string[];
+  savingsTips: string[];
+  generatedAt: string;
+};
+
+export type ChatMessage = {
+  role: 'user' | 'model';
+  content: string;
+};
+
+export type ChatResponse = {
+  reply: string;
+};
+
 export type CreateTransactionProps = {
   name: string;
   amount: string;

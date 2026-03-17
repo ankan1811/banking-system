@@ -2,6 +2,7 @@ import { CountryCode } from 'plaid';
 import { plaidClient } from '../lib/plaid.js';
 import { getBanks as getBanksFromDb, getBank as getBankFromDb } from './user.service.js';
 import { getTransactionsByBankId } from './transaction.service.js';
+import { categorizeTransactions } from './gemini.service.js';
 
 export const getAccounts = async (userId: string) => {
   const banks = await getBanksFromDb(userId);
@@ -73,7 +74,15 @@ export const getAccount = async (bankRecordId: string) => {
     accountsResponse.data.item.institution_id!
   );
 
-  const transactions = await getTransactions(bank.accessToken);
+  const rawTransactions = await getTransactions(bank.accessToken);
+
+  // Enrich with AI categories (uses DB cache, only calls Gemini for new txns)
+  let transactions = rawTransactions;
+  try {
+    transactions = await categorizeTransactions(rawTransactions);
+  } catch (err) {
+    console.error('AI categorization failed, using original categories:', err);
+  }
 
   const account = {
     id: accountData.account_id,
@@ -121,6 +130,7 @@ export const getTransactions = async (accessToken: string) => {
     transactions = response.data.added.map((transaction) => ({
       id: transaction.transaction_id,
       name: transaction.name,
+      merchantName: transaction.merchant_name || transaction.name,
       paymentChannel: transaction.payment_channel,
       type: transaction.payment_channel,
       accountId: transaction.account_id,

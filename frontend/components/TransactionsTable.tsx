@@ -1,6 +1,6 @@
 'use client'
 
-import { transactionCategoryStyles } from '@/constants'
+import { transactionCategoryStyles, aiCategoryStyles } from '@/constants'
 import { cn, formatAmount, formatDateTime, getTransactionStatus, removeSpecialCharacters } from '@/lib/utils'
 
 const CategoryBadge = ({ category }: CategoryBadgeProps) => {
@@ -9,7 +9,7 @@ const CategoryBadge = ({ category }: CategoryBadgeProps) => {
     backgroundColor,
     textColor,
     chipBackgroundColor,
-   } = transactionCategoryStyles[category as keyof typeof transactionCategoryStyles] || transactionCategoryStyles.default
+   } = aiCategoryStyles[category] || transactionCategoryStyles[category as keyof typeof transactionCategoryStyles] || transactionCategoryStyles.default
 
   return (
     <div className={cn('category-badge', borderColor, chipBackgroundColor)}>
@@ -65,7 +65,7 @@ const TransactionsTable = ({ transactions }: TransactionTableProps) => {
               </span>
 
               <span className="w-24 hidden lg:flex justify-end">
-                <CategoryBadge category={t.category} />
+                <CategoryBadge category={t.aiCategory || t.category} />
               </span>
             </div>
           </div>
