@@ -414,6 +414,3 @@ If you're evaluating managed PostgreSQL providers beyond Neon and Supabase, here
 ## License
 
 This project is for educational and portfolio purposes.
-
-Original template by [Adrian Hajdin](https://github.com/adrianhajdin/banking) — heavily modified with custom auth, separate frontend/backend architecture, Razorpay integration, and glassmorphic redesign.
-# Ankan's Banking System
