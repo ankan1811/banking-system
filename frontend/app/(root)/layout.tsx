@@ -1,3 +1,4 @@
+import AIChatbot from "@/components/AIChatbot";
 import MobileNav from "@/components/MobileNav";
 import Sidebar from "@/components/Sidebar";
 import { serverApiRequest } from "@/lib/api/server-client";
@@ -30,6 +31,7 @@ export default async function RootLayout({
           {children}
         </div>
       </div>
+      <AIChatbot />
     </main>
   );
 }
