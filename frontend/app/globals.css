@@ -1,0 +1,522 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== SHADCN CSS VARIABLES ===== */
+@layer base {
+  :root {
+    --background: 222 47% 7%;
+    --foreground: 214 32% 91%;
+    --card: 222 47% 7%;
+    --card-foreground: 214 32% 91%;
+    --popover: 220 40% 13%;
+    --popover-foreground: 214 32% 91%;
+    --primary: 258 90% 66%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 214 32% 91%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 33% 17%;
+    --accent-foreground: 214 32% 91%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 217 33% 25%;
+    --input: 217 33% 25%;
+    --ring: 258 90% 66%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+  body {
+    background-color: #0a0e1a;
+    color: #e2e8f0;
+  }
+}
+
+/* ===== BODY ===== */
+body {
+  background-color: #0a0e1a;
+  color: #e2e8f0;
+  min-height: 100vh;
+}
+
+/* ===== TEXT SIZE UTILITIES ===== */
+@layer utilities {
+  .text-10 {
+    @apply text-[10px] leading-[14px];
+  }
+
+  .text-12 {
+    @apply text-[12px] leading-[16px];
+  }
+
+  .text-14 {
+    @apply text-[14px] leading-[20px];
+  }
+
+  .text-16 {
+    @apply text-[16px] leading-[24px];
+  }
+
+  .text-18 {
+    @apply text-[18px] leading-[22px];
+  }
+
+  .text-20 {
+    @apply text-[20px] leading-[24px];
+  }
+
+  .text-24 {
+    @apply text-[24px] leading-[30px];
+  }
+
+  .text-26 {
+    @apply text-[26px] leading-[32px];
+  }
+
+  .text-30 {
+    @apply text-[30px] leading-[38px];
+  }
+
+  .text-36 {
+    @apply text-[36px] leading-[44px];
+  }
+
+  .sheet-content button {
+    @apply focus:ring-0 focus-visible:ring-transparent focus:ring-offset-0 focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:border-none !important;
+  }
+}
+
+/* ===== GLASS UTILITIES ===== */
+.glass-card {
+  @apply bg-white/[0.04] backdrop-blur-xl border border-white/[0.08] rounded-2xl;
+}
+
+.glass-card-hover {
+  @apply glass-card transition-all duration-300;
+}
+.glass-card-hover:hover {
+  @apply bg-white/[0.07] border-white/[0.12] shadow-glass-hover -translate-y-0.5;
+}
+
+/* ===== ANIMATED BACKGROUNDS ===== */
+.auth-bg {
+  position: relative;
+  overflow: hidden;
+  background: #0a0e1a;
+}
+.auth-bg::before,
+.auth-bg::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.25;
+  animation: float 6s ease-in-out infinite;
+}
+.auth-bg::before {
+  width: 600px;
+  height: 600px;
+  background: #8b5cf6;
+  top: -20%;
+  left: -15%;
+}
+.auth-bg::after {
+  width: 500px;
+  height: 500px;
+  background: #22d3ee;
+  bottom: -15%;
+  right: -10%;
+  animation-delay: -3s;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  @apply sticky left-0 top-0 h-screen w-[72px] flex-col justify-between border-r border-white/[0.06] bg-[#0f1629]/80 backdrop-blur-2xl pt-2 max-md:hidden;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  display: flex;
+}
+.group:hover .sidebar,
+.sidebar:hover {
+  width: 240px;
+}
+
+.sidebar-link {
+  @apply flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200 border border-transparent;
+}
+
+.sidebar-label {
+  @apply whitespace-nowrap text-sm font-medium opacity-0 transition-all duration-300 overflow-hidden;
+}
+.group:hover .sidebar-label,
+.sidebar:hover .sidebar-label {
+  opacity: 1;
+}
+
+.sidebar-logo {
+  @apply sidebar-label text-xl font-bold font-ibm-plex-serif;
+}
+
+/* ===== MOBILE TAB BAR ===== */
+.mobile-tab-bar {
+  @apply fixed bottom-0 left-0 right-0 z-50 bg-[#0f1629]/90 backdrop-blur-2xl border-t border-white/[0.06] py-2 px-4 md:hidden;
+}
+
+/* ===== TOP BAR ===== */
+.top-bar {
+  @apply sticky top-0 z-40 bg-[#0a0e1a]/80 backdrop-blur-xl border-b border-white/[0.06] px-6 py-4 flex items-center justify-between;
+}
+
+/* ===== HOME LAYOUT ===== */
+.home {
+  @apply flex w-full flex-col xl:flex-row;
+}
+.home-content {
+  @apply flex-1 px-4 sm:px-6 lg:px-8 py-6 space-y-6;
+}
+.home-header {
+  @apply flex flex-col gap-6;
+}
+
+/* ===== HEADER BOX ===== */
+.header-box {
+  @apply animate-[slide-up_0.5s_ease-out];
+}
+.header-box-title {
+  @apply text-24 lg:text-30 font-semibold text-white;
+}
+.header-box-subtext {
+  @apply text-14 lg:text-16 font-normal text-slate-400 mt-2;
+}
+
+/* ===== HERO BALANCE CARD ===== */
+.total-balance {
+  @apply glass-card p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center gap-6 relative overflow-hidden;
+}
+.total-balance::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 1rem;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(34, 211, 238, 0.1), transparent);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+.total-balance-chart {
+  @apply shrink-0;
+}
+.total-balance-label {
+  @apply text-14 font-medium text-slate-400;
+}
+.total-balance-amount {
+  @apply text-30 sm:text-36 font-bold text-white flex items-center gap-2;
+}
+
+/* ===== STAT PILLS ===== */
+.stat-pill {
+  @apply glass-card px-5 py-4 flex items-center gap-3 flex-1 min-w-[140px];
+}
+
+/* ===== BANK CARD 3D ===== */
+.bank-card-wrapper {
+  perspective: 1000px;
+}
+.bank-card {
+  @apply relative flex h-[200px] w-full max-w-[360px] flex-col justify-between rounded-2xl border border-white/[0.08] p-5 shadow-card-3d overflow-hidden;
+  background: linear-gradient(135deg, #1a1040, #0f1629, #0a1628);
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+.bank-card:hover {
+  transform: rotateY(-4deg) rotateX(4deg) scale(1.02);
+}
+.bank-card_content {
+  @apply flex flex-col justify-between h-full relative z-10;
+}
+.bank-card_icon {
+  @apply absolute top-4 right-4 flex items-center gap-2 z-10;
+}
+/* Shine overlay */
+.bank-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.06) 45%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.06) 55%, transparent 60%);
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+  pointer-events: none;
+}
+/* Gradient border */
+.bank-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 1rem;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(99, 102, 241, 0.2), rgba(34, 211, 238, 0.3));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* ===== BANK CARD ROW (horizontal scroll) ===== */
+.bank-card-row {
+  @apply flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory;
+  scrollbar-width: none;
+}
+.bank-card-row::-webkit-scrollbar { display: none; }
+.bank-card-row > * {
+  @apply snap-center shrink-0;
+}
+
+/* ===== RECENT TRANSACTIONS ===== */
+.recent-transactions {
+  @apply glass-card p-5 sm:p-6 space-y-4;
+}
+.recent-transactions-label {
+  @apply text-18 sm:text-20 font-semibold text-white;
+}
+.recent-transactions-tablist {
+  @apply flex gap-2 overflow-x-auto pb-2;
+  scrollbar-width: none;
+}
+.recent-transactions-tablist::-webkit-scrollbar { display: none; }
+
+/* ===== TRANSACTION CARD ===== */
+.transaction-card {
+  @apply flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-white/[0.04] hover:bg-white/[0.05] hover:border-white/[0.08] transition-all duration-200;
+}
+
+/* ===== CATEGORY PILL ===== */
+.category-pill {
+  @apply inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06];
+}
+.category-badge {
+  @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium border;
+}
+
+/* ===== BANK TAB (pill style) ===== */
+.banktab-item {
+  @apply px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer border border-transparent;
+}
+
+/* ===== BANK INFO ===== */
+.bank-info {
+  @apply glass-card p-4 flex items-center gap-4 cursor-pointer transition-all duration-200;
+}
+.bank-info:hover {
+  @apply bg-white/[0.06];
+}
+.bank-info_content {
+  @apply flex flex-1 items-center justify-between;
+}
+
+/* ===== AUTH FORM ===== */
+.auth-form {
+  @apply flex flex-col gap-6 w-full max-w-[480px] glass-card p-8 sm:p-10;
+  animation: slide-up 0.6s ease-out;
+}
+
+/* ===== FORM ELEMENTS ===== */
+.input-class {
+  @apply bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-white placeholder:text-slate-500 outline-none transition-all duration-200;
+}
+.input-class:focus {
+  @apply border-violet-500/50 ring-1 ring-violet-500/20 bg-white/[0.06];
+}
+.form-label {
+  @apply text-14 font-medium text-slate-300;
+}
+.form-message {
+  @apply text-12 text-rose-400;
+}
+.form-btn {
+  @apply w-full py-3 px-4 rounded-xl font-semibold text-white bg-gradient-to-r from-violet-600 via-indigo-500 to-cyan-500 hover:shadow-glow-violet transition-all duration-300 text-16;
+  background-size: 200% auto;
+}
+.form-btn:hover {
+  background-position: right center;
+}
+.form-link {
+  @apply text-cyan-400 hover:text-violet-400 transition-colors duration-200 font-semibold text-14;
+}
+
+/* ===== OTP BOXES ===== */
+.otp-box {
+  @apply w-12 h-14 text-center text-xl font-mono bg-white/[0.04] border border-white/[0.08] rounded-xl text-white outline-none transition-all duration-200;
+}
+.otp-box:focus {
+  @apply border-violet-500 ring-1 ring-violet-500/30;
+}
+
+/* ===== PROFILE ===== */
+.profile-banner {
+  @apply h-28 bg-gradient-to-r from-violet-600/80 via-indigo-500/80 to-cyan-400/80 rounded-t-2xl;
+}
+.profile {
+  @apply relative flex flex-col items-center px-6 pb-6;
+}
+.profile-img {
+  @apply size-20 rounded-full bg-[#0f1629] ring-4 ring-[#0a0e1a] flex items-center justify-center -mt-10;
+}
+.profile-name {
+  @apply text-18 font-semibold text-white mt-3;
+}
+.profile-email {
+  @apply text-14 text-slate-400 mt-1;
+}
+.profile-details {
+  @apply flex flex-col items-center;
+}
+
+/* ===== PAYMENT TRANSFER ===== */
+.payment-transfer {
+  @apply flex flex-col px-4 sm:px-6 lg:px-8 py-6 overflow-y-auto space-y-6;
+}
+.payment-transfer_form-item {
+  @apply flex flex-col md:flex-row md:items-start gap-4;
+}
+.payment-transfer_form-content {
+  @apply flex flex-col gap-1 md:w-[280px] md:shrink-0;
+}
+.payment-transfer_form-details {
+  @apply glass-card p-5 mt-2;
+}
+.payment-transfer_btn-box {
+  @apply mt-6;
+}
+.payment-transfer_btn {
+  @apply form-btn;
+}
+
+/* ===== TRANSACTIONS PAGE ===== */
+.transactions {
+  @apply flex flex-col px-4 sm:px-6 lg:px-8 py-6 overflow-y-auto space-y-6;
+}
+.transactions-header {
+  @apply flex flex-col gap-2;
+}
+.transactions-account {
+  @apply glass-card p-6 flex flex-col sm:flex-row justify-between gap-4 relative overflow-hidden;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(99, 102, 241, 0.1), rgba(34, 211, 238, 0.08));
+}
+.transactions-account-balance {
+  @apply flex flex-col items-end gap-1 text-white;
+}
+
+/* ===== MY BANKS ===== */
+.my-banks {
+  @apply flex flex-col px-4 sm:px-6 lg:px-8 py-6 space-y-6;
+}
+
+/* ===== VIEW ALL / MISC ===== */
+.view-all-btn {
+  @apply text-14 font-semibold text-violet-400 hover:text-cyan-400 transition-colors;
+}
+.header-2 {
+  @apply text-18 font-semibold text-white;
+}
+.text-bankGradient {
+  @apply bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent;
+}
+.bank-gradient {
+  background: linear-gradient(135deg, #8b5cf6, #6366f1, #22d3ee);
+}
+.bg-bank-gradient {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(99, 102, 241, 0.15), rgba(34, 211, 238, 0.1));
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  @apply flex items-center justify-between px-3 py-3 border-t border-white/[0.06];
+}
+.footer_name {
+  @apply size-9 rounded-full bg-gradient-to-br from-violet-500 to-cyan-400 flex items-center justify-center shrink-0;
+}
+.footer_name-mobile {
+  @apply size-9 rounded-full bg-gradient-to-br from-violet-500 to-cyan-400 flex items-center justify-center;
+}
+.footer_email {
+  @apply sidebar-label flex flex-col min-w-0;
+}
+.footer_email-mobile {
+  @apply flex flex-col flex-1 min-w-0;
+}
+.footer_image {
+  @apply sidebar-label shrink-0 p-2 rounded-lg hover:bg-white/[0.04] transition-colors cursor-pointer;
+}
+
+/* ===== PLAID LINK ===== */
+.plaidlink-primary {
+  @apply form-btn flex items-center justify-center gap-2;
+}
+.plaidlink-ghost {
+  @apply flex items-center gap-3 rounded-xl px-3 py-2.5 text-slate-400 hover:bg-white/[0.04] hover:text-white transition-all;
+}
+.plaidlink-default {
+  @apply flex items-center gap-3 px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.07] transition-all;
+}
+
+/* ===== PAGINATION ===== */
+.pagination-btn {
+  @apply flex items-center gap-2 px-4 py-2 rounded-full glass-card text-sm font-medium text-slate-300 hover:text-white hover:bg-white/[0.07] transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed;
+}
+
+/* ===== SCROLLBAR ===== */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.3); border-radius: 4px; }
+
+/* ===== UTILITIES ===== */
+.flex-center { @apply flex items-center justify-center; }
+.text-14_padding10 { @apply text-14 py-2.5; }
+.text14_padding10 { @apply text-14 py-2.5; }
+
+/* ===== GLASSMORPHISM ===== */
+.glassmorphism {
+  @apply bg-white/[0.04] backdrop-blur-xl border border-white/[0.08];
+}
+
+/* ===== ROOT LAYOUT MOBILE HEADER ===== */
+.root-layout {
+  @apply flex items-center justify-between p-4 md:hidden;
+}
+
+/* ===== RIGHT SIDEBAR (kept but simplified) ===== */
+.right-sidebar {
+  @apply hidden xl:flex xl:flex-col xl:w-[340px] xl:border-l xl:border-white/[0.06] xl:bg-[#0f1629]/40 xl:backdrop-blur-xl overflow-y-auto;
+}
+.banks {
+  @apply flex flex-col gap-4 px-4 py-6;
+}
+
+/* ===== MOBILE NAV LEGACY (keep for compat) ===== */
+.mobilenav-sheet {
+  @apply flex h-full flex-col justify-between;
+}
+.mobilenav-sheet_close {
+  @apply flex items-center gap-3 rounded-xl px-4 py-3 transition-all;
+}
+
+/* ===== FORM ITEM (keep for compat) ===== */
+.form-item {
+  @apply flex flex-col gap-1.5;
+}
+
+/* ===== AUTH ASSET (keep for compat) ===== */
+.auth-asset {
+  @apply flex h-screen w-full sticky top-0 items-center justify-end bg-[#0a0e1a] max-lg:hidden;
+}

@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                 String   @id @default(uuid())
+  email              String   @unique
+  firstName          String
+  lastName           String
+  address1           String
+  city               String
+  state              String
+  postalCode         String
+  dateOfBirth        String
+  ssn                String
+  dwollaCustomerId   String?
+  dwollaCustomerUrl  String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  banks                Bank[]
+  sentTransactions     Transaction[] @relation("sender")
+  receivedTransactions Transaction[] @relation("receiver")
+
+  @@map("users")
+}
+
+model Bank {
+  id               String   @id @default(uuid())
+  userId           String
+  bankId           String
+  accountId        String
+  accessToken      String
+  fundingSourceUrl String?
+  shareableId      String?
+  createdAt        DateTime @default(now())
+
+  user                 User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sentTransactions     Transaction[] @relation("senderBank")
+  receivedTransactions Transaction[] @relation("receiverBank")
+
+  @@index([userId])
+  @@index([accountId])
+  @@map("banks")
+}
+
+model Transaction {
+  id             String   @id @default(uuid())
+  name           String
+  amount         Decimal  @db.Decimal(12, 2)
+  senderId       String
+  senderBankId   String
+  receiverId     String
+  receiverBankId String
+  email          String?
+  channel        String   @default("online")
+  category       String   @default("Transfer")
+  createdAt      DateTime @default(now())
+
+  sender       User @relation("sender", fields: [senderId], references: [id])
+  senderBank   Bank @relation("senderBank", fields: [senderBankId], references: [id])
+  receiver     User @relation("receiver", fields: [receiverId], references: [id])
+  receiverBank Bank @relation("receiverBank", fields: [receiverBankId], references: [id])
+
+  @@index([senderBankId])
+  @@index([receiverBankId])
+  @@map("transactions")
+}
+
+model OtpCode {
+  id        String   @id @default(uuid())
+  email     String
+  otpHash   String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([expiresAt])
+  @@map("otp_codes")
+}
