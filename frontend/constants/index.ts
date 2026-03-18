@@ -66,6 +66,11 @@ export const sidebarLinks = [
   },
   {
     imgURL: "/icons/monitor.svg",
+    route: "/net-worth",
+    label: "Net Worth",
+  },
+  {
+    imgURL: "/icons/monitor.svg",
     route: "/merchants",
     label: "Merchants",
   },
