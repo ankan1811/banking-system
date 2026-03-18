@@ -43,6 +43,7 @@ bank/
 │                                     #   AI & CACHING:
 │                                     #     cached_categories  — Gemini category cache (SHA-256 hash key)
 │                                     #     financial_health_scores — AI health score cache per user/month
+│                                     #     monthly_digests    — AI monthly report cache per user/month
 │                                     #   FINANCIAL PLANNING:
 │                                     #     budgets            — Monthly spending limits per category
 │                                     #     savings_goals      — Named goals with target amounts
@@ -562,8 +563,8 @@ bank/
   │                       │ notes (2m), tags (5m)                   │
   ├───────────────────────┼─────────────────────────────────────────┤
   │ L2: PostgreSQL        │ cached_categories (permanent),          │
-  │     (persistent)      │ financial_health_scores (survives       │
-  │                       │ restarts)                               │
+  │     (persistent)      │ financial_health_scores, monthly_digests│
+  │                       │ (survive restarts)                      │
   ├───────────────────────┼─────────────────────────────────────────┤
   │ L3: External API      │ Gemini (only on cache miss),            │
   │     (last resort)     │ Plaid (only on cache miss)              │
