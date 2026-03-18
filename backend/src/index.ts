@@ -21,6 +21,7 @@ import alertsRoutes from './routes/alerts.routes.js';
 import searchRoutes from './routes/search.routes.js';
 import notesRoutes from './routes/notes.routes.js';
 import healthScoreRoutes from './routes/health-score.routes.js';
+import reportsRoutes from './routes/reports.routes.js';
 import { requireAuth } from './middleware/auth.js';
 import { accountsRateLimit, aiRateLimit, exportRateLimit, analyticsRateLimit } from './middleware/rateLimit.js';
 
@@ -52,6 +53,7 @@ app.use('/api/alerts', requireAuth, alertsRoutes);
 app.use('/api/search', requireAuth, accountsRateLimit, searchRoutes);
 app.use('/api/notes', requireAuth, notesRoutes);
 app.use('/api/health-score', requireAuth, aiRateLimit, healthScoreRoutes);
+app.use('/api/reports', requireAuth, aiRateLimit, reportsRoutes);
 
 // Health check
 app.get('/health', (_req, res) => {
