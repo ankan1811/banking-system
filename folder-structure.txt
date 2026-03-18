@@ -15,7 +15,7 @@ bank/
 │
 ├── shared/                           # ── SHARED CODE (used by both frontend & backend) ──
 │   │
-│   ├── types.ts                      # 20+ TypeScript types shared across the stack:
+│   ├── types.ts                      # 35+ TypeScript types shared across the stack:
 │   │                                 #   - User, Account, Transaction, Bank (core models)
 │   │                                 #   - AICategory, AI_CATEGORIES[] (10 spending categories)
 │   │                                 #   - Budget, BudgetStatus (budget tracking)
@@ -28,6 +28,11 @@ bank/
 │   │                                 #   - TransactionNote (notes & tags)
 │   │                                 #   - ChatMessage, ChatResponse (AI chatbot)
 │   │                                 #   - SignUpParams, TransferParams, CreateTransactionProps
+│   │                                 #   - SplitGroup, SplitParticipant, SplitSummary (splits)
+│   │                                 #   - SpendingChallenge, ChallengeProgress, ChallengeStreak (challenges)
+│   │                                 #   - Badge, BadgeType, ChallengesOverview, AiChallengeSuggestion
+│   │                                 #   - ManualAsset, ManualLiability, NetWorthSnapshot (net worth)
+│   │                                 #   - NetWorthBreakdown, NetWorthData, AssetCategory, LiabilityCategory
 │   │
 │   └── validators.ts                 # Zod validation schemas and shared utility functions
 │
@@ -81,7 +86,7 @@ bank/
 │   └── src/
 │       │
 │       ├── index.ts                  # Express app entry point:
-│       │                             #   - Registers all 16 route modules
+│       │                             #   - Registers all 19 route modules
 │       │                             #   - Applies CORS, cookie parser, JSON middleware
 │       │                             #   - Applies rate limiters per route group
 │       │                             #   - Health check endpoint at GET /health
@@ -108,7 +113,7 @@ bank/
 │       │                             #   - analyticsRateLimit — 15 req/min (analytics)
 │       │                             #   - exportRateLimit  — 5 req/min (CSV/PDF export)
 │       │
-│       ├── routes/                   # ── API ROUTES (16 files) ──
+│       ├── routes/                   # ── API ROUTES (19 files) ──
 │       │   │                         #   Each file: Router + Zod validation + service call
 │       │   │
 │       │   ├── auth.routes.ts        # POST /api/auth/request-signin-otp
@@ -174,10 +179,33 @@ bank/
 │       │   │                         # GET    /api/notes/batch?hashes=h1,h2,...
 │       │   │                         # GET    /api/notes/tags — user's tags (autocomplete)
 │       │   │
-│       │   └── reports.routes.ts     # GET /api/reports/digest?bankRecordId&month — monthly digest
-│       │                             # GET /api/reports/digest/pdf — PDF export of digest
+│       │   ├── reports.routes.ts     # GET /api/reports/digest?bankRecordId&month — monthly digest
+│       │   │                         # GET /api/reports/digest/pdf — PDF export of digest
+│       │   │
+│       │   ├── splits.routes.ts     # GET    /api/splits — list splits (optional ?status=)
+│       │   │                         # GET    /api/splits/summary — owed to you, pending, settled
+│       │   │                         # GET    /api/splits/:id — single split with participants
+│       │   │                         # POST   /api/splits — create split (equal or custom)
+│       │   │                         # PATCH  /api/splits/:id/participants/:pid — toggle paid
+│       │   │                         # DELETE /api/splits/:id
+│       │   │
+│       │   ├── net-worth.routes.ts  # GET    /api/net-worth?months=12 — net worth + history + AI
+│       │   │                         # GET    /api/net-worth/assets — list manual assets
+│       │   │                         # POST   /api/net-worth/assets — add asset
+│       │   │                         # PATCH  /api/net-worth/assets/:id — update asset
+│       │   │                         # DELETE /api/net-worth/assets/:id
+│       │   │                         # GET    /api/net-worth/liabilities — list liabilities
+│       │   │                         # POST   /api/net-worth/liabilities — add liability
+│       │   │                         # PATCH  /api/net-worth/liabilities/:id — update
+│       │   │                         # DELETE /api/net-worth/liabilities/:id
+│       │   │
+│       │   └── challenges.routes.ts # GET    /api/challenges — list challenges
+│       │                             # GET    /api/challenges/overview?bankRecordId — progress+streak+badges
+│       │                             # GET    /api/challenges/suggestions?bankRecordId — AI suggestions
+│       │                             # POST   /api/challenges — create challenge
+│       │                             # PATCH  /api/challenges/:id/abandon
 │       │
-│       └── services/                 # ── BUSINESS LOGIC (17 files) ──
+│       └── services/                 # ── BUSINESS LOGIC (20 files) ──
 │           │
 │           ├── auth.service.ts       # JWT creation, verification, token versioning
 │           │
@@ -265,8 +293,25 @@ bank/
 │           │                         #   createTransaction() — records fund transfers
 │           │                         #   getTransactionsByBankId() — fetch by bank
 │           │
-│           └── google.service.ts     # Google OAuth token verification:
-│                                     #   verifyGoogleToken() — validates Google ID token
+│           ├── google.service.ts     # Google OAuth token verification:
+│           │                         #   verifyGoogleToken() — validates Google ID token
+│           │
+│           ├── splits.service.ts    # Split expenses:
+│           │                         #   getSplits(), createSplit(), deleteSplit()
+│           │                         #   updateParticipantStatus() — toggle paid, auto-settle
+│           │                         #   getSplitSummary() — aggregate owed/pending/settled
+│           │
+│           ├── net-worth.service.ts # Net worth tracker:
+│           │                         #   Manual assets/liabilities CRUD (6 functions)
+│           │                         #   getNetWorth() — aggregate Plaid + manual, snapshot, AI insight
+│           │                         #   getNetWorthInsight() — Gemini trend analysis (1-hr cache)
+│           │
+│           └── challenges.service.ts # Spending challenges + gamification:
+│                                     #   getChallenges(), createChallenge(), abandonChallenge()
+│                                     #   getChallengeProgress() — real-time vs transaction data
+│                                     #   getAiSuggestions() — Gemini suggestions (10-min cache)
+│                                     #   getStreakAndBadges() — streak + 8 badge types
+│                                     #   getChallengesOverview() — bundled endpoint
 │
 │
 ├── frontend/                         # ══════════════════════════════════════════════════
@@ -369,11 +414,23 @@ bank/
 │   │       │                         #   budget adherence, goals, merchants, income/expense
 │   │       │                         #   with PDF export (1 Gemini call/month, DB-cached)
 │   │       │
+│   │       ├── splits/
+│   │       │   └── page.tsx          # SPLIT EXPENSES — create splits, add participants,
+│   │       │                         #   toggle paid/unpaid, auto-settle, summary cards
+│   │       │
+│   │       ├── net-worth/
+│   │       │   └── page.tsx          # NET WORTH — aggregate balances, manual assets/liabilities,
+│   │       │                         #   line chart (6/12/24mo), summary cards, AI insight
+│   │       │
+│   │       ├── challenges/
+│   │       │   └── page.tsx          # SPENDING CHALLENGES — AI suggestions, custom challenges,
+│   │       │                         #   progress tracking, streak/badges, challenge history
+│   │       │
 │   │       └── settings/
 │   │           └── page.tsx          # SETTINGS — profile editing, connected banks
 │   │                                 #   management, logout all, delete account
 │   │
-│   ├── components/                   # ── REACT COMPONENTS (37 files) ──
+│   ├── components/                   # ── REACT COMPONENTS (45 files) ──
 │   │   │
 │   │   │  ─── AI & Analytics ───
 │   │   ├── AIChatbot.tsx             # Floating chat panel (bottom-right sparkle button)
@@ -392,6 +449,28 @@ bank/
 │   │   │                               #   budget bars, goal progress, top merchants, income/expense
 │   │   ├── ProfileSettings.tsx         # Settings page: profile form, bank management,
 │   │   │                               #   logout all devices, delete account with confirmation
+│   │   │
+│   │   │  ─── Split Expenses ───
+│   │   ├── SplitsManager.tsx           # Split expenses manager: summary cards, filter tabs,
+│   │   │                               #   create form with dynamic participant rows
+│   │   ├── SplitCard.tsx               # Individual split: participant checkboxes, progress bar,
+│   │   │                               #   paid/unpaid toggle, auto-settle detection
+│   │   │
+│   │   │  ─── Net Worth ───
+│   │   ├── NetWorthManager.tsx         # Net worth dashboard: summary cards, line chart, tabs
+│   │   │                               #   (overview/assets/liabilities), CRUD forms, AI insight
+│   │   ├── NetWorthChart.tsx           # Line chart: assets (emerald), liabilities (rose),
+│   │   │                               #   net worth (violet filled), 6/12/24mo toggles
+│   │   ├── AssetLiabilityRow.tsx       # Reusable row: inline edit, category badge, delete
+│   │   │                               #   — used for both manual assets and liabilities
+│   │   │
+│   │   │  ─── Spending Challenges ───
+│   │   ├── ChallengesManager.tsx       # Challenges overview: streak/badges bar, active challenges,
+│   │   │                               #   AI suggestions with accept, custom form, history
+│   │   ├── ChallengeProgressCard.tsx   # Challenge progress: type badge, progress bar, stats,
+│   │   │                               #   days remaining, on-track indicator, abandon button
+│   │   ├── BadgeIcon.tsx               # Badge display: maps badgeType to emoji + label + color
+│   │   │                               #   — 8 badge types (first, streak, completed, etc.)
 │   │   │
 │   │   │  ─── Financial Planning ───
 │   │   ├── BudgetProgressCard.tsx    # Budget progress bars per category (green/amber/red)
@@ -447,7 +526,7 @@ bank/
 │   │
 │   ├── constants/
 │   │   └── index.ts                  # App constants:
-│   │                                 #   sidebarLinks[] — 13 sidebar navigation items
+│   │                                 #   sidebarLinks[] — 18 sidebar navigation items
 │   │                                 #   aiCategoryColors — hex colors for 10 AI categories
 │   │                                 #   aiCategoryStyles — Tailwind classes per category
 │   │                                 #   topCategoryStyles — dashboard category card styles
@@ -463,7 +542,7 @@ bank/
 │   │   │                             #   removeSpecialCharacters() — clean display names
 │   │   │                             #   cn() — Tailwind class merge (clsx + twMerge)
 │   │   │
-│   │   └── api/                      # ── API CLIENT LAYER (17 files) ──
+│   │   └── api/                      # ── API CLIENT LAYER (20 files) ──
 │   │       │
 │   │       ├── client.ts             # Base client: apiRequest<T>(path, options)
 │   │       │                         #   — credentials: 'include' for cookie auth
@@ -490,7 +569,10 @@ bank/
 │   │       ├── alerts.api.ts         # Alerts: getAlerts, create, update, delete
 │   │       ├── health-score.api.ts   # Health: getHealthScore
 │   │       ├── search.api.ts         # Search: searchTransactions with filter params
-│   │       └── notes.api.ts          # Notes: batchGetNotes, upsertNote, deleteNote, getUserTags
+│   │       ├── notes.api.ts          # Notes: batchGetNotes, upsertNote, deleteNote, getUserTags
+│   │       ├── splits.api.ts         # Splits: getSplits, createSplit, settleParticipant, delete
+│   │       ├── net-worth.api.ts      # Net Worth: getNetWorth, asset/liability CRUD (9 functions)
+│   │       └── challenges.api.ts     # Challenges: getOverview, getSuggestions, create, abandon
 │   │
 │   ├── types/
 │   │   └── index.d.ts               # Global TypeScript declarations:
@@ -571,10 +653,12 @@ bank/
   │                       │ trends (5m), recurring (1h),            │
   │                       │ income/expense (5m), merchants (5m),    │
   │                       │ health score (1h), chat context (5m),   │
-  │                       │ notes (2m), tags (5m)                   │
+  │                       │ notes (2m), tags (5m),                  │
+  │                       │ net worth AI (1h), challenge AI (10m)   │
   ├───────────────────────┼─────────────────────────────────────────┤
   │ L2: PostgreSQL        │ cached_categories (permanent),          │
   │     (persistent)      │ financial_health_scores, monthly_digests│
+  │                       │ net_worth_snapshots (monthly)           │
   │                       │ (survive restarts)                      │
   ├───────────────────────┼─────────────────────────────────────────┤
   │ L3: External API      │ Gemini (only on cache miss),            │
@@ -585,15 +669,15 @@ bank/
                                     STATS
 ================================================================================
 
-  Frontend Pages ............ 12
-  React Components .......... 37 (+ 10 shadcn/ui primitives)
-  API Client Files .......... 17
-  Backend Route Files ....... 16
-  Backend Service Files ..... 17
-  Database Tables ........... 12
-  Shared Types .............. 20+
+  Frontend Pages ............ 15
+  React Components .......... 45 (+ 10 shadcn/ui primitives)
+  API Client Files .......... 20
+  Backend Route Files ....... 19
+  Backend Service Files ..... 20
+  Database Tables ........... 20
+  Shared Types .............. 35+
   Public Icons .............. 40+
-  In-Memory Caches .......... 12
-  Rate Limit Tiers .......... 5
+  In-Memory Caches .......... 14
+  Rate Limit Tiers .......... 7
 
 ================================================================================
