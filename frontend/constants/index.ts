@@ -24,6 +24,26 @@ export const sidebarLinks = [
     route: "/insights",
     label: "AI Insights",
   },
+  {
+    imgURL: "/icons/monitor.svg",
+    route: "/budgets",
+    label: "Budgets",
+  },
+  {
+    imgURL: "/icons/monitor.svg",
+    route: "/goals",
+    label: "Savings Goals",
+  },
+  {
+    imgURL: "/icons/monitor.svg",
+    route: "/trends",
+    label: "Trends",
+  },
+  {
+    imgURL: "/icons/monitor.svg",
+    route: "/alerts",
+    label: "Alerts",
+  },
 ];
 
 // good_user / good_password - Bank of America
