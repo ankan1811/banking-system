@@ -121,6 +121,8 @@ bank/
 │       │   │                         # POST /api/plaid/exchange-token
 │       │   │
 │       │   ├── transfers.routes.ts   # POST /api/transfers — create fund transfer (Razorpay)
+│       │   │                         #   Clears account cache for sender + receiver after transfer
+│       │   │                         #   so the new transaction appears on dashboard immediately
 │       │   │
 │       │   ├── ai.routes.ts          # POST /api/ai/insights — AI spending insights
 │       │   │
@@ -172,6 +174,9 @@ bank/
 │           │                         #   getInstitution(id)      — 24-hr cache (static data)
 │           │                         #   getTransactions(token)  — Plaid transactionsSync loop
 │           │                         #   hashTransaction()       — SHA-256 hash for note lookups
+│           │                         #   clearAccountCache()     — instant invalidation after transfers
+│           │                         #   Merges Plaid + internal transfers into unified format
+│           │                         #   (both have same fields: merchantName, aiCategory, etc.)
 │           │                         #   Triggers AI categorization + alert evaluation
 │           │
 │           ├── gemini.service.ts     # AI SERVICE — Google Gemini integration:
