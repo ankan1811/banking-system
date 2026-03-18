@@ -54,7 +54,9 @@ Built with **Next.js 14**, **Express.js**, **Prisma**, **PostgreSQL**, **Plaid**
 - Stored by transaction hash (SHA-256) for consistency across Plaid syncs
 
 ### Payments & Transfers
-- **Fund transfers** between linked bank accounts (Razorpay integration)
+- **Fund transfers** between linked bank accounts (Razorpay integration, demo/test mode)
+- **Unified transaction format** — Internal Razorpay transfers are mapped to the same shape as Plaid transactions (`merchantName`, `aiCategory: 'Transfers'`, `accountId`, `pending`, `image`). Both types are indistinguishable in the UI — the app tells one seamless financial story.
+- **Instant cache invalidation** — After a transfer, the account cache is cleared for both sender and receiver so the transaction appears on the dashboard immediately (no 5-min wait).
 - **Transaction recording** — All transfers stored in PostgreSQL
 - **Recipient lookup** by sharable ID
 
