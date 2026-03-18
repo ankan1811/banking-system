@@ -2,6 +2,7 @@ import HeaderBox from '@/components/HeaderBox'
 import { Pagination } from '@/components/Pagination';
 import TransactionsTable from '@/components/TransactionsTable';
 import ExportModal from '@/components/ExportModal';
+import TransactionSearchView from '@/components/TransactionSearchView';
 import { serverApiRequest } from '@/lib/api/server-client';
 import { formatAmount } from '@/lib/utils';
 import React from 'react'
@@ -57,6 +58,10 @@ const TransactionHistory = async ({ searchParams: { id, page }}:SearchParamProps
             )}
           </div>
         </div>
+
+        {bankRecordId && (
+          <TransactionSearchView bankRecordId={bankRecordId} />
+        )}
 
         <section className="flex w-full flex-col gap-6">
           <TransactionsTable
