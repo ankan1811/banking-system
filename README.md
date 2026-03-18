@@ -1,6 +1,16 @@
 # Ankan's Bank
 
-A modern, full-stack fintech banking application with a glassmorphic dark UI, passwordless authentication, bank account linking, and fund transfers.
+**AI-powered full-stack fintech app** 🏦
+
+💳 **Banking:** Plaid linking + Razorpay transfers + Real-time balances + Multi-account  
+🤖 **AI (Gemini):** Transaction categorization + Spending insights + Financial chatbot + Health score + Monthly digest + Challenge suggestions  
+📊 **Analytics:** Spending trends + Income/Expense + Merchant insights + Recurring detection + Bill calendar  
+💰 **Planning:** Budgets + Savings goals + Spending alerts + Split expenses + Net worth tracker  
+🎮 **Gamification:** Spending challenges + Streaks + 8 badge types  
+🔧 **Tools:** Notes & tags + Smart search + CSV/PDF export + Profile settings  
+🔐 **Auth:** Passwordless OTP + Google OAuth + JWT sessions  
+
+📈💹🚀✨
 
 Built with **Next.js 14**, **Express.js**, **Prisma**, **PostgreSQL**, **Plaid**, **Razorpay**, and **Google Gemini**.
 
