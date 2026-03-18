@@ -107,17 +107,24 @@ export const getAccount = async (bankRecordId: string, userId?: string) => {
 
   const transferTransactionsData = await getTransactionsByBankId(bank.id);
 
+  // Map internal transfers to Plaid-like shape for seamless UI merge
   const transferTransactions = transferTransactionsData.documents.map(
     (transferData: any) => ({
       id: transferData.id,
       name: transferData.name!,
+      merchantName: transferData.name!,
       amount: typeof transferData.amount === 'object'
         ? parseFloat(transferData.amount.toString())
         : transferData.amount,
       date: transferData.createdAt,
-      paymentChannel: transferData.channel,
+      paymentChannel: 'online',
+      channel: transferData.channel,
       category: transferData.category,
+      aiCategory: 'Transfers',
       type: transferData.senderBankId === bank.id ? 'debit' : 'credit',
+      accountId: bank.accountId,
+      pending: false,
+      image: null,
     })
   );
 
@@ -178,6 +185,12 @@ function fireAlerts(userId: string, allTransactions: any[]) {
       );
     }
   }).catch(() => {});
+}
+
+// ─── Cache invalidation (called after transfers) ────────────
+
+export function clearAccountCache(bankRecordId: string) {
+  accountCache.delete(bankRecordId);
 }
 
 // ─── getInstitution (cached 24 hours) ────────────────────────
