@@ -18,7 +18,7 @@ router.get('/', async (req: Request, res: Response) => {
 router.get('/:bankRecordId', async (req: Request, res: Response) => {
   try {
     const bankRecordId = req.params.bankRecordId as string;
-    const result = await getAccount(bankRecordId);
+    const result = await getAccount(bankRecordId, req.userId);
     res.json(result);
   } catch (error) {
     console.error('Error getting account:', error);

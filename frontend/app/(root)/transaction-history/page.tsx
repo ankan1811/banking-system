@@ -1,6 +1,7 @@
 import HeaderBox from '@/components/HeaderBox'
 import { Pagination } from '@/components/Pagination';
 import TransactionsTable from '@/components/TransactionsTable';
+import ExportModal from '@/components/ExportModal';
 import { serverApiRequest } from '@/lib/api/server-client';
 import { formatAmount } from '@/lib/utils';
 import React from 'react'
@@ -51,6 +52,9 @@ const TransactionHistory = async ({ searchParams: { id, page }}:SearchParamProps
           <div className='transactions-account-balance'>
             <p className="text-14 text-slate-400">Current balance</p>
             <p className="text-24 text-center font-bold text-white">{formatAmount(account?.data.currentBalance)}</p>
+            {bankRecordId && (
+              <ExportModal bankRecordId={bankRecordId} accountName={account?.data.name} />
+            )}
           </div>
         </div>
 

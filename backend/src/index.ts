@@ -13,6 +13,11 @@ import plaidRoutes from './routes/plaid.routes.js';
 import transfersRoutes from './routes/transfers.routes.js';
 import aiRoutes from './routes/ai.routes.js';
 import chatRoutes from './routes/chat.routes.js';
+import budgetsRoutes from './routes/budgets.routes.js';
+import goalsRoutes from './routes/goals.routes.js';
+import exportRoutes from './routes/export.routes.js';
+import analyticsRoutes from './routes/analytics.routes.js';
+import alertsRoutes from './routes/alerts.routes.js';
 import { requireAuth } from './middleware/auth.js';
 
 const app = express();
@@ -35,6 +40,11 @@ app.use('/api/plaid', requireAuth, plaidRoutes);
 app.use('/api/transfers', requireAuth, transfersRoutes);
 app.use('/api/ai', requireAuth, aiRoutes);
 app.use('/api/chat', requireAuth, chatRoutes);
+app.use('/api/budgets', requireAuth, budgetsRoutes);
+app.use('/api/goals', requireAuth, goalsRoutes);
+app.use('/api/export', requireAuth, exportRoutes);
+app.use('/api/analytics', requireAuth, analyticsRoutes);
+app.use('/api/alerts', requireAuth, alertsRoutes);
 
 // Health check
 app.get('/health', (_req, res) => {

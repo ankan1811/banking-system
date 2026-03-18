@@ -84,6 +84,11 @@ export type AICategory =
   | 'Transfers'
   | 'Other';
 
+export const AI_CATEGORIES: AICategory[] = [
+  'Food & Dining', 'Transport', 'Shopping', 'Entertainment',
+  'Bills & Utilities', 'Health', 'Education', 'Income', 'Transfers', 'Other',
+];
+
 export type SpendingInsight = {
   summary: string;
   monthComparison: {
@@ -119,4 +124,74 @@ export type CreateTransactionProps = {
   receiverId: string;
   receiverBankId: string;
   email: string;
+};
+
+// ─── Budget ─────────────────────────────────────────────────
+export type Budget = {
+  id: string;
+  userId: string;
+  category: AICategory;
+  monthlyLimit: number;
+  month: string; // "YYYY-MM"
+};
+
+export type BudgetStatus = {
+  category: AICategory;
+  budgetId: string | null;
+  monthlyLimit: number | null;
+  spent: number;
+  remaining: number | null;
+  percentUsed: number | null;
+};
+
+// ─── Savings Goals ───────────────────────────────────────────
+export type SavingsGoal = {
+  id: string;
+  userId: string;
+  name: string;
+  targetAmount: number;
+  savedAmount: number;
+  targetDate: string | null;
+  emoji: string | null;
+  color: string | null;
+  status: 'active' | 'completed' | 'abandoned';
+  createdAt: string;
+};
+
+export type GoalContribution = {
+  id: string;
+  goalId: string;
+  amount: number;
+  note: string | null;
+  createdAt: string;
+};
+
+// ─── Analytics ───────────────────────────────────────────────
+export type TrendsData = {
+  months: string[];
+  categories: AICategory[];
+  data: Record<string, number[]>;
+  totals: number[];
+};
+
+export type RecurringPattern = {
+  name: string;
+  normalizedAmount: number;
+  frequency: 'weekly' | 'monthly' | 'quarterly';
+  lastCharged: string;
+  nextExpected: string;
+  category: string;
+  occurrences: number;
+};
+
+// ─── Alerts ──────────────────────────────────────────────────
+export type AlertRule = {
+  id: string;
+  userId: string;
+  type: 'category_monthly_limit' | 'single_transaction' | 'balance_below';
+  category: AICategory | null;
+  threshold: number;
+  channel: string;
+  enabled: boolean;
+  createdAt: string;
 };

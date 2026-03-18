@@ -2,7 +2,7 @@
 
 A modern, full-stack fintech banking application with a glassmorphic dark UI, passwordless authentication, bank account linking, and fund transfers.
 
-Built with **Next.js 14**, **Express.js**, **Prisma**, **PostgreSQL**, **Plaid**, and **Razorpay**.
+Built with **Next.js 14**, **Express.js**, **Prisma**, **PostgreSQL**, **Plaid**, **Razorpay**, and **Google Gemini**.
 
 ---
 
@@ -20,6 +20,12 @@ Built with **Next.js 14**, **Express.js**, **Prisma**, **PostgreSQL**, **Plaid**
 - **Transaction history** with pagination and category badges
 - **Multi-account support** — Link multiple banks, switch between tabs
 - **Doughnut chart** — Visual breakdown of account balances
+
+### AI Features (powered by Google Gemini)
+- **Transaction categorization** — Automatically classifies every Plaid transaction into 10 categories (Food & Dining, Transport, Shopping, Entertainment, Bills & Utilities, Health, Education, Income, Transfers, Other) using Gemini. Results are cached in PostgreSQL so repeat loads are instant and free.
+- **Spending insights** — Dedicated `/insights` page with: AI-generated natural language summary, month-over-month category comparison, top spending categories with progress bars, anomaly detection, and personalized savings tips. Results cached for 5 minutes.
+- **AI chatbot** — Floating chat panel (bottom-right) powered by Gemini. Has full context of your accounts, balances, and recent transactions. Supports quick-prompt shortcuts. Rate-limited to 10 messages/minute per user.
+- **Category breakdown chart** — Doughnut chart on the dashboard visualizing spending by AI category with a color-coded legend.
 
 ### Payments & Transfers
 - **Fund transfers** between linked bank accounts (Razorpay integration)
@@ -48,6 +54,7 @@ Built with **Next.js 14**, **Express.js**, **Prisma**, **PostgreSQL**, **Plaid**
 | **Bank Data** | Plaid API (sandbox) |
 | **Payments** | Razorpay (test mode) |
 | **Email** | Resend |
+| **AI** | Google Gemini 1.5 Flash (free tier) |
 
 ---
 
@@ -59,19 +66,31 @@ bank/
 │   ├── app/
 │   │   ├── (auth)/              # Sign-in / Sign-up pages
 │   │   └── (root)/              # Protected dashboard pages
-│   ├── components/              # 24 React components
+│   ├── app/
+│   │   ├── (auth)/              # Sign-in / Sign-up pages
+│   │   └── (root)/              # Protected dashboard pages
+│   │       └── insights/        # AI Insights page
+│   ├── components/              # React components
+│   │   ├── AIChatbot.tsx        # Floating AI chat panel
+│   │   ├── CategoryBreakdownChart.tsx  # Spending doughnut chart
+│   │   └── SpendingInsightsCard.tsx    # AI insights display
 │   ├── lib/
 │   │   └── api/                 # API client (fetch wrappers)
-│   └── constants/               # Style configs
+│   │       ├── ai.api.ts        # Insights API client
+│   │       └── chat.api.ts      # Chat API client
+│   └── constants/               # Style configs (includes AI category colors)
 │
 ├── backend/                     # Express API (port 8787)
 │   ├── src/
-│   │   ├── routes/              # 6 route files
-│   │   ├── services/            # 8 service files
-│   │   ├── middleware/          # JWT auth middleware
-│   │   └── lib/                 # Prisma client, Plaid client
+│   │   ├── routes/              # Route files
+│   │   │   ├── ai.routes.ts     # POST /api/ai/insights
+│   │   │   └── chat.routes.ts   # POST /api/chat
+│   │   ├── services/            # Service files
+│   │   │   └── gemini.service.ts  # categorize, insights, chat
+│   │   ├── middleware/          # JWT auth + rate limiter
+│   │   └── lib/                 # Prisma, Plaid, Gemini clients
 │   └── prisma/
-│       └── schema.prisma        # Database schema
+│       └── schema.prisma        # Database schema (5 tables)
 │
 ├── shared/                      # Shared between frontend & backend
 │   ├── types.ts                 # TypeScript types
@@ -153,6 +172,9 @@ RAZORPAY_KEY_SECRET=
 # GOOGLE OAUTH (optional — get from Google Cloud Console)
 GOOGLE_CLIENT_ID=
 
+# GEMINI AI (get from https://aistudio.google.com/app/apikey — free tier)
+GEMINI_API_KEY=
+
 # APP
 FRONTEND_URL=http://localhost:3003
 COOKIE_DOMAIN=localhost
@@ -174,7 +196,7 @@ cd backend
 npx prisma migrate dev --name init
 ```
 
-This creates 4 tables: `users`, `banks`, `transactions`, `otp_codes`.
+This creates 5 tables: `users`, `banks`, `transactions`, `otp_codes`, `cached_categories`.
 
 ### 5. Start the app
 
@@ -193,8 +215,10 @@ Open [http://localhost:3003](http://localhost:3003).
 1. Go to `/sign-up` and fill in the form, click "Send Verification Code"
 2. Enter `123456` (MASTER_OTP) as the verification code
 3. Link a sandbox bank via Plaid (use credentials: `user_good` / `pass_good`)
-4. View your dashboard with balances and transactions
-5. Try a fund transfer from the Payment Transfer page
+4. View your dashboard — transactions are auto-categorized by Gemini and a spending chart appears
+5. Click **AI Insights** in the sidebar for a full spending analysis
+6. Click the sparkle button (bottom-right) to open the AI chatbot
+7. Try a fund transfer from the Payment Transfer page
 
 ---
 
@@ -245,6 +269,12 @@ Open [http://localhost:3003](http://localhost:3003).
 |--------|------|-------------|
 | POST | `/api/transfers` | Create a fund transfer |
 
+### AI (Protected)
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/ai/insights` | Generate spending insights for an account + month |
+| POST | `/api/chat` | Send a message to the AI financial assistant |
+
 ### Health
 | Method | Path | Description |
 |--------|------|-------------|
@@ -271,13 +301,18 @@ Open [http://localhost:3003](http://localhost:3003).
 | googleId     |     |  otp_codes   |     | createdAt        |
 | tokenVersion |     +--------------+     +------------------+
 | createdAt    |     | id (PK)      |
-| updatedAt    |     | email        |
-+--------------+     | otpHash      |
-                     | expiresAt    |
-                     | used         |
-                     | createdAt    |
-                     +--------------+
+| updatedAt    |     | email        |     +----------------------+
++--------------+     | otpHash      |     | cached_categories    |
+                     | expiresAt    |     +----------------------+
+                     | used         |     | id (PK)              |
+                     | createdAt    |     | transactionHash      |
+                     +--------------+     | originalName         |
+                                          | aiCategory           |
+                                          | createdAt            |
+                                          +----------------------+
 ```
+
+`cached_categories` stores Gemini's category decisions keyed by a SHA-256 hash of `(name, amount, date)`. Repeat loads hit the cache and never call the API again.
 
 ---
 
@@ -335,7 +370,7 @@ No code changes needed. Just swap the URL.
 - **Root Directory**: `backend`
 - **Build Command**: `npm install && npx prisma generate && npm run build`
 - **Start Command**: `npm start`
-- **Environment**: Set all backend env vars
+- **Environment**: Set all backend env vars (including `GEMINI_API_KEY`)
 
 ### Frontend
 - **Type**: Web Service
@@ -359,6 +394,7 @@ This project runs entirely in test/sandbox mode — perfect for portfolio demos:
 | **Razorpay** | Test | No real money moves. Use test API keys from dashboard |
 | **Resend** | Free tier | 100 emails/day. Or use `MASTER_OTP=123456` to skip emails |
 | **Neon/Supabase** | Free tier | Real database, fully functional |
+| **Gemini** | Free tier | 15 RPM, 1M TPM. Categorization results cached in DB to minimize calls |
 
 ---
 

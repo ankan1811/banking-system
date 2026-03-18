@@ -3,6 +3,8 @@ import { plaidClient } from '../lib/plaid.js';
 import { getBanks as getBanksFromDb, getBank as getBankFromDb } from './user.service.js';
 import { getTransactionsByBankId } from './transaction.service.js';
 import { categorizeTransactions } from './gemini.service.js';
+import { evaluateAlerts } from './alerts.service.js';
+import { prisma } from '../lib/db.js';
 
 export const getAccounts = async (userId: string) => {
   const banks = await getBanksFromDb(userId);
@@ -44,7 +46,7 @@ export const getAccounts = async (userId: string) => {
   return { data: accounts, totalBanks, totalCurrentBalance };
 };
 
-export const getAccount = async (bankRecordId: string) => {
+export const getAccount = async (bankRecordId: string, userId?: string) => {
   const bank = await getBankFromDb(bankRecordId);
 
   if (!bank) throw new Error('Bank not found');
@@ -100,6 +102,18 @@ export const getAccount = async (bankRecordId: string) => {
   const allTransactions = [...transactions, ...transferTransactions].sort(
     (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
+
+  // Evaluate spending alerts in the background (non-blocking)
+  if (userId) {
+    const currentMonth = new Date().toISOString().slice(0, 7);
+    prisma.user.findUnique({ where: { id: userId }, select: { email: true } }).then((user) => {
+      if (user?.email) {
+        evaluateAlerts(userId, user.email, allTransactions, currentMonth).catch((err) =>
+          console.error('Alert evaluation error:', err)
+        );
+      }
+    }).catch(() => {});
+  }
 
   return {
     data: account,

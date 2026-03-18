@@ -3,11 +3,7 @@ import { geminiModel } from '../lib/gemini.js';
 import { prisma } from '../lib/db.js';
 import { getAccounts, getAccount } from './bank.service.js';
 import type { AICategory, SpendingInsight, ChatMessage } from '@shared/types';
-
-const AI_CATEGORIES: AICategory[] = [
-  'Food & Dining', 'Transport', 'Shopping', 'Entertainment',
-  'Bills & Utilities', 'Health', 'Education', 'Income', 'Transfers', 'Other',
-];
+import { AI_CATEGORIES } from '@shared/types';
 
 // ─── Helpers ────────────────────────────────────────────────
 
