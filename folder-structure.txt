@@ -344,9 +344,22 @@ bank/
 │   │       │   └── page.tsx          # INCOME VS EXPENSES — grouped bar chart,
 │   │       │                         #   summary cards, net savings per month
 │   │       │
-│   │       └── merchants/
-│   │           └── page.tsx          # MERCHANT INSIGHTS — top 50 merchants ranked,
-│   │                                 #   category badges, trend arrows, search filter
+│   │       ├── merchants/
+│   │       │   └── page.tsx          # MERCHANT INSIGHTS — top 50 merchants ranked,
+│   │       │                         #   category badges, trend arrows, search filter
+│   │       │
+│   │       ├── calendar/
+│   │       │   └── page.tsx          # BILL CALENDAR — monthly grid showing projected
+│   │       │                         #   recurring charges on expected dates, color-coded
+│   │       │
+│   │       ├── reports/
+│   │       │   └── page.tsx          # MONTHLY DIGEST — AI narrative, health score,
+│   │       │                         #   budget adherence, goals, merchants, income/expense
+│   │       │                         #   with PDF export (1 Gemini call/month, DB-cached)
+│   │       │
+│   │       └── settings/
+│   │           └── page.tsx          # SETTINGS — profile editing, connected banks
+│   │                                 #   management, logout all, delete account
 │   │
 │   ├── components/                   # ── REACT COMPONENTS (37 files) ──
 │   │   │
@@ -361,6 +374,12 @@ bank/
 │   │   ├── MerchantInsightsCard.tsx  # Ranked merchant list with spend, count, trend arrows
 │   │   ├── HealthScoreCard.tsx       # SVG circular gauge (0-100), breakdown bars, tips
 │   │   ├── RecurringTransactionsCard.tsx  # Auto-detected subscriptions (expandable card)
+│   │   ├── BillCalendar.tsx            # Monthly calendar grid with projected recurring bills
+│   │   │                               #   — date projection, click-to-expand, category colors
+│   │   ├── MonthlyDigestView.tsx       # Full monthly report: AI narrative, health score gauge,
+│   │   │                               #   budget bars, goal progress, top merchants, income/expense
+│   │   ├── ProfileSettings.tsx         # Settings page: profile form, bank management,
+│   │   │                               #   logout all devices, delete account with confirmation
 │   │   │
 │   │   │  ─── Financial Planning ───
 │   │   ├── BudgetProgressCard.tsx    # Budget progress bars per category (green/amber/red)
