@@ -234,6 +234,34 @@ export type HealthScore = {
   generatedAt: string;
 };
 
+// ─── Monthly Digest ─────────────────────────────────────────
+export type DigestSection = {
+  budgetAdherence: {
+    statuses: BudgetStatus[];
+    overBudgetCount: number;
+    totalBudgets: number;
+  };
+  goalProgress: {
+    goals: SavingsGoal[];
+    activeCount: number;
+    completedCount: number;
+    totalSavedAmount: number;
+  };
+  healthScore: HealthScore;
+  topMerchants: MerchantInsight[];
+  incomeVsExpense: IncomeExpenseData;
+};
+
+export type MonthlyDigest = {
+  id: string;
+  userId: string;
+  month: string;
+  bankRecordId: string;
+  sections: DigestSection;
+  narrative: string;
+  generatedAt: string;
+};
+
 // ─── Transaction Notes ──────────────────────────────────────
 export type TransactionNote = {
   id: string;
