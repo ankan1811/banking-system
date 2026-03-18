@@ -70,6 +70,29 @@ Built with **Next.js 14**, **Express.js**, **Prisma**, **PostgreSQL**, **Plaid**
 - **Tag autocomplete** — Fetches your existing tags for quick reuse
 - Stored by transaction hash (SHA-256) for consistency across Plaid syncs
 
+### Split Expenses
+- **Bill splitting** — Create splits from any transaction or a manual amount. Add participants by name and email (they don't need accounts in the app).
+- **Equal or custom splits** — Split equally among all participants, or assign custom amounts per person.
+- **Payment tracking** — Toggle each participant as paid/unpaid with one click. Splits auto-settle when all participants have paid.
+- **Summary dashboard** — See total owed to you, pending count, and settled count at a glance. Filter splits by status (all/pending/settled).
+
+### Net Worth Tracker
+- **Aggregate net worth** — Automatically pulls balances from all linked Plaid accounts and combines with manually added assets and liabilities.
+- **Manual assets & liabilities** — Add property, vehicles, investments, cash, mortgages, auto loans, student loans, credit cards, and personal loans with full CRUD.
+- **Monthly snapshots** — Current month's net worth is auto-saved to the database. Historical snapshots power the trends chart.
+- **Line chart** — Track total assets, total liabilities, and net worth over 6/12/24 months with Chart.js Line chart (emerald/rose/violet).
+- **Summary cards** — Total assets, total liabilities, net worth, and monthly change (with percent).
+- **AI insight** — Optional Gemini-generated 2-sentence trend analysis and actionable tip (1-hour in-memory cache).
+
+### Spending Challenges / Gamification
+- **AI-powered suggestions** — Gemini analyzes your top spending categories and suggests 3 personalized challenges. Accept with one click. 10-minute cache per user.
+- **Custom challenges** — Create your own with 3 types: category spending limit, no-spend days, or savings target. Set weekly or monthly duration.
+- **Real-time progress** — Progress bars tracked against live transaction data. Category limit shows spent vs budget. No-spend shows days hit vs target. Savings shows amount saved vs goal.
+- **Auto-completion** — Challenges automatically complete or fail when their end date passes, based on actual performance.
+- **Streak tracking** — Consecutive completed challenges build your streak. Failures reset it. Longest streak is recorded.
+- **8 badge types** — Earn achievements: First Challenge, 3/7/30 Streak, 5/10 Completed, Perfect Month (4+ weekly in a month), Savings Hero (>120% of savings target).
+- **Challenge history** — View all past challenges with completed/failed/abandoned status.
+
 ### Payments & Transfers
 - **Fund transfers** between linked bank accounts (Razorpay integration, demo/test mode)
 - **Unified transaction format** — Internal Razorpay transfers are mapped to the same shape as Plaid transactions (`merchantName`, `aiCategory: 'Transfers'`, `accountId`, `pending`, `image`). Both types are indistinguishable in the UI — the app tells one seamless financial story.
@@ -91,6 +114,9 @@ All external API calls are aggressively cached to stay within free tier limits:
 | Analytics (trends, recurring, income/expense, merchants) | 5-60 min | Pure aggregation on cached data |
 | Financial health score | 1 hr (memory) + DB | At most 1 Gemini call per user per hour |
 | Monthly digest | 1 hr (memory) + DB | At most 1 Gemini call per user per month |
+| Net worth AI insight | 1 hr (memory) | At most 1 Gemini call per user per hour |
+| Challenge AI suggestions | 10 min (memory) | At most 1 Gemini call per user per 10 min |
+| Net worth snapshots | Permanent (DB) | Monthly snapshots stored for historical charts |
 
 Rate limits per user per minute:
 
@@ -101,6 +127,8 @@ Rate limits per user per minute:
 | Chat | 10/min | Triggers Gemini API calls |
 | Export (CSV/PDF) | 5/min | Triggers Plaid API calls |
 | Analytics | 15/min | Triggers Plaid via getAccount |
+| Net Worth | 30/min | Triggers Plaid via getAccounts |
+| Challenges | 5/min | Suggestions trigger Gemini |
 
 ### Design
 - **Glassmorphic dark theme** — Frosted glass cards, animated gradients
@@ -145,8 +173,11 @@ bank/
 │   │       ├── alerts/               # Spending Alerts page
 │   │       ├── health-score/         # Financial Health Score page
 │   │       ├── income-expense/       # Income vs Expense report
-│   │       └── merchants/            # Merchant Insights page
-│   ├── components/                   # React components (30+)
+│   │       ├── merchants/            # Merchant Insights page
+│   │       ├── splits/               # Split Expenses page
+│   │       ├── net-worth/            # Net Worth Tracker page
+│   │       └── challenges/           # Spending Challenges page
+│   ├── components/                   # React components (45+)
 │   │   ├── AIChatbot.tsx             # Floating AI chat panel
 │   │   ├── CategoryBreakdownChart.tsx  # Spending doughnut chart
 │   │   ├── SpendingInsightsCard.tsx  # AI insights display
@@ -160,7 +191,15 @@ bank/
 │   │   ├── HealthScoreCard.tsx       # AI health score gauge
 │   │   ├── IncomeExpenseChart.tsx    # Income vs expense chart
 │   │   ├── MerchantInsightsCard.tsx  # Top merchants ranked
-│   │   └── TransactionSearchView.tsx # Search + filter bar
+│   │   ├── TransactionSearchView.tsx # Search + filter bar
+│   │   ├── SplitsManager.tsx         # Split expenses CRUD + summary
+│   │   ├── SplitCard.tsx             # Split participant checkboxes + progress
+│   │   ├── NetWorthManager.tsx       # Net worth overview + asset/liability CRUD
+│   │   ├── NetWorthChart.tsx         # Line chart (assets/liabilities/net worth)
+│   │   ├── AssetLiabilityRow.tsx     # Inline edit row for assets/liabilities
+│   │   ├── ChallengesManager.tsx     # Challenges overview + AI suggestions + form
+│   │   ├── ChallengeProgressCard.tsx # Challenge progress bar + stats
+│   │   └── BadgeIcon.tsx             # Badge display with colors/labels
 │   ├── lib/api/                      # API client (fetch wrappers)
 │   │   ├── ai.api.ts                 # Insights API
 │   │   ├── chat.api.ts               # Chat API

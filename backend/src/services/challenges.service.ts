@@ -342,24 +342,14 @@ async function updateStreak(userId: string) {
 
   const totalCompleted = challenges.filter((c) => c.status === 'completed').length;
 
+  const existing = await prisma.challengeStreak.findUnique({ where: { userId } });
+  const longestStreak = existing ? Math.max(existing.longestStreak, currentStreak) : currentStreak;
+
   await prisma.challengeStreak.upsert({
     where: { userId },
-    create: { userId, currentStreak, longestStreak: currentStreak, totalCompleted },
-    update: {
-      currentStreak,
-      longestStreak: { set: undefined }, // handled below
-      totalCompleted,
-    },
+    create: { userId, currentStreak, longestStreak, totalCompleted },
+    update: { currentStreak, longestStreak, totalCompleted },
   });
-
-  // Update longest streak if current exceeds it
-  const existing = await prisma.challengeStreak.findUnique({ where: { userId } });
-  if (existing && currentStreak > existing.longestStreak) {
-    await prisma.challengeStreak.update({
-      where: { userId },
-      data: { longestStreak: currentStreak },
-    });
-  }
 }
 
 async function checkBadges(userId: string, savingsPercent?: number) {
