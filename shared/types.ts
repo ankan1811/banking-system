@@ -272,3 +272,159 @@ export type TransactionNote = {
   createdAt: string;
   updatedAt: string;
 };
+
+// ─── Split Expenses ─────────────────────────────────────────
+export type SplitParticipant = {
+  id: string;
+  splitGroupId: string;
+  email: string;
+  name: string;
+  amount: number;
+  isPaid: boolean;
+  paidAt: string | null;
+};
+
+export type SplitGroup = {
+  id: string;
+  userId: string;
+  title: string;
+  totalAmount: number;
+  transactionId: string | null;
+  splitType: 'equal' | 'custom';
+  status: 'pending' | 'settled';
+  createdAt: string;
+  participants: SplitParticipant[];
+};
+
+export type SplitSummary = {
+  totalOwedToYou: number;
+  pendingCount: number;
+  settledCount: number;
+};
+
+// ─── Spending Challenges ────────────────────────────────────
+export type ChallengeType = 'category_limit' | 'no_spend' | 'savings_target';
+export type ChallengeDuration = 'weekly' | 'monthly';
+export type ChallengeStatus = 'active' | 'completed' | 'failed' | 'abandoned';
+
+export type SpendingChallenge = {
+  id: string;
+  userId: string;
+  title: string;
+  description: string;
+  type: ChallengeType;
+  category: string | null;
+  targetAmount: number | null;
+  duration: ChallengeDuration;
+  startDate: string;
+  endDate: string;
+  status: ChallengeStatus;
+  isAiGenerated: boolean;
+  createdAt: string;
+};
+
+export type ChallengeProgress = {
+  challenge: SpendingChallenge;
+  currentSpent: number;
+  targetAmount: number;
+  percentUsed: number;
+  daysRemaining: number;
+  isOnTrack: boolean;
+  noSpendDaysHit: number;
+  noSpendDaysTarget: number;
+};
+
+export type ChallengeStreak = {
+  currentStreak: number;
+  longestStreak: number;
+  totalCompleted: number;
+};
+
+export type BadgeType =
+  | 'first_challenge'
+  | 'streak_3'
+  | 'streak_7'
+  | 'streak_30'
+  | 'five_completed'
+  | 'ten_completed'
+  | 'perfect_month'
+  | 'savings_hero';
+
+export type Badge = {
+  id: string;
+  badgeType: BadgeType;
+  earnedAt: string;
+};
+
+export type ChallengesOverview = {
+  activeChallenges: ChallengeProgress[];
+  streak: ChallengeStreak;
+  badges: Badge[];
+  history: SpendingChallenge[];
+};
+
+export type AiChallengeSuggestion = {
+  title: string;
+  description: string;
+  type: ChallengeType;
+  category: string | null;
+  targetAmount: number | null;
+  duration: ChallengeDuration;
+};
+
+// ─── Net Worth ──────────────────────────────────────────────
+export type AssetCategory = 'property' | 'vehicle' | 'investment' | 'cash' | 'other';
+export type LiabilityCategory = 'mortgage' | 'auto_loan' | 'student_loan' | 'credit_card' | 'personal_loan' | 'other';
+
+export const ASSET_CATEGORIES: AssetCategory[] = ['property', 'vehicle', 'investment', 'cash', 'other'];
+export const LIABILITY_CATEGORIES: LiabilityCategory[] = ['mortgage', 'auto_loan', 'student_loan', 'credit_card', 'personal_loan', 'other'];
+
+export type ManualAsset = {
+  id: string;
+  userId: string;
+  name: string;
+  category: AssetCategory;
+  value: number;
+  notes: string | null;
+  createdAt: string;
+};
+
+export type ManualLiability = {
+  id: string;
+  userId: string;
+  name: string;
+  category: LiabilityCategory;
+  value: number;
+  notes: string | null;
+  createdAt: string;
+};
+
+export type NetWorthSnapshot = {
+  month: string;
+  linkedAssets: number;
+  manualAssets: number;
+  totalAssets: number;
+  totalLiabilities: number;
+  netWorth: number;
+};
+
+export type NetWorthBreakdown = {
+  linkedAccounts: { name: string; balance: number }[];
+  manualAssets: { name: string; category: string; value: number }[];
+  liabilities: { name: string; category: string; value: number }[];
+};
+
+export type NetWorthData = {
+  current: {
+    linkedAssets: number;
+    manualAssets: number;
+    totalAssets: number;
+    totalLiabilities: number;
+    netWorth: number;
+    monthlyChange: number;
+    monthlyChangePercent: number;
+  };
+  breakdown: NetWorthBreakdown;
+  history: NetWorthSnapshot[];
+  aiInsight: string | null;
+};
