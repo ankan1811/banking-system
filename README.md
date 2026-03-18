@@ -112,41 +112,79 @@ Rate limits per user per minute:
 
 ```
 bank/
-├── frontend/                    # Next.js 14 (port 3003)
+├── frontend/                         # Next.js 14 (port 3003)
 │   ├── app/
-│   │   ├── (auth)/              # Sign-in / Sign-up pages
-│   │   └── (root)/              # Protected dashboard pages
-│   ├── app/
-│   │   ├── (auth)/              # Sign-in / Sign-up pages
-│   │   └── (root)/              # Protected dashboard pages
-│   │       └── insights/        # AI Insights page
-│   ├── components/              # React components
-│   │   ├── AIChatbot.tsx        # Floating AI chat panel
+│   │   ├── (auth)/                   # Sign-in / Sign-up pages
+│   │   └── (root)/                   # Protected dashboard pages
+│   │       ├── insights/             # AI Insights page
+│   │       ├── budgets/              # Budget Tracker page
+│   │       ├── goals/                # Savings Goals page
+│   │       ├── trends/               # Spending Trends chart
+│   │       ├── alerts/               # Spending Alerts page
+│   │       ├── health-score/         # Financial Health Score page
+│   │       ├── income-expense/       # Income vs Expense report
+│   │       └── merchants/            # Merchant Insights page
+│   ├── components/                   # React components (30+)
+│   │   ├── AIChatbot.tsx             # Floating AI chat panel
 │   │   ├── CategoryBreakdownChart.tsx  # Spending doughnut chart
-│   │   └── SpendingInsightsCard.tsx    # AI insights display
-│   ├── lib/
-│   │   └── api/                 # API client (fetch wrappers)
-│   │       ├── ai.api.ts        # Insights API client
-│   │       └── chat.api.ts      # Chat API client
-│   └── constants/               # Style configs (includes AI category colors)
+│   │   ├── SpendingInsightsCard.tsx  # AI insights display
+│   │   ├── BudgetProgressCard.tsx    # Budget progress bars
+│   │   ├── GoalCard.tsx              # Savings goal progress ring
+│   │   ├── GoalsManager.tsx          # Goals CRUD manager
+│   │   ├── SpendingTrendsChart.tsx   # Multi-month trends chart
+│   │   ├── RecurringTransactionsCard.tsx  # Subscriptions card
+│   │   ├── AlertsManager.tsx         # Alert rules manager
+│   │   ├── ExportModal.tsx           # CSV/PDF export dialog
+│   │   ├── HealthScoreCard.tsx       # AI health score gauge
+│   │   ├── IncomeExpenseChart.tsx    # Income vs expense chart
+│   │   ├── MerchantInsightsCard.tsx  # Top merchants ranked
+│   │   └── TransactionSearchView.tsx # Search + filter bar
+│   ├── lib/api/                      # API client (fetch wrappers)
+│   │   ├── ai.api.ts                 # Insights API
+│   │   ├── chat.api.ts               # Chat API
+│   │   ├── budgets.api.ts            # Budgets + Export API
+│   │   ├── goals.api.ts              # Goals API
+│   │   ├── analytics.api.ts          # Trends + Recurring + Income/Expense + Merchants
+│   │   ├── alerts.api.ts             # Alerts API
+│   │   ├── health-score.api.ts       # Health Score API
+│   │   ├── search.api.ts             # Transaction search API
+│   │   └── notes.api.ts              # Transaction notes/tags API
+│   └── constants/                    # Style configs (AI category colors, sidebar links)
 │
-├── backend/                     # Express API (port 8787)
+├── backend/                          # Express API (port 8787)
 │   ├── src/
-│   │   ├── routes/              # Route files
-│   │   │   ├── ai.routes.ts     # POST /api/ai/insights
-│   │   │   └── chat.routes.ts   # POST /api/chat
-│   │   ├── services/            # Service files
-│   │   │   └── gemini.service.ts  # categorize, insights, chat
-│   │   ├── middleware/          # JWT auth + rate limiter
-│   │   └── lib/                 # Prisma, Plaid, Gemini clients
+│   │   ├── routes/                   # 13 route files
+│   │   │   ├── ai.routes.ts          # POST /api/ai/insights
+│   │   │   ├── chat.routes.ts        # POST /api/chat
+│   │   │   ├── budgets.routes.ts     # CRUD /api/budgets + status
+│   │   │   ├── goals.routes.ts       # CRUD /api/goals + contribute
+│   │   │   ├── export.routes.ts      # GET /api/export/csv, /api/export/pdf
+│   │   │   ├── analytics.routes.ts   # trends, recurring, income-expense, merchants
+│   │   │   ├── alerts.routes.ts      # CRUD /api/alerts
+│   │   │   ├── health-score.routes.ts  # GET /api/health-score
+│   │   │   ├── search.routes.ts      # GET /api/search
+│   │   │   └── notes.routes.ts       # CRUD /api/notes + batch + tags
+│   │   ├── services/                 # 10 service files
+│   │   │   ├── gemini.service.ts     # categorize, insights, chat (cached)
+│   │   │   ├── bank.service.ts       # Plaid calls (5-min + 24-hr caches)
+│   │   │   ├── budget.service.ts     # Budget CRUD + status
+│   │   │   ├── goals.service.ts      # Goals CRUD + contributions
+│   │   │   ├── analytics.service.ts  # trends, recurring, income/expense, merchants
+│   │   │   ├── alerts.service.ts     # Alert evaluation + email
+│   │   │   ├── export.service.ts     # CSV/PDF generation
+│   │   │   ├── health-score.service.ts  # 3-layer cached health score
+│   │   │   ├── search.service.ts     # Transaction search/filter
+│   │   │   └── notes.service.ts      # Transaction notes/tags CRUD
+│   │   ├── middleware/               # JWT auth + rate limiter factory
+│   │   └── lib/                      # Prisma, Plaid, Gemini clients
 │   └── prisma/
-│       └── schema.prisma        # Database schema (5 tables)
+│       └── schema.prisma             # Database schema (12 tables)
 │
-├── shared/                      # Shared between frontend & backend
-│   ├── types.ts                 # TypeScript types
-│   └── validators.ts            # Zod schemas, utilities
+├── shared/                           # Shared between frontend & backend
+│   ├── types.ts                      # TypeScript types (20+ types)
+│   └── validators.ts                 # Zod schemas, utilities
 │
-└── package.json                 # Root scripts (dev:frontend, dev:backend)
+└── package.json                      # Root scripts (dev:frontend, dev:backend)
 ```
 
 ---
@@ -246,7 +284,7 @@ cd backend
 npx prisma migrate dev --name init
 ```
 
-This creates 5 tables: `users`, `banks`, `transactions`, `otp_codes`, `cached_categories`.
+This creates 12 tables: `users`, `banks`, `transactions`, `otp_codes`, `cached_categories`, `budgets`, `savings_goals`, `goal_contributions`, `alert_rules`, `alert_trigger_logs`, `transaction_notes`, `financial_health_scores`.
 
 ### 5. Start the app
 
@@ -265,10 +303,19 @@ Open [http://localhost:3003](http://localhost:3003).
 1. Go to `/sign-up` and fill in the form, click "Send Verification Code"
 2. Enter `123456` (MASTER_OTP) as the verification code
 3. Link a sandbox bank via Plaid (use credentials: `user_good` / `pass_good`)
-4. View your dashboard — transactions are auto-categorized by Gemini and a spending chart appears
+4. View your dashboard — transactions are auto-categorized by Gemini, a spending chart and recurring subscriptions card appear
 5. Click **AI Insights** in the sidebar for a full spending analysis
 6. Click the sparkle button (bottom-right) to open the AI chatbot
 7. Try a fund transfer from the Payment Transfer page
+8. Go to **Budgets** — set monthly spending limits per category and watch progress bars
+9. Go to **Savings Goals** — create a goal, add contributions, watch the progress ring fill
+10. Go to **Trends** — see multi-month spending trends by category
+11. Go to **Income/Expense** — see your monthly P&L with income vs expense bars
+12. Go to **Merchants** — see your top merchants ranked by spending
+13. Go to **Health Score** — get your AI-generated financial health score (0-100)
+14. Go to **Alerts** — set email notifications for spending thresholds
+15. On **Transaction History** — use the search bar to filter by text, category, amount, or date range
+16. On **Transaction History** — click Export to download transactions as CSV or PDF
 
 ---
 
@@ -325,6 +372,64 @@ Open [http://localhost:3003](http://localhost:3003).
 | POST | `/api/ai/insights` | Generate spending insights for an account + month |
 | POST | `/api/chat` | Send a message to the AI financial assistant |
 
+### Budgets (Protected)
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/budgets?month=YYYY-MM` | Get all budgets for a month |
+| GET | `/api/budgets/status?bankRecordId=x&month=YYYY-MM` | Get budget status with spending |
+| POST | `/api/budgets` | Create or update a budget |
+| DELETE | `/api/budgets/:id` | Delete a budget |
+
+### Savings Goals (Protected)
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/goals` | List all savings goals |
+| POST | `/api/goals` | Create a new goal |
+| PATCH | `/api/goals/:id` | Update a goal |
+| DELETE | `/api/goals/:id` | Delete a goal |
+| POST | `/api/goals/:id/contribute` | Add a contribution |
+| GET | `/api/goals/:id/contributions` | Get contribution history |
+
+### Analytics (Protected)
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/analytics/trends?bankRecordId=x&months=6` | Spending trends by category |
+| GET | `/api/analytics/recurring?bankRecordId=x` | Detected recurring transactions |
+| GET | `/api/analytics/income-expense?bankRecordId=x&months=6` | Income vs expense report |
+| GET | `/api/analytics/merchants?bankRecordId=x&months=6` | Top merchants by spend |
+
+### Alerts (Protected)
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/alerts` | List all alert rules |
+| POST | `/api/alerts` | Create an alert rule |
+| PATCH | `/api/alerts/:id` | Enable/disable or update threshold |
+| DELETE | `/api/alerts/:id` | Delete an alert rule |
+
+### Export (Protected)
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/export/csv?bankRecordId=x&from=YYYY-MM-DD&to=YYYY-MM-DD` | Download CSV |
+| GET | `/api/export/pdf?bankRecordId=x&from=YYYY-MM-DD&to=YYYY-MM-DD` | Download PDF statement |
+
+### Search (Protected)
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/search?bankRecordId=x&q=coffee&category=...` | Search + filter transactions |
+
+### Notes & Tags (Protected)
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/notes` | Upsert a note on a transaction |
+| DELETE | `/api/notes/:hash` | Delete a note |
+| GET | `/api/notes/batch?hashes=h1,h2,...` | Batch fetch notes |
+| GET | `/api/notes/tags` | Get all user tags (autocomplete) |
+
+### Health Score (Protected)
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/health-score?bankRecordId=x&month=YYYY-MM` | AI-generated financial health score |
+
 ### Health
 | Method | Path | Description |
 |--------|------|-------------|
@@ -332,37 +437,35 @@ Open [http://localhost:3003](http://localhost:3003).
 
 ---
 
-## Database Schema
+## Database Schema (12 Tables)
 
-```
-+--------------+     +--------------+     +------------------+
-|    users     |     |    banks     |     |  transactions    |
-+--------------+     +--------------+     +------------------+
-| id (PK)      |<----| userId (FK)  |     | id (PK)          |
-| email        |     | bankId       |     | name             |
-| firstName    |     | accountId    |     | amount           |
-| lastName     |     | accessToken  |     | senderId (FK)    |
-| address1     |     | shareableId  |     | senderBankId(FK) |
-| city/state   |     | razorpay...  |     | receiverId (FK)  |
-| postalCode   |     | createdAt    |     | receiverBank(FK) |
-| dateOfBirth  |     +--------------+     | email            |
-| ssn          |                          | channel          |
-| razorpay...  |     +--------------+     | category         |
-| googleId     |     |  otp_codes   |     | createdAt        |
-| tokenVersion |     +--------------+     +------------------+
-| createdAt    |     | id (PK)      |
-| updatedAt    |     | email        |     +----------------------+
-+--------------+     | otpHash      |     | cached_categories    |
-                     | expiresAt    |     +----------------------+
-                     | used         |     | id (PK)              |
-                     | createdAt    |     | transactionHash      |
-                     +--------------+     | originalName         |
-                                          | aiCategory           |
-                                          | createdAt            |
-                                          +----------------------+
-```
+### Core Tables
+| Table | Purpose |
+|-------|---------|
+| `users` | User profiles with auth fields |
+| `banks` | Linked bank accounts (Plaid access tokens) |
+| `transactions` | In-app transfer records |
+| `otp_codes` | Passwordless auth OTP codes |
 
-`cached_categories` stores Gemini's category decisions keyed by a SHA-256 hash of `(name, amount, date)`. Repeat loads hit the cache and never call the API again.
+### AI & Caching Tables
+| Table | Purpose |
+|-------|---------|
+| `cached_categories` | Gemini category decisions keyed by SHA-256 hash of `(name, amount, date)` |
+| `financial_health_scores` | AI health score cache per user/month (survives server restart) |
+
+### Financial Planning Tables
+| Table | Purpose |
+|-------|---------|
+| `budgets` | Monthly spending limits per category. Unique on `(userId, category, month)` |
+| `savings_goals` | Named savings goals with target amounts, dates, progress |
+| `goal_contributions` | Audit trail of contributions to savings goals |
+
+### Alerts & Notes Tables
+| Table | Purpose |
+|-------|---------|
+| `alert_rules` | User-defined spending alert rules (category limit, single txn, balance) |
+| `alert_trigger_logs` | Deduplication log preventing duplicate alert emails |
+| `transaction_notes` | User notes and tags on transactions, keyed by transaction hash |
 
 ---
 
