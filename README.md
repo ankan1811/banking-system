@@ -17,20 +17,70 @@ Built with **Next.js 14**, **Express.js**, **Prisma**, **PostgreSQL**, **Plaid**
 ### Banking Dashboard
 - **Bank account linking** via Plaid (sandbox mode)
 - **Real-time balances** fetched from Plaid on each page load
-- **Transaction history** with pagination and category badges
+- **Transaction history** with pagination, category badges, and smart search/filters
 - **Multi-account support** — Link multiple banks, switch between tabs
 - **Doughnut chart** — Visual breakdown of account balances
+- **Recurring transactions card** — Auto-detected subscriptions and recurring charges on the dashboard
 
 ### AI Features (powered by Google Gemini)
 - **Transaction categorization** — Automatically classifies every Plaid transaction into 10 categories (Food & Dining, Transport, Shopping, Entertainment, Bills & Utilities, Health, Education, Income, Transfers, Other) using Gemini. Results are cached in PostgreSQL so repeat loads are instant and free.
 - **Spending insights** — Dedicated `/insights` page with: AI-generated natural language summary, month-over-month category comparison, top spending categories with progress bars, anomaly detection, and personalized savings tips. Results cached for 5 minutes.
 - **AI chatbot** — Floating chat panel (bottom-right) powered by Gemini. Has full context of your accounts, balances, and recent transactions. Supports quick-prompt shortcuts. Rate-limited to 10 messages/minute per user.
 - **Category breakdown chart** — Doughnut chart on the dashboard visualizing spending by AI category with a color-coded legend.
+- **Financial health score** — AI-generated 0-100 score based on budget adherence, savings rate, spending trends, and goal progress. Uses a 3-layer cache (in-memory 1hr + DB persistence + local rule-based fallback) to minimize Gemini calls to at most 1 per user per hour.
+
+### Budget & Financial Planning
+- **Budget tracker** — Set monthly spending limits per AI category. Real-time progress bars (green < 75%, amber 75-90%, red > 90%). Inline editing and management on the `/budgets` page.
+- **Savings goals** — Create named goals with target amounts, target dates, emoji icons, and color coding. Log manual contributions with an SVG progress ring. Auto-completes when target is reached.
+- **Spending alerts** — Set email alert rules for category monthly limits, single transaction thresholds, or low balance. Alerts are evaluated in the background when transactions are fetched and sent via Resend. Deduplication via trigger logs prevents spam.
+
+### Analytics & Reports
+- **Spending trends** — Multi-month stacked bar chart (Chart.js) showing spending per AI category over the last 3/6/12 months. Category toggle pills to show/hide individual categories.
+- **Income vs expenses** — Monthly P&L report with grouped bar chart (green income, red expenses), net savings line, and summary cards (total income, total expenses, net savings, avg monthly).
+- **Merchant insights** — Top 50 merchants ranked by total spend. Shows transaction count, average amount, category badge, month-over-month trend arrows, and a client-side search filter.
+- **Recurring transaction detection** — Algorithm detects subscriptions by grouping transactions with similar names/amounts at regular intervals (weekly, monthly, quarterly). Shows on dashboard with next expected date.
+- **Transaction export** — Export any date range to CSV (for spreadsheets/accountants) or a formatted PDF bank statement with account info, transaction table, and debit/credit totals.
+
+### Smart Search & Filters
+- **Full-text search** across transaction names and merchant names
+- **Filter by** AI category, amount range (min/max), and date range
+- **Paginated results** with debounced 300ms search
+- Integrated into the transaction history page
+
+### Transaction Notes & Tags
+- **Custom notes** — Attach notes (up to 500 characters) to any transaction
+- **Color-coded tags** — Add up to 10 custom tags per transaction for personal organization (e.g., "business expense", "reimbursable", "gift")
+- **Tag autocomplete** — Fetches your existing tags for quick reuse
+- Stored by transaction hash (SHA-256) for consistency across Plaid syncs
 
 ### Payments & Transfers
 - **Fund transfers** between linked bank accounts (Razorpay integration)
 - **Transaction recording** — All transfers stored in PostgreSQL
 - **Recipient lookup** by sharable ID
+
+### Caching & Rate Limiting
+All external API calls are aggressively cached to stay within free tier limits:
+
+| Cache | TTL | Impact |
+|-------|-----|--------|
+| `getAccount()` (Plaid + Gemini) | 5 min | ~80% fewer Plaid and Gemini calls |
+| `getAccounts()` (Plaid) | 5 min | Dashboard loads instantly on repeat |
+| `getInstitution()` (Plaid) | 24 hr | Static bank info cached long-term |
+| Chat financial context | 5 min | 0 Plaid calls per chat message |
+| AI transaction categories | Permanent (DB) | Never re-categorize the same transaction |
+| Spending insights | 5 min | Gemini called once per user/month window |
+| Analytics (trends, recurring, income/expense, merchants) | 5-60 min | Pure aggregation on cached data |
+| Financial health score | 1 hr (memory) + DB | At most 1 Gemini call per user per hour |
+
+Rate limits per user per minute:
+
+| Endpoint Group | Limit | Reason |
+|---------------|-------|--------|
+| Accounts | 30/min | Triggers Plaid API calls |
+| AI Insights | 5/min | Triggers Gemini API calls |
+| Chat | 10/min | Triggers Gemini API calls |
+| Export (CSV/PDF) | 5/min | Triggers Plaid API calls |
+| Analytics | 15/min | Triggers Plaid via getAccount |
 
 ### Design
 - **Glassmorphic dark theme** — Frosted glass cards, animated gradients
