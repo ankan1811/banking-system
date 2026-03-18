@@ -1,5 +1,5 @@
 import { Router, type Request, type Response } from 'express';
-import { getBanks, getBank, getBankByAccountId } from '../services/user.service.js';
+import { getBanks, getBank, getBankByAccountId, disconnectBank } from '../services/user.service.js';
 
 const router = Router();
 
@@ -47,6 +47,21 @@ router.get('/:id', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error getting bank:', error);
     res.status(500).json({ error: 'Failed to get bank' });
+  }
+});
+
+// DELETE /api/banks/:id
+router.delete('/:id', async (req: Request, res: Response) => {
+  try {
+    await disconnectBank(req.userId!, req.params.id);
+    res.json({ success: true });
+  } catch (error) {
+    if ((error as Error).message === 'Bank not found') {
+      res.status(404).json({ error: 'Bank not found' });
+      return;
+    }
+    console.error('Error disconnecting bank:', error);
+    res.status(500).json({ error: 'Failed to disconnect bank' });
   }
 });
 

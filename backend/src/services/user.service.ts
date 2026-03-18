@@ -1,5 +1,7 @@
 import { prisma } from '../lib/db.js';
 import { createContact } from './razorpay.service.js';
+import { plaidClient } from '../lib/plaid.js';
+import { clearAccountCache } from './bank.service.js';
 import type { SignUpParams } from '@shared/types';
 
 export const getUserInfo = async (userId: string) => {
@@ -91,4 +93,54 @@ export const getBankByAccountId = async (accountId: string) => {
   });
 
   return bank || null;
+};
+
+// ─── Profile Management ─────────────────────────────────────
+
+export const updateProfile = async (
+  userId: string,
+  data: {
+    firstName?: string;
+    lastName?: string;
+    address1?: string;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+  }
+) => {
+  const user = await prisma.user.update({
+    where: { id: userId },
+    data,
+  });
+  return { ...user, name: `${user.firstName} ${user.lastName}` };
+};
+
+export const disconnectBank = async (userId: string, bankId: string) => {
+  const bank = await prisma.bank.findFirst({ where: { id: bankId, userId } });
+  if (!bank) throw new Error('Bank not found');
+
+  // Revoke Plaid access token (best-effort)
+  try {
+    await plaidClient.itemRemove({ access_token: bank.accessToken });
+  } catch (err) {
+    console.error('Plaid itemRemove error (continuing):', err);
+  }
+
+  await prisma.bank.delete({ where: { id: bankId } });
+  clearAccountCache(bankId);
+};
+
+export const deleteUser = async (userId: string) => {
+  // Remove all Plaid items first (best-effort)
+  const banks = await getBanks(userId);
+  for (const bank of banks) {
+    try {
+      await plaidClient.itemRemove({ access_token: bank.accessToken });
+    } catch {
+      // continue even if Plaid cleanup fails
+    }
+  }
+
+  // Cascade deletes all child records (banks, budgets, goals, alerts, notes, etc.)
+  await prisma.user.delete({ where: { id: userId } });
 };

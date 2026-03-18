@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { prisma } from '../lib/db.js';
 import { sendOtp, verifyOtp } from '../services/otp.service.js';
 import { createSession, destroySession } from '../services/auth.service.js';
-import { getUserInfo, createUser } from '../services/user.service.js';
+import { getUserInfo, createUser, updateProfile, deleteUser } from '../services/user.service.js';
 import { verifyGoogleToken, findOrCreateGoogleUser } from '../services/google.service.js';
 import { requireAuth } from '../middleware/auth.js';
 
@@ -201,6 +201,43 @@ router.post('/logout', requireAuth, async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error logging out:', error);
     res.status(500).json({ error: 'Failed to logout' });
+  }
+});
+
+// PATCH /api/auth/profile
+const profileSchema = z.object({
+  firstName: z.string().min(1).optional(),
+  lastName: z.string().min(1).optional(),
+  address1: z.string().min(1).optional(),
+  city: z.string().min(1).optional(),
+  state: z.string().min(2).max(2).optional(),
+  postalCode: z.string().min(3).max(6).optional(),
+});
+
+router.patch('/profile', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const data = profileSchema.parse(req.body);
+    const user = await updateProfile(req.userId!, data);
+    res.json(user);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      res.status(400).json({ error: 'Invalid input', details: error.errors });
+      return;
+    }
+    console.error('Error updating profile:', error);
+    res.status(500).json({ error: 'Failed to update profile' });
+  }
+});
+
+// DELETE /api/auth/account
+router.delete('/account', requireAuth, async (req: Request, res: Response) => {
+  try {
+    await deleteUser(req.userId!);
+    await destroySession(res);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting account:', error);
+    res.status(500).json({ error: 'Failed to delete account' });
   }
 });
 
