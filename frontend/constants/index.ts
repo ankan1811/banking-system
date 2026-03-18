@@ -21,6 +21,11 @@ export const sidebarLinks = [
   },
   {
     imgURL: "/icons/monitor.svg",
+    route: "/splits",
+    label: "Split Expenses",
+  },
+  {
+    imgURL: "/icons/monitor.svg",
     route: "/insights",
     label: "AI Insights",
   },
@@ -48,6 +53,11 @@ export const sidebarLinks = [
     imgURL: "/icons/monitor.svg",
     route: "/health-score",
     label: "Health Score",
+  },
+  {
+    imgURL: "/icons/monitor.svg",
+    route: "/challenges",
+    label: "Challenges",
   },
   {
     imgURL: "/icons/monitor.svg",

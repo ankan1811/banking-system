@@ -22,6 +22,9 @@ import searchRoutes from './routes/search.routes.js';
 import notesRoutes from './routes/notes.routes.js';
 import healthScoreRoutes from './routes/health-score.routes.js';
 import reportsRoutes from './routes/reports.routes.js';
+import splitsRoutes from './routes/splits.routes.js';
+import netWorthRoutes from './routes/net-worth.routes.js';
+import challengesRoutes from './routes/challenges.routes.js';
 import { requireAuth } from './middleware/auth.js';
 import { accountsRateLimit, aiRateLimit, exportRateLimit, analyticsRateLimit } from './middleware/rateLimit.js';
 
@@ -54,6 +57,9 @@ app.use('/api/search', requireAuth, accountsRateLimit, searchRoutes);
 app.use('/api/notes', requireAuth, notesRoutes);
 app.use('/api/health-score', requireAuth, aiRateLimit, healthScoreRoutes);
 app.use('/api/reports', requireAuth, aiRateLimit, reportsRoutes);
+app.use('/api/splits', requireAuth, splitsRoutes);
+app.use('/api/net-worth', requireAuth, accountsRateLimit, netWorthRoutes);
+app.use('/api/challenges', requireAuth, aiRateLimit, challengesRoutes);
 
 // Health check
 app.get('/health', (_req, res) => {
