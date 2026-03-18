@@ -159,3 +159,158 @@ export async function detectRecurring(bankRecordId: string): Promise<RecurringPa
   recurringCache.set(cacheKey, { data: patterns, expiresAt: Date.now() + RECURRING_TTL });
   return patterns;
 }
+
+// ─── Income vs Expense Report ────────────────────────────────
+
+function generateMonthLabels(months: number): string[] {
+  const labels: string[] = [];
+  const now = new Date();
+  for (let i = months - 1; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    labels.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+  }
+  return labels;
+}
+
+export async function getIncomeVsExpense(bankRecordId: string, months: number): Promise<IncomeExpenseData> {
+  const cacheKey = `${bankRecordId}:${months}`;
+  const cached = incomeExpenseCache.get(cacheKey);
+  if (cached && cached.expiresAt > Date.now()) return cached.data;
+
+  const { transactions } = await getAccount(bankRecordId);
+  const monthLabels = generateMonthLabels(months);
+
+  const income: number[] = new Array(months).fill(0);
+  const expenses: number[] = new Array(months).fill(0);
+  const expensesByCategory: Record<string, number[]> = {};
+
+  for (const t of transactions) {
+    const date: string = t.date || t.createdAt;
+    const monthStr = typeof date === 'string' ? date.slice(0, 7) : new Date(date).toISOString().slice(0, 7);
+    const monthIdx = monthLabels.indexOf(monthStr);
+    if (monthIdx === -1) continue;
+
+    const amt = Math.abs(t.amount);
+    const cat: string = (t as any).aiCategory || t.category || 'Other';
+
+    if (t.amount < 0 || cat === 'Income') {
+      income[monthIdx] = Math.round((income[monthIdx] + amt) * 100) / 100;
+    } else {
+      expenses[monthIdx] = Math.round((expenses[monthIdx] + amt) * 100) / 100;
+      if (!expensesByCategory[cat]) expensesByCategory[cat] = new Array(months).fill(0);
+      expensesByCategory[cat][monthIdx] = Math.round((expensesByCategory[cat][monthIdx] + amt) * 100) / 100;
+    }
+  }
+
+  const net = monthLabels.map((_, i) => Math.round((income[i] - expenses[i]) * 100) / 100);
+  const totalIncome = income.reduce((s, v) => s + v, 0);
+  const totalExpenses = expenses.reduce((s, v) => s + v, 0);
+
+  const result: IncomeExpenseData = {
+    months: monthLabels,
+    income,
+    expenses,
+    net,
+    expensesByCategory,
+    totals: {
+      totalIncome: Math.round(totalIncome * 100) / 100,
+      totalExpenses: Math.round(totalExpenses * 100) / 100,
+      totalNet: Math.round((totalIncome - totalExpenses) * 100) / 100,
+      avgMonthlyNet: Math.round(((totalIncome - totalExpenses) / months) * 100) / 100,
+    },
+  };
+
+  incomeExpenseCache.set(cacheKey, { data: result, expiresAt: Date.now() + IE_TTL });
+  return result;
+}
+
+// ─── Merchant Insights ───────────────────────────────────────
+
+export async function getMerchantInsights(bankRecordId: string, months: number): Promise<MerchantInsight[]> {
+  const cacheKey = `${bankRecordId}:${months}`;
+  const cached = merchantCache.get(cacheKey);
+  if (cached && cached.expiresAt > Date.now()) return cached.data;
+
+  const { transactions } = await getAccount(bankRecordId);
+  const monthLabels = generateMonthLabels(months);
+  const currentMonth = monthLabels[monthLabels.length - 1];
+  const prevMonth = monthLabels.length >= 2 ? monthLabels[monthLabels.length - 2] : null;
+
+  // Group by normalized merchant name
+  const groups = new Map<string, {
+    name: string;
+    totalSpent: number;
+    count: number;
+    categories: Map<string, number>;
+    lastDate: string;
+    monthlyAmounts: Record<string, number>;
+  }>();
+
+  for (const t of transactions) {
+    if (t.amount <= 0) continue; // debits only
+    const date: string = t.date || t.createdAt;
+    const monthStr = typeof date === 'string' ? date.slice(0, 7) : new Date(date).toISOString().slice(0, 7);
+    if (!monthLabels.includes(monthStr)) continue;
+
+    const key = normalizeName((t as any).merchantName || t.name || '');
+    if (!key) continue;
+
+    const cat: string = (t as any).aiCategory || t.category || 'Other';
+    const amt = Math.abs(t.amount);
+
+    if (!groups.has(key)) {
+      groups.set(key, {
+        name: (t as any).merchantName || t.name,
+        totalSpent: 0,
+        count: 0,
+        categories: new Map(),
+        lastDate: date,
+        monthlyAmounts: {},
+      });
+    }
+    const g = groups.get(key)!;
+    g.totalSpent += amt;
+    g.count++;
+    g.categories.set(cat, (g.categories.get(cat) || 0) + 1);
+    if (date > g.lastDate) g.lastDate = date;
+    g.monthlyAmounts[monthStr] = (g.monthlyAmounts[monthStr] || 0) + amt;
+  }
+
+  const merchants: MerchantInsight[] = [];
+  for (const [, g] of groups) {
+    // Find most frequent category
+    let topCat = 'Other';
+    let topCatCount = 0;
+    for (const [cat, count] of g.categories) {
+      if (count > topCatCount) { topCat = cat; topCatCount = count; }
+    }
+
+    // Compute trend: current vs previous month
+    const currentSpend = g.monthlyAmounts[currentMonth] || 0;
+    const prevSpend = prevMonth ? (g.monthlyAmounts[prevMonth] || 0) : 0;
+    const trend = prevSpend > 0 ? ((currentSpend - prevSpend) / prevSpend) * 100 : 0;
+
+    // Round monthly amounts
+    const roundedMonthly: Record<string, number> = {};
+    for (const [m, v] of Object.entries(g.monthlyAmounts)) {
+      roundedMonthly[m] = Math.round(v * 100) / 100;
+    }
+
+    merchants.push({
+      name: g.name,
+      totalSpent: Math.round(g.totalSpent * 100) / 100,
+      transactionCount: g.count,
+      avgAmount: Math.round((g.totalSpent / g.count) * 100) / 100,
+      category: topCat,
+      lastTransaction: g.lastDate,
+      trend: Math.round(trend * 10) / 10,
+      monthlyAmounts: roundedMonthly,
+    });
+  }
+
+  merchants.sort((a, b) => b.totalSpent - a.totalSpent);
+  const top50 = merchants.slice(0, 50);
+
+  merchantCache.set(cacheKey, { data: top50, expiresAt: Date.now() + MERCHANT_TTL });
+  return top50;
+}

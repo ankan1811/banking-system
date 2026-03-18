@@ -29,6 +29,8 @@ model User {
   budgets              Budget[]
   savingsGoals         SavingsGoal[]
   alertRules           AlertRule[]
+  transactionNotes     TransactionNote[]
+  healthScores         FinancialHealthScore[]
 
   @@map("users")
 }
@@ -176,4 +178,38 @@ model AlertTriggerLog {
 
   @@index([ruleId, triggeredAt])
   @@map("alert_trigger_logs")
+}
+
+model TransactionNote {
+  id              String   @id @default(uuid())
+  transactionHash String
+  userId          String
+  note            String?
+  tags            String[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([transactionHash, userId])
+  @@index([userId])
+  @@index([transactionHash])
+  @@map("transaction_notes")
+}
+
+model FinancialHealthScore {
+  id          String   @id @default(uuid())
+  userId      String
+  month       String
+  score       Int
+  breakdown   Json
+  tips        Json
+  generatedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, month])
+  @@index([userId, month])
+  @@map("financial_health_scores")
 }

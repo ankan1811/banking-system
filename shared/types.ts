@@ -184,6 +184,31 @@ export type RecurringPattern = {
   occurrences: number;
 };
 
+export type IncomeExpenseData = {
+  months: string[];
+  income: number[];
+  expenses: number[];
+  net: number[];
+  expensesByCategory: Record<string, number[]>;
+  totals: {
+    totalIncome: number;
+    totalExpenses: number;
+    totalNet: number;
+    avgMonthlyNet: number;
+  };
+};
+
+export type MerchantInsight = {
+  name: string;
+  totalSpent: number;
+  transactionCount: number;
+  avgAmount: number;
+  category: string;
+  lastTransaction: string;
+  trend: number;
+  monthlyAmounts: Record<string, number>;
+};
+
 // ─── Alerts ──────────────────────────────────────────────────
 export type AlertRule = {
   id: string;
@@ -194,4 +219,28 @@ export type AlertRule = {
   channel: string;
   enabled: boolean;
   createdAt: string;
+};
+
+// ─── Health Score ────────────────────────────────────────────
+export type HealthScore = {
+  score: number;
+  breakdown: {
+    budgetAdherence: number;
+    savingsRate: number;
+    spendingTrend: number;
+    goalProgress: number;
+  };
+  tips: string[];
+  generatedAt: string;
+};
+
+// ─── Transaction Notes ──────────────────────────────────────
+export type TransactionNote = {
+  id: string;
+  transactionHash: string;
+  userId: string;
+  note: string | null;
+  tags: string[];
+  createdAt: string;
+  updatedAt: string;
 };
