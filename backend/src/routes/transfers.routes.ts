@@ -1,5 +1,6 @@
 import { Router, type Request, type Response } from 'express';
 import { createTransfer } from '../services/razorpay.service.js';
+import { clearAccountCache } from '../services/bank.service.js';
 
 const router = Router();
 
@@ -13,6 +14,10 @@ router.post('/', async (req: Request, res: Response) => {
       amount: parseFloat(amount),
       name: name || 'Transfer',
     });
+
+    // Invalidate account cache so the transfer shows up immediately
+    clearAccountCache(senderBankId);
+    clearAccountCache(receiverBankId);
 
     res.json(result);
   } catch (error) {
