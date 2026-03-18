@@ -612,6 +612,793 @@ If you're evaluating managed PostgreSQL providers beyond Neon and Supabase, here
 
 ---
 
+## Prisma vs Drizzle ORM — A Pragmatic, Example-Driven Comparison
+
+This project uses **Prisma** as its ORM. Below is a detailed comparison with **Drizzle ORM** using concrete examples from this codebase's actual schema (users, banks, transactions, budgets, goals) — so you can understand the tradeoffs and make an informed choice for your own projects.
+
+### TL;DR (Quick Decision Guide)
+
+| | **Prisma** | **Drizzle** |
+|---|---|---|
+| **Philosophy** | Describe **what** you want — hide the SQL | Describe **how** to query — you *are* the SQL |
+| **Best for** | CRUD-heavy apps, fast dev velocity, nested writes | Analytics, complex joins, serverless cold starts |
+| **DX** | Schema-first codegen, Studio, integrated migrations | Everything-in-TypeScript, no codegen step |
+| **Perf** | Slight runtime overhead (engine layer) | Thin wrapper, lower overhead, predictable SQL |
+| **Verbosity** | Less code for CRUD | More code, but more control |
+
+---
+
+### 1) Schema & Relations — Single File vs Many Small Files
+
+**Prisma** (single `schema.prisma`)
+
+```prisma
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  firstName String
+  lastName  String
+  banks     Bank[]
+  budgets   Budget[]
+}
+
+model Bank {
+  id          String @id @default(uuid())
+  userId      String
+  bankId      String
+  accountId   String
+  accessToken String
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Budget {
+  id           String  @id @default(uuid())
+  userId       String
+  category     String
+  monthlyLimit Decimal @db.Decimal(12, 2)
+  month        String
+  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([userId, category, month])
+}
+```
+
+Relation + FK + reverse relation all declared together in one file. Easy mental model for teams.
+
+**Drizzle** (table + FK + optional relation files)
+
+```typescript
+// db/tables/users.ts
+import { pgTable, uuid, text, timestamp } from 'drizzle-orm/pg-core';
+
+export const users = pgTable('users', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  email: text('email').unique().notNull(),
+  firstName: text('first_name').notNull(),
+  lastName: text('last_name').notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+// db/tables/banks.ts
+import { pgTable, uuid, text } from 'drizzle-orm/pg-core';
+import { users } from './users';
+
+export const banks = pgTable('banks', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  bankId: text('bank_id').notNull(),
+  accountId: text('account_id').notNull(),
+  accessToken: text('access_token').notNull(),
+});
+
+// db/tables/budgets.ts
+import { pgTable, uuid, text, decimal, timestamp, unique } from 'drizzle-orm/pg-core';
+import { users } from './users';
+
+export const budgets = pgTable('budgets', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  category: text('category').notNull(),
+  monthlyLimit: decimal('monthly_limit', { precision: 12, scale: 2 }).notNull(),
+  month: text('month').notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+}, (table) => ({
+  uniqueUserCategoryMonth: unique().on(table.userId, table.category, table.month),
+}));
+
+// db/relations/index.ts (optional sugar for relational queries)
+import { relations } from 'drizzle-orm';
+import { users } from '../tables/users';
+import { banks } from '../tables/banks';
+import { budgets } from '../tables/budgets';
+
+export const userRelations = relations(users, ({ many }) => ({
+  banks: many(banks),
+  budgets: many(budgets),
+}));
+
+export const bankRelations = relations(banks, ({ one }) => ({
+  user: one(users, {
+    fields: [banks.userId],
+    references: [users.id],
+  }),
+}));
+
+export const budgetRelations = relations(budgets, ({ one }) => ({
+  user: one(users, {
+    fields: [budgets.userId],
+    references: [users.id],
+  }),
+}));
+```
+
+Drizzle separates: (1) table definitions, (2) FK constraints, (3) relation helpers (which are optional sugar). That split makes things explicit but verbose — roughly 3x the lines for the same schema.
+
+---
+
+### 2) Nested Reads & Writes — Why Prisma Looks Magical
+
+**Creating a savings goal with an initial contribution:**
+
+**Prisma** (nested create — single call, auto-transactional)
+
+```typescript
+const goal = await prisma.savingsGoal.create({
+  data: {
+    name: 'Emergency Fund',
+    targetAmount: 5000,
+    savedAmount: 100,
+    emoji: '🎯',
+    color: '#8b5cf6',
+    user: { connect: { id: userId } },
+    contributions: {
+      create: {
+        amount: 100,
+        note: 'Initial deposit',
+      },
+    },
+  },
+  include: {
+    contributions: true,
+  },
+});
+```
+
+One call. Prisma creates the goal, inserts the contribution, connects the user, and returns everything — all inside an implicit transaction.
+
+**Drizzle** (explicit inserts + transaction)
+
+```typescript
+const goal = await db.transaction(async (tx) => {
+  const [newGoal] = await tx.insert(savingsGoals).values({
+    userId: userId,
+    name: 'Emergency Fund',
+    targetAmount: '5000',
+    savedAmount: '100',
+    emoji: '🎯',
+    color: '#8b5cf6',
+  }).returning();
+
+  const [contribution] = await tx.insert(goalContributions).values({
+    goalId: newGoal.id,
+    amount: '100',
+    note: 'Initial deposit',
+  }).returning();
+
+  return { ...newGoal, contributions: [contribution] };
+});
+```
+
+More code, but you control the transaction boundary, the exact SQL, and the return shape. No hidden queries.
+
+---
+
+**Many-to-many: Connecting alert rules to trigger logs**
+
+**Prisma**
+
+```typescript
+const alert = await prisma.alertRule.create({
+  data: {
+    userId: userId,
+    type: 'category_monthly_limit',
+    category: 'Food & Dining',
+    threshold: 500,
+    triggerLogs: {
+      create: [
+        { details: JSON.stringify({ subject: 'Budget Alert', body: 'You exceeded $500' }) },
+        { details: JSON.stringify({ subject: 'Budget Alert', body: 'Still over budget' }) },
+      ],
+    },
+  },
+  include: { triggerLogs: true },
+});
+```
+
+**Drizzle**
+
+```typescript
+const alert = await db.transaction(async (tx) => {
+  const [newRule] = await tx.insert(alertRules).values({
+    userId: userId,
+    type: 'category_monthly_limit',
+    category: 'Food & Dining',
+    threshold: '500',
+  }).returning();
+
+  const logs = await tx.insert(alertTriggerLogs).values([
+    { ruleId: newRule.id, details: JSON.stringify({ subject: 'Budget Alert', body: 'You exceeded $500' }) },
+    { ruleId: newRule.id, details: JSON.stringify({ subject: 'Budget Alert', body: 'Still over budget' }) },
+  ]).returning();
+
+  return { ...newRule, triggerLogs: logs };
+});
+```
+
+Key difference: Drizzle requires you to perform the join-table/child inserts yourself. Use `insert().values([...])` to batch multiple rows in one SQL call rather than `Promise.all` with individual inserts — safer and faster.
+
+---
+
+### 3) Aggregations & Analytics — Where Drizzle Shows Its Teeth
+
+**Budget status: aggregate spending per category for a month**
+
+**Prisma** (using `groupBy`)
+
+```typescript
+const spending = await prisma.transaction.groupBy({
+  by: ['category'],
+  where: {
+    senderBankId: bankId,
+    createdAt: {
+      gte: new Date('2026-03-01'),
+      lt: new Date('2026-04-01'),
+    },
+    amount: { gt: 0 },
+  },
+  _sum: { amount: true },
+  _count: true,
+});
+// Returns: [{ category: 'Food & Dining', _sum: { amount: 320.50 }, _count: 12 }, ...]
+```
+
+Convenient for simple sums. But try adding `COUNT(DISTINCT ...)`, window functions, or joining 3 tables — and you'll quickly reach for `prisma.$queryRaw`.
+
+**Drizzle** (explicit SQL expressions)
+
+```typescript
+import { eq, gte, lt, gt, sql } from 'drizzle-orm';
+
+const spending = await db
+  .select({
+    category: transactions.category,
+    totalAmount: sql<number>`sum(${transactions.amount})`.as('total_amount'),
+    transactionCount: sql<number>`count(*)`.as('transaction_count'),
+  })
+  .from(transactions)
+  .where(
+    and(
+      eq(transactions.senderBankId, bankId),
+      gte(transactions.createdAt, new Date('2026-03-01')),
+      lt(transactions.createdAt, new Date('2026-04-01')),
+      gt(transactions.amount, 0)
+    )
+  )
+  .groupBy(transactions.category);
+// Returns: [{ category: 'Food & Dining', totalAmount: 320.50, transactionCount: 12 }, ...]
+```
+
+Same result, but Drizzle makes it natural to add complex expressions without escaping to raw SQL.
+
+---
+
+**5-table JOIN: Users + Banks + Transactions + Budgets + Goals (analytics dashboard)**
+
+**Drizzle** (clear mapping from JS → SQL)
+
+```typescript
+const dashboardData = await db
+  .select({
+    userName: sql<string>`${users.firstName} || ' ' || ${users.lastName}`.as('user_name'),
+    bankName: banks.bankId,
+    accountId: banks.accountId,
+    totalSpent: sql<number>`coalesce(sum(${transactions.amount}), 0)`.as('total_spent'),
+    transactionCount: sql<number>`count(distinct ${transactions.id})`.as('txn_count'),
+    activeBudgets: sql<number>`count(distinct ${budgets.id})`.as('budget_count'),
+    activeGoals: sql<number>`count(distinct ${savingsGoals.id})`.as('goal_count'),
+    totalSaved: sql<number>`coalesce(sum(distinct ${savingsGoals.savedAmount}), 0)`.as('total_saved'),
+  })
+  .from(users)
+  .leftJoin(banks, eq(users.id, banks.userId))
+  .leftJoin(transactions, eq(banks.id, transactions.senderBankId))
+  .leftJoin(budgets, eq(users.id, budgets.userId))
+  .leftJoin(savingsGoals, eq(users.id, savingsGoals.userId))
+  .where(eq(users.id, userId))
+  .groupBy(users.id, banks.id);
+```
+
+**Prisma** (separate queries — no multi-table GROUP BY)
+
+```typescript
+// Prisma can't do a 5-table LEFT JOIN with GROUP BY in one call.
+// You'd use multiple queries or raw SQL:
+
+const user = await prisma.user.findUnique({
+  where: { id: userId },
+  include: {
+    banks: {
+      include: {
+        sentTransactions: { where: { amount: { gt: 0 } } },
+      },
+    },
+    budgets: { where: { month: '2026-03' } },
+    savingsGoals: { where: { status: 'active' } },
+  },
+});
+
+// Then aggregate in JavaScript:
+const totalSpent = user.banks.flatMap(b => b.sentTransactions)
+  .reduce((sum, t) => sum + Number(t.amount), 0);
+const activeBudgets = user.budgets.length;
+const activeGoals = user.savingsGoals.length;
+const totalSaved = user.savingsGoals.reduce((sum, g) => sum + Number(g.savedAmount), 0);
+```
+
+Prisma fetches all rows and aggregates in JS. Drizzle pushes the aggregation to the database (where it belongs for large datasets). For small datasets, Prisma's approach is fine. For analytics at scale, Drizzle wins.
+
+---
+
+### 4) CRUD Operations — Side-by-Side
+
+**Upsert a budget (this project's actual pattern)**
+
+**Prisma**
+
+```typescript
+const budget = await prisma.budget.upsert({
+  where: {
+    userId_category_month: { userId, category: 'Food & Dining', month: '2026-03' },
+  },
+  update: { monthlyLimit: 400 },
+  create: {
+    userId,
+    category: 'Food & Dining',
+    monthlyLimit: 400,
+    month: '2026-03',
+  },
+});
+```
+
+**Drizzle**
+
+```typescript
+const [budget] = await db
+  .insert(budgets)
+  .values({
+    userId,
+    category: 'Food & Dining',
+    monthlyLimit: '400',
+    month: '2026-03',
+  })
+  .onConflictDoUpdate({
+    target: [budgets.userId, budgets.category, budgets.month],
+    set: { monthlyLimit: '400', updatedAt: new Date() },
+  })
+  .returning();
+```
+
+Both clean. Drizzle maps directly to PostgreSQL's `ON CONFLICT DO UPDATE` — you see the exact SQL behavior.
+
+---
+
+**Find with filtering and ordering (get user's active goals)**
+
+**Prisma**
+
+```typescript
+const goals = await prisma.savingsGoal.findMany({
+  where: { userId, status: 'active' },
+  orderBy: [{ targetDate: 'asc' }, { createdAt: 'desc' }],
+  include: { contributions: { orderBy: { createdAt: 'desc' }, take: 5 } },
+});
+```
+
+**Drizzle**
+
+```typescript
+// Step 1: fetch goals
+const goals = await db
+  .select()
+  .from(savingsGoals)
+  .where(and(eq(savingsGoals.userId, userId), eq(savingsGoals.status, 'active')))
+  .orderBy(asc(savingsGoals.targetDate), desc(savingsGoals.createdAt));
+
+// Step 2: fetch recent contributions for each (batched)
+const goalIds = goals.map(g => g.id);
+const contributions = await db
+  .select()
+  .from(goalContributions)
+  .where(inArray(goalContributions.goalId, goalIds))
+  .orderBy(desc(goalContributions.createdAt));
+
+// Step 3: merge in JS
+const goalsWithContribs = goals.map(g => ({
+  ...g,
+  contributions: contributions.filter(c => c.goalId === g.id).slice(0, 5),
+}));
+```
+
+Prisma handles the join + limit per relation in one call. Drizzle requires manual batching — but gives you full control over the exact queries hitting the database (no N+1 surprises).
+
+---
+
+**Transactional contribution + auto-complete goal**
+
+**Prisma** (using `$transaction`)
+
+```typescript
+const [contribution, updatedGoal] = await prisma.$transaction([
+  prisma.goalContribution.create({
+    data: { goalId, amount: 250, note: 'March savings' },
+  }),
+  prisma.savingsGoal.update({
+    where: { id: goalId },
+    data: {
+      savedAmount: { increment: 250 },
+      status: newSaved >= targetAmount ? 'completed' : undefined,
+    },
+  }),
+]);
+```
+
+**Drizzle**
+
+```typescript
+const result = await db.transaction(async (tx) => {
+  const [contribution] = await tx.insert(goalContributions).values({
+    goalId,
+    amount: '250',
+    note: 'March savings',
+  }).returning();
+
+  const [updatedGoal] = await tx
+    .update(savingsGoals)
+    .set({
+      savedAmount: sql`${savingsGoals.savedAmount} + 250`,
+      ...(newSaved >= targetAmount ? { status: 'completed' } : {}),
+      updatedAt: new Date(),
+    })
+    .where(eq(savingsGoals.id, goalId))
+    .returning();
+
+  return { contribution, goal: updatedGoal };
+});
+```
+
+Both work cleanly. Drizzle uses `sql` template for atomic increment — no read-modify-write race condition.
+
+---
+
+### 5) Performance & Benchmarks
+
+| Factor | Prisma | Drizzle |
+|--------|--------|---------|
+| **Query generation** | Passes through Rust engine, adds ~1-3ms overhead | Direct SQL string building, near-zero overhead |
+| **Cold start (serverless)** | Heavier — engine binary + WASM init | Lighter — pure JS/TS, faster Lambda/Edge cold starts |
+| **Steady-state throughput** | "Fast enough" for most CRUD apps | Measurably faster for high-throughput pipelines |
+| **Bundle size** | Larger (engine + generated client) | Smaller (no engine, no codegen artifacts) |
+| **Connection pooling** | Built-in via engine | Relies on external poolers (pgBouncer, Neon pooler) |
+
+> **Rule of thumb**: If raw request/response latency matters (serverless cold starts, ultra-high-throughput), Drizzle gives an edge. For standard CRUD in monoliths, Prisma is "fast enough" and better DX.
+
+---
+
+### 6) TypeScript DX & Compile-Time Tradeoffs
+
+| Factor | Prisma | Drizzle |
+|--------|--------|---------|
+| **Type generation** | Codegen from schema → fast type-checking | TypeScript inference from table defs → heavier TS compiler work |
+| **Editor autocomplete** | Excellent — generated client is narrow and specific | Good, but deeper inference can slow large schemas |
+| **Schema definition** | Separate `.prisma` DSL (not TypeScript) | Pure TypeScript (no context switching) |
+| **CI type-check speed** | Faster for large schemas (codegen'd types are flat) | Slower for large schemas (inference chains) |
+| **Refactoring** | Rename in schema → regenerate → find all usages | Rename in TS → standard TS refactoring tools work |
+
+Prisma's codegen approach means you run `prisma generate` after schema changes. Drizzle's pure-TS approach means no extra step, but heavier compiler load.
+
+---
+
+### 7) Migrations, Ecosystem, and Stability
+
+| Factor | Prisma | Drizzle |
+|--------|--------|---------|
+| **Migrations** | `prisma migrate dev` — automatic diff from schema, battle-tested | `drizzle-kit generate` — newer, improving rapidly |
+| **Studio/GUI** | Prisma Studio (built-in data browser) | Drizzle Studio (newer, web-based) |
+| **Community** | Larger, more Stack Overflow answers, more tutorials | Rapidly growing, strong Discord community |
+| **Maturity** | Production-proven since 2020 | Newer (2023+), but stable for most use cases |
+| **Edge/Serverless** | Requires engine WASM for Edge, improving | Native Edge support, smaller footprint |
+| **Multi-database** | PostgreSQL, MySQL, SQLite, MongoDB, CockroachDB | PostgreSQL, MySQL, SQLite (relational only) |
+
+---
+
+### 8) The "More Code in Drizzle" Complaint — Why It's Actually Useful
+
+From this project's codebase: Drizzle files have explicit `pgTable()` + `.relations()` files and explicit join-handling. It looks repetitive — but the repetition gives you:
+
+1. **Explicit FK and join table control** — no magic, no hidden queries
+2. **Easier debugging** — you see the exact SQL that runs, log it, explain it
+3. **Flexible batching/transactions** — wire them precisely where needed
+4. **No N+1 surprises** — Prisma's `include` can generate multiple queries under the hood; Drizzle makes you write them, so you know what's happening
+
+**Practical pattern to reduce Drizzle friction:**
+
+```
+/db/
+  tables/
+    users.ts
+    banks.ts
+    transactions.ts
+    budgets.ts
+    savingsGoals.ts
+    goalContributions.ts
+  relations/
+    index.ts          # import and combine all relations in one place
+  queries/
+    analytics.ts      # complex joins/aggregations
+    budgets.ts        # budget CRUD helpers
+    goals.ts          # goal CRUD helpers
+```
+
+Keeping relations in a single `relations/index.ts` and query patterns in `queries/` reduces scatter and keeps the codebase readable.
+
+---
+
+### 9) How to Make Drizzle Less Verbose (Practical Tips)
+
+1. **Batch join inserts** — Use `insert().values([row1, row2, row3])` for multiple child rows in a single SQL call. Avoid `Promise.all` with individual inserts.
+
+2. **Wrap multi-step ops in transactions** — `db.transaction(async (tx) => { ... })` gives you atomicity matching Prisma's nested writes.
+
+3. **Create small helpers for common patterns:**
+
+```typescript
+// helpers/connectMany.ts
+async function connectMany(
+  tx: Transaction,
+  joinTable: PgTable,
+  parentField: string,
+  parentId: string,
+  childField: string,
+  childIds: string[]
+) {
+  if (!childIds.length) return;
+  const rows = childIds.map(childId => ({
+    [parentField]: parentId,
+    [childField]: childId,
+  }));
+  await tx.insert(joinTable).values(rows);
+}
+```
+
+4. **Use relation helpers sparingly** — Only for developer-facing CRUD endpoints. Keep analytics queries as explicit joins.
+
+5. **Materialized views** for expensive aggregation queries (compute once, read many) — both ORMs benefit from this, but Drizzle makes it easier to query views directly since they're just another table definition.
+
+---
+
+### 10) Complete Production Examples (From This Project's Schema)
+
+#### A) Monthly Digest Report — Aggregating Across 5 Tables
+
+**Drizzle** (single query, database does the work)
+
+```typescript
+const digestData = await db
+  .select({
+    totalSpent: sql<number>`coalesce(sum(case when ${transactions.amount} > 0 then ${transactions.amount} else 0 end), 0)`.as('total_spent'),
+    totalIncome: sql<number>`coalesce(sum(case when ${transactions.amount} < 0 then abs(${transactions.amount}) else 0 end), 0)`.as('total_income'),
+    transactionCount: sql<number>`count(distinct ${transactions.id})`.as('txn_count'),
+    activeBudgets: sql<number>`count(distinct ${budgets.id})`.as('budget_count'),
+    budgetsOverLimit: sql<number>`count(distinct case when ${budgets.monthlyLimit} < (
+      select coalesce(sum(t2.amount), 0) from transactions t2
+      where t2.category = ${budgets.category}
+    ) then ${budgets.id} end)`.as('over_budget'),
+    activeGoals: sql<number>`count(distinct ${savingsGoals.id})`.as('goal_count'),
+    totalSaved: sql<number>`coalesce(sum(distinct ${savingsGoals.savedAmount}), 0)`.as('total_saved'),
+  })
+  .from(users)
+  .leftJoin(banks, eq(users.id, banks.userId))
+  .leftJoin(transactions, eq(banks.id, transactions.senderBankId))
+  .leftJoin(budgets, and(eq(users.id, budgets.userId), eq(budgets.month, '2026-03')))
+  .leftJoin(savingsGoals, and(eq(users.id, savingsGoals.userId), eq(savingsGoals.status, 'active')))
+  .where(eq(users.id, userId))
+  .groupBy(users.id);
+```
+
+**Prisma** (multiple queries + JS aggregation)
+
+```typescript
+const [user, txns, userBudgets, goals] = await Promise.all([
+  prisma.user.findUnique({ where: { id: userId } }),
+  prisma.transaction.findMany({
+    where: { sender: { id: userId } },
+    select: { amount: true, category: true },
+  }),
+  prisma.budget.findMany({
+    where: { userId, month: '2026-03' },
+  }),
+  prisma.savingsGoal.findMany({
+    where: { userId, status: 'active' },
+    select: { savedAmount: true, id: true },
+  }),
+]);
+
+const totalSpent = txns
+  .filter(t => Number(t.amount) > 0)
+  .reduce((sum, t) => sum + Number(t.amount), 0);
+const totalIncome = txns
+  .filter(t => Number(t.amount) < 0)
+  .reduce((sum, t) => sum + Math.abs(Number(t.amount)), 0);
+const categorySpend: Record<string, number> = {};
+for (const t of txns) {
+  if (Number(t.amount) > 0) {
+    categorySpend[t.category] = (categorySpend[t.category] || 0) + Number(t.amount);
+  }
+}
+const budgetsOverLimit = userBudgets.filter(
+  b => (categorySpend[b.category] || 0) > Number(b.monthlyLimit)
+).length;
+const totalSaved = goals.reduce((sum, g) => sum + Number(g.savedAmount), 0);
+```
+
+Prisma fetches raw rows and aggregates in JavaScript. Drizzle pushes computation to PostgreSQL — important when datasets grow beyond trivial size.
+
+#### B) Budget Upsert With Conflict Resolution
+
+**Prisma**
+
+```typescript
+const budget = await prisma.budget.upsert({
+  where: {
+    userId_category_month: {
+      userId: 'user-abc-123',
+      category: 'Food & Dining',
+      month: '2026-03',
+    },
+  },
+  update: {
+    monthlyLimit: 450,
+  },
+  create: {
+    userId: 'user-abc-123',
+    category: 'Food & Dining',
+    monthlyLimit: 450,
+    month: '2026-03',
+  },
+});
+```
+
+**Drizzle**
+
+```typescript
+const [budget] = await db
+  .insert(budgets)
+  .values({
+    userId: 'user-abc-123',
+    category: 'Food & Dining',
+    monthlyLimit: '450',
+    month: '2026-03',
+  })
+  .onConflictDoUpdate({
+    target: [budgets.userId, budgets.category, budgets.month],
+    set: {
+      monthlyLimit: '450',
+      updatedAt: new Date(),
+    },
+  })
+  .returning();
+```
+
+#### C) Goal Contribution With Atomic Increment + Auto-Complete
+
+**Prisma**
+
+```typescript
+const [contribution, updatedGoal] = await prisma.$transaction([
+  prisma.goalContribution.create({
+    data: {
+      goalId: 'goal-xyz-789',
+      amount: 250,
+      note: 'March savings',
+    },
+  }),
+  prisma.savingsGoal.update({
+    where: { id: 'goal-xyz-789' },
+    data: {
+      savedAmount: { increment: 250 },
+      status: newTotal >= targetAmount ? 'completed' : undefined,
+    },
+  }),
+]);
+```
+
+**Drizzle**
+
+```typescript
+const result = await db.transaction(async (tx) => {
+  const [contribution] = await tx.insert(goalContributions).values({
+    goalId: 'goal-xyz-789',
+    amount: '250',
+    note: 'March savings',
+  }).returning();
+
+  const [updatedGoal] = await tx
+    .update(savingsGoals)
+    .set({
+      savedAmount: sql`${savingsGoals.savedAmount} + 250`,
+      status: newTotal >= targetAmount ? 'completed' : 'active',
+      updatedAt: new Date(),
+    })
+    .where(eq(savingsGoals.id, 'goal-xyz-789'))
+    .returning();
+
+  return { contribution, goal: updatedGoal };
+});
+```
+
+Both use transactions. Drizzle's `sql` template for atomic increment avoids read-modify-write race conditions at the database level.
+
+---
+
+### 11) When to Pick Which (Practical Checklist)
+
+#### Pick Prisma if:
+
+- You want nested writes and reads with minimal code
+- Your team values quick onboarding and strong tooling (Studio, migrations)
+- You have CRUD-heavy endpoints and don't need complex SQL every day
+- You want a larger community with more tutorials and Stack Overflow answers
+- You need MongoDB support (Drizzle is relational only)
+- You prioritize developer experience over raw performance
+
+#### Pick Drizzle if:
+
+- You build analytics, complex joins, or need predictable SQL output
+- You're optimizing for serverless cold start latency or want minimal runtime overhead
+- You prefer the "everything in TypeScript" approach and want to avoid an external codegen step
+- You need window functions, CTEs, or complex aggregations without falling back to raw SQL
+- You want to see and control the exact SQL hitting your database
+- You're building for Edge runtimes where bundle size matters
+
+---
+
+### 12) Summary Table — Feature-by-Feature
+
+| Feature | Prisma | Drizzle |
+|---------|--------|---------|
+| **Schema definition** | `.prisma` DSL (separate language) | Pure TypeScript |
+| **Relations** | Implicit from schema | Explicit `relations()` helpers |
+| **Nested creates** | Built-in (`create: { ... }`) | Manual transaction + inserts |
+| **Nested reads** | `include: { ... }` | Manual joins or separate queries |
+| **Upsert** | `prisma.model.upsert()` | `onConflictDoUpdate()` |
+| **Aggregations** | `.aggregate()`, `.groupBy()` | `sql` template + `.groupBy()` |
+| **Complex joins** | Limited — often needs `$queryRaw` | Native — mirrors SQL directly |
+| **Window functions** | `$queryRaw` only | `sql` template, first-class |
+| **Migrations** | `prisma migrate dev` (mature) | `drizzle-kit generate` (newer) |
+| **Studio/GUI** | Prisma Studio (built-in) | Drizzle Studio (web-based) |
+| **Codegen required** | Yes (`prisma generate`) | No |
+| **Bundle size** | Larger (Rust engine) | Smaller (pure JS) |
+| **Cold start** | Slower (engine init) | Faster |
+| **Edge runtime** | Requires WASM adapter | Native support |
+| **Type safety** | Codegen'd (fast checks) | Inferred (heavier checks) |
+| **Raw SQL escape hatch** | `$queryRaw`, `$executeRaw` | `sql` template (inline) |
+| **Transaction API** | `$transaction([...])` or interactive | `db.transaction(async (tx) => { ... })` |
+| **Learning curve** | Lower (more abstracted) | Higher (closer to SQL) |
+| **Maturity** | 5+ years, battle-tested | 2+ years, rapidly maturing |
+
+> **This project uses Prisma** because it's a CRUD-heavy banking app where nested writes (goals + contributions, alerts + trigger logs) happen frequently, the team benefits from Studio for debugging, and the runtime overhead is negligible given the 5-minute caching layer on all Plaid/Gemini calls. If this were a high-throughput analytics pipeline or a serverless Edge function, Drizzle would be the better choice.
+
+---
+
 ## License
 
 This project is for educational and portfolio purposes.
