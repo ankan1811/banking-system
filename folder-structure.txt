@@ -1,0 +1,537 @@
+================================================================================
+                        ANKAN'S BANK — FOLDER STRUCTURE
+              A full-stack fintech app with AI-powered financial tools
+================================================================================
+
+
+bank/
+│
+├── .gitignore                        # Git ignore rules (node_modules, .env, .next, dist)
+├── LICENSE                           # Project license
+├── README.md                         # Full project documentation with setup guide
+├── package.json                      # Root scripts: dev:frontend, dev:backend, install:all
+├── folder-structure.txt              # This file — full folder map with descriptions
+│
+│
+├── shared/                           # ── SHARED CODE (used by both frontend & backend) ──
+│   │
+│   ├── types.ts                      # 20+ TypeScript types shared across the stack:
+│   │                                 #   - User, Account, Transaction, Bank (core models)
+│   │                                 #   - AICategory, AI_CATEGORIES[] (10 spending categories)
+│   │                                 #   - Budget, BudgetStatus (budget tracking)
+│   │                                 #   - SavingsGoal, GoalContribution (savings goals)
+│   │                                 #   - SpendingInsight (AI insights response)
+│   │                                 #   - TrendsData, RecurringPattern (analytics)
+│   │                                 #   - IncomeExpenseData, MerchantInsight (reports)
+│   │                                 #   - HealthScore (AI health score)
+│   │                                 #   - AlertRule (spending alerts)
+│   │                                 #   - TransactionNote (notes & tags)
+│   │                                 #   - ChatMessage, ChatResponse (AI chatbot)
+│   │                                 #   - SignUpParams, TransferParams, CreateTransactionProps
+│   │
+│   └── validators.ts                 # Zod validation schemas and shared utility functions
+│
+│
+├── prisma/                           # ── DATABASE SCHEMA ──
+│   │
+│   └── schema.prisma                 # Prisma schema defining 12 PostgreSQL tables:
+│                                     #   CORE:
+│                                     #     users              — User profiles, auth fields, relations
+│                                     #     banks              — Linked Plaid bank accounts + access tokens
+│                                     #     transactions       — In-app fund transfer records
+│                                     #     otp_codes          — Passwordless auth OTP codes (hashed)
+│                                     #   AI & CACHING:
+│                                     #     cached_categories  — Gemini category cache (SHA-256 hash key)
+│                                     #     financial_health_scores — AI health score cache per user/month
+│                                     #   FINANCIAL PLANNING:
+│                                     #     budgets            — Monthly spending limits per category
+│                                     #     savings_goals      — Named goals with target amounts
+│                                     #     goal_contributions — Audit trail of goal contributions
+│                                     #   ALERTS & NOTES:
+│                                     #     alert_rules        — User-defined spending alert rules
+│                                     #     alert_trigger_logs — Dedup log preventing duplicate emails
+│                                     #     transaction_notes  — User notes/tags per transaction
+│
+│
+├── backend/                          # ══════════════════════════════════════════════════
+│   │                                 #   EXPRESS.JS API SERVER (port 8787)
+│   │                                 # ══════════════════════════════════════════════════
+│   │
+│   ├── .env                          # Backend environment variables (DATABASE_URL, API keys)
+│   ├── package.json                  # Backend dependencies (express, prisma, plaid, etc.)
+│   ├── package-lock.json             # Lockfile
+│   ├── tsconfig.json                 # TypeScript config for backend
+│   ├── prisma.config.ts              # Prisma 7 config (datasource URL, migration path)
+│   │
+│   ├── prisma/                       # Symlink/copy of root prisma schema
+│   │   └── schema.prisma
+│   │
+│   └── src/
+│       │
+│       ├── index.ts                  # Express app entry point:
+│       │                             #   - Registers all 16 route modules
+│       │                             #   - Applies CORS, cookie parser, JSON middleware
+│       │                             #   - Applies rate limiters per route group
+│       │                             #   - Health check endpoint at GET /health
+│       │
+│       ├── lib/                      # ── CLIENT LIBRARIES ──
+│       │   │
+│       │   ├── db.ts                 # Prisma client singleton (PostgreSQL connection)
+│       │   ├── gemini.ts             # Google Gemini AI client (gemini-2.0-flash model)
+│       │   ├── plaid.ts              # Plaid API client (sandbox environment)
+│       │   └── utils.ts              # Backend utility functions
+│       │
+│       ├── middleware/               # ── MIDDLEWARE ──
+│       │   │
+│       │   ├── auth.ts               # JWT authentication middleware:
+│       │   │                         #   - Extracts session-token from httpOnly cookie
+│       │   │                         #   - Verifies JWT signature + token version
+│       │   │                         #   - Attaches userId to request object
+│       │   │
+│       │   └── rateLimit.ts          # Rate limiting middleware factory:
+│       │                             #   - createRateLimit(windowMs, max) — reusable factory
+│       │                             #   - chatRateLimit    — 10 req/min (AI chat)
+│       │                             #   - aiRateLimit      — 5 req/min (Gemini insights)
+│       │                             #   - accountsRateLimit — 30 req/min (Plaid fetches)
+│       │                             #   - analyticsRateLimit — 15 req/min (analytics)
+│       │                             #   - exportRateLimit  — 5 req/min (CSV/PDF export)
+│       │
+│       ├── routes/                   # ── API ROUTES (16 files) ──
+│       │   │                         #   Each file: Router + Zod validation + service call
+│       │   │
+│       │   ├── auth.routes.ts        # POST /api/auth/request-signin-otp
+│       │   │                         # POST /api/auth/verify-signin-otp
+│       │   │                         # POST /api/auth/request-signup-otp
+│       │   │                         # POST /api/auth/verify-signup-otp
+│       │   │                         # POST /api/auth/google
+│       │   │                         # GET  /api/auth/me
+│       │   │                         # POST /api/auth/logout
+│       │   │
+│       │   ├── accounts.routes.ts    # GET /api/accounts — all accounts with Plaid balances
+│       │   │                         # GET /api/accounts/:bankRecordId — account + transactions
+│       │   │
+│       │   ├── banks.routes.ts       # GET /api/banks — list connected banks
+│       │   │                         # GET /api/banks/:id — bank by ID
+│       │   │                         # GET /api/banks/by-account/:accountId
+│       │   │
+│       │   ├── transactions.routes.ts # POST /api/transactions — create transaction
+│       │   │                         # GET  /api/transactions/by-bank/:bankId
+│       │   │
+│       │   ├── plaid.routes.ts       # POST /api/plaid/create-link-token
+│       │   │                         # POST /api/plaid/exchange-token
+│       │   │
+│       │   ├── transfers.routes.ts   # POST /api/transfers — create fund transfer (Razorpay)
+│       │   │
+│       │   ├── ai.routes.ts          # POST /api/ai/insights — AI spending insights
+│       │   │
+│       │   ├── chat.routes.ts        # POST /api/chat — AI financial assistant
+│       │   │
+│       │   ├── budgets.routes.ts     # GET    /api/budgets?month=YYYY-MM
+│       │   │                         # GET    /api/budgets/status?bankRecordId=x&month=YYYY-MM
+│       │   │                         # POST   /api/budgets — create/update budget
+│       │   │                         # DELETE /api/budgets/:id
+│       │   │
+│       │   ├── goals.routes.ts       # GET    /api/goals — list all goals
+│       │   │                         # POST   /api/goals — create goal
+│       │   │                         # PATCH  /api/goals/:id — update goal
+│       │   │                         # DELETE /api/goals/:id
+│       │   │                         # POST   /api/goals/:id/contribute
+│       │   │                         # GET    /api/goals/:id/contributions
+│       │   │
+│       │   ├── export.routes.ts      # GET /api/export/csv?bankRecordId&from&to — CSV download
+│       │   │                         # GET /api/export/pdf?bankRecordId&from&to — PDF statement
+│       │   │
+│       │   ├── analytics.routes.ts   # GET /api/analytics/trends?bankRecordId&months
+│       │   │                         # GET /api/analytics/recurring?bankRecordId
+│       │   │                         # GET /api/analytics/income-expense?bankRecordId&months
+│       │   │                         # GET /api/analytics/merchants?bankRecordId&months
+│       │   │
+│       │   ├── alerts.routes.ts      # GET    /api/alerts — list alert rules
+│       │   │                         # POST   /api/alerts — create rule
+│       │   │                         # PATCH  /api/alerts/:id — enable/disable
+│       │   │                         # DELETE /api/alerts/:id
+│       │   │
+│       │   ├── health-score.routes.ts # GET /api/health-score?bankRecordId&month
+│       │   │
+│       │   ├── search.routes.ts      # GET /api/search?bankRecordId&q&category&amountMin&...
+│       │   │
+│       │   └── notes.routes.ts       # POST   /api/notes — upsert note
+│       │                             # DELETE /api/notes/:hash
+│       │                             # GET    /api/notes/batch?hashes=h1,h2,...
+│       │                             # GET    /api/notes/tags — user's tags (autocomplete)
+│       │
+│       └── services/                 # ── BUSINESS LOGIC (17 files) ──
+│           │
+│           ├── auth.service.ts       # JWT creation, verification, token versioning
+│           │
+│           ├── user.service.ts       # User CRUD, bank record lookups
+│           │
+│           ├── bank.service.ts       # CENTRAL SERVICE — Plaid data fetching with caching:
+│           │                         #   getAccounts(userId)     — 5-min cache per userId
+│           │                         #   getAccount(bankRecordId) — 5-min cache per account
+│           │                         #   getInstitution(id)      — 24-hr cache (static data)
+│           │                         #   getTransactions(token)  — Plaid transactionsSync loop
+│           │                         #   hashTransaction()       — SHA-256 hash for note lookups
+│           │                         #   Triggers AI categorization + alert evaluation
+│           │
+│           ├── gemini.service.ts     # AI SERVICE — Google Gemini integration:
+│           │                         #   categorizeTransactions() — batch 50/call, DB-cached
+│           │                         #   generateSpendingInsights() — 5-min in-memory cache
+│           │                         #   buildFinancialContext() — 5-min context cache
+│           │                         #   chat() — Gemini chat with financial context
+│           │
+│           ├── budget.service.ts     # Budget CRUD + getBudgetStatus():
+│           │                         #   Joins live Plaid spending with budget limits
+│           │                         #   Calculates percentUsed per category
+│           │
+│           ├── goals.service.ts      # Savings goal CRUD + contributions:
+│           │                         #   addContribution() — Prisma transaction updates
+│           │                         #     savedAmount + auto-completes if target reached
+│           │
+│           ├── analytics.service.ts  # Analytics with in-memory TTL caches:
+│           │                         #   getSpendingTrends()   — 5-min cache, multi-month
+│           │                         #   detectRecurring()     — 1-hr cache, subscription detection
+│           │                         #   getIncomeVsExpense()  — 5-min cache, monthly P&L
+│           │                         #   getMerchantInsights() — 5-min cache, top 50 merchants
+│           │                         #   normalizeName()       — shared merchant name normalizer
+│           │
+│           ├── alerts.service.ts     # Alert evaluation + Resend email:
+│           │                         #   evaluateAlerts() — checks rules against transactions
+│           │                         #   Types: category_monthly_limit, single_transaction
+│           │                         #   Dedup via AlertTriggerLog (28d/1hr windows)
+│           │
+│           ├── export.service.ts     # Transaction export:
+│           │                         #   exportCSV() — csv-stringify, streams as download
+│           │                         #   exportPDF() — PDFKit, formatted bank statement
+│           │
+│           ├── health-score.service.ts # AI financial health score (3-layer cache):
+│           │                         #   Layer 1: In-memory (1-hr TTL)
+│           │                         #   Layer 2: DB (FinancialHealthScore table)
+│           │                         #   Layer 3: Gemini call (pre-aggregated ~200 bytes)
+│           │                         #   Fallback: Local rule-based score if Gemini fails
+│           │
+│           ├── search.service.ts     # Transaction search/filter:
+│           │                         #   searchTransactions() — text, category, amount, date
+│           │                         #   Runs on cached getAccount() data (0 extra API calls)
+│           │
+│           ├── notes.service.ts      # Transaction notes/tags CRUD:
+│           │                         #   batchGetNotes()  — 2-min cache, batch by hashes
+│           │                         #   upsertNote()     — create/update with cache invalidation
+│           │                         #   getUserTags()    — 5-min cache, distinct tags
+│           │
+│           ├── otp.service.ts        # OTP generation, hashing, verification:
+│           │                         #   sendOtp() — generates 6-digit code, sends via Resend
+│           │                         #   verifyOtp() — hash comparison + expiry check
+│           │                         #   MASTER_OTP bypass for development
+│           │
+│           ├── plaid.service.ts      # Plaid Link token creation + token exchange:
+│           │                         #   createLinkToken() — for Plaid Link UI
+│           │                         #   exchangePublicToken() — saves access token to DB
+│           │
+│           ├── razorpay.service.ts   # Razorpay integration (test mode):
+│           │                         #   createContact() — RazorpayX business contact on signup
+│           │                         #   createTransfer() — demo mode, records in DB only
+│           │
+│           ├── transaction.service.ts # In-app transaction CRUD:
+│           │                         #   createTransaction() — records fund transfers
+│           │                         #   getTransactionsByBankId() — fetch by bank
+│           │
+│           └── google.service.ts     # Google OAuth token verification:
+│                                     #   verifyGoogleToken() — validates Google ID token
+│
+│
+├── frontend/                         # ══════════════════════════════════════════════════
+│   │                                 #   NEXT.JS 14 FRONTEND (port 3003)
+│   │                                 # ══════════════════════════════════════════════════
+│   │
+│   ├── .env                          # Frontend env (NEXT_PUBLIC_API_URL, GOOGLE_CLIENT_ID)
+│   ├── .env.example                  # Example env template
+│   ├── .eslintrc.json                # ESLint config
+│   ├── components.json               # shadcn/ui component config
+│   ├── next.config.mjs               # Next.js config (Sentry, webpack)
+│   ├── next-env.d.ts                 # Next.js TypeScript declarations
+│   ├── package.json                  # Frontend dependencies
+│   ├── package-lock.json             # Lockfile
+│   ├── postcss.config.mjs            # PostCSS config for Tailwind
+│   ├── tailwind.config.ts            # Tailwind config (custom colors, fonts, animations)
+│   ├── tsconfig.json                 # TypeScript config with path aliases (@/, @shared/)
+│   ├── middleware.ts                 # Next.js middleware (auth redirect, cookie forwarding)
+│   ├── sentry.client.config.ts       # Sentry client-side error tracking
+│   ├── sentry.edge.config.ts         # Sentry edge runtime config
+│   ├── sentry.server.config.ts       # Sentry server-side error tracking
+│   │
+│   ├── app/                          # ── NEXT.JS APP ROUTER ──
+│   │   │
+│   │   ├── layout.tsx                # Root layout: HTML shell, fonts, global providers
+│   │   ├── globals.css               # Global CSS: Tailwind directives, glass-card styles,
+│   │   │                             #   custom scrollbar, transaction-card, sidebar styles
+│   │   ├── global-error.jsx          # Global error boundary (Sentry integration)
+│   │   │
+│   │   ├── api/
+│   │   │   └── sentry-example-api/
+│   │   │       └── route.js          # Sentry test route
+│   │   │
+│   │   ├── (auth)/                   # ── PUBLIC AUTH PAGES (no sidebar) ──
+│   │   │   │
+│   │   │   ├── layout.tsx            # Auth layout: gradient blobs, centered card
+│   │   │   ├── sign-in/
+│   │   │   │   └── page.tsx          # Sign-in: OTP or Google OAuth
+│   │   │   └── sign-up/
+│   │   │       └── page.tsx          # Sign-up: form + OTP verification
+│   │   │
+│   │   └── (root)/                   # ── PROTECTED DASHBOARD PAGES (with sidebar) ──
+│   │       │
+│   │       ├── layout.tsx            # Dashboard layout: sidebar + mobile nav + AI chatbot
+│   │       │
+│   │       ├── page.tsx              # HOME DASHBOARD — greeting, total balance, bank cards,
+│   │       │                         #   category breakdown chart, recurring subscriptions
+│   │       │                         #   card, recent transactions
+│   │       │
+│   │       ├── my-banks/
+│   │       │   └── page.tsx          # MY BANKS — linked bank accounts, Plaid Link button
+│   │       │
+│   │       ├── transaction-history/
+│   │       │   └── page.tsx          # TRANSACTION HISTORY — account info, balance,
+│   │       │                         #   export button (CSV/PDF), search/filter bar,
+│   │       │                         #   paginated transaction table
+│   │       │
+│   │       ├── payment-transfer/
+│   │       │   └── page.tsx          # PAYMENT TRANSFER — fund transfer form (Razorpay)
+│   │       │
+│   │       ├── insights/
+│   │       │   └── page.tsx          # AI INSIGHTS — category breakdown doughnut chart +
+│   │       │                         #   SpendingInsightsCard (summary, categories,
+│   │       │                         #   month comparison, anomalies, savings tips)
+│   │       │
+│   │       ├── budgets/
+│   │       │   └── page.tsx          # BUDGET TRACKER — set monthly limits per AI category,
+│   │       │                         #   real-time progress bars (green/amber/red)
+│   │       │
+│   │       ├── goals/
+│   │       │   └── page.tsx          # SAVINGS GOALS — create goals, add contributions,
+│   │       │                         #   SVG progress rings, emoji/color customization
+│   │       │
+│   │       ├── trends/
+│   │       │   └── page.tsx          # SPENDING TRENDS — multi-month stacked bar chart,
+│   │       │                         #   category toggles, 3/6/12 month selector
+│   │       │
+│   │       ├── alerts/
+│   │       │   └── page.tsx          # SPENDING ALERTS — create email alert rules,
+│   │       │                         #   toggle enable/disable, delete
+│   │       │
+│   │       ├── health-score/
+│   │       │   └── page.tsx          # HEALTH SCORE — AI-generated 0-100 gauge,
+│   │       │                         #   breakdown bars, personalized tips
+│   │       │
+│   │       ├── income-expense/
+│   │       │   └── page.tsx          # INCOME VS EXPENSES — grouped bar chart,
+│   │       │                         #   summary cards, net savings per month
+│   │       │
+│   │       └── merchants/
+│   │           └── page.tsx          # MERCHANT INSIGHTS — top 50 merchants ranked,
+│   │                                 #   category badges, trend arrows, search filter
+│   │
+│   ├── components/                   # ── REACT COMPONENTS (37 files) ──
+│   │   │
+│   │   │  ─── AI & Analytics ───
+│   │   ├── AIChatbot.tsx             # Floating chat panel (bottom-right sparkle button)
+│   │   │                             #   — Gemini-powered, full financial context
+│   │   │                             #   — Quick-prompt shortcuts, message history
+│   │   ├── CategoryBreakdownChart.tsx # Doughnut chart: spending by AI category (Chart.js)
+│   │   ├── SpendingInsightsCard.tsx  # AI insights: summary, categories, anomalies, tips
+│   │   ├── SpendingTrendsChart.tsx   # Multi-month bar chart with category toggles (Chart.js)
+│   │   ├── IncomeExpenseChart.tsx    # Income vs expense grouped bars + net savings line
+│   │   ├── MerchantInsightsCard.tsx  # Ranked merchant list with spend, count, trend arrows
+│   │   ├── HealthScoreCard.tsx       # SVG circular gauge (0-100), breakdown bars, tips
+│   │   ├── RecurringTransactionsCard.tsx  # Auto-detected subscriptions (expandable card)
+│   │   │
+│   │   │  ─── Financial Planning ───
+│   │   ├── BudgetProgressCard.tsx    # Budget progress bars per category (green/amber/red)
+│   │   │                             #   — Inline add/edit/delete budgets
+│   │   ├── GoalCard.tsx              # Individual goal: SVG progress ring, contribute button
+│   │   ├── GoalsManager.tsx          # Goals list + create form (emoji picker, color picker)
+│   │   ├── AlertsManager.tsx         # Alert rules list + create form with type/category/threshold
+│   │   │
+│   │   │  ─── Transaction Tools ───
+│   │   ├── TransactionsTable.tsx     # Transaction list: responsive, category badges,
+│   │   │                             #   color-coded amounts (red debit, green credit)
+│   │   ├── TransactionSearchView.tsx # Search + filter bar: text, category, amount, date range
+│   │   │                             #   — Debounced 300ms, paginated results
+│   │   ├── ExportModal.tsx           # Date range picker + CSV/PDF download buttons
+│   │   ├── RecentTransactions.tsx    # Dashboard recent transactions with bank tab switcher
+│   │   │
+│   │   │  ─── Dashboard & Layout ───
+│   │   ├── HeaderBox.tsx             # Page header (title + subtitle)
+│   │   ├── Sidebar.tsx               # Collapsible sidebar (72px → 240px on hover)
+│   │   ├── MobileNav.tsx             # Bottom tab bar for mobile (Revolut-style)
+│   │   ├── RightSidebar.tsx          # Right panel: bank cards + recent transactions
+│   │   ├── Footer.tsx                # Footer component
+│   │   ├── Pagination.tsx            # Page navigation with prev/next
+│   │   │
+│   │   │  ─── Banking ───
+│   │   ├── TotalBalanceBox.tsx       # Total balance display with animated counter
+│   │   ├── DoughnutChart.tsx         # Account balance doughnut chart
+│   │   ├── BankCard.tsx              # 3D bank card with tilt + shimmer effect
+│   │   ├── BankDropdown.tsx          # Bank account selector dropdown
+│   │   ├── BankInfo.tsx              # Bank account info display
+│   │   ├── BankTabItem.tsx           # Tab item for multi-bank switching
+│   │   ├── PlaidLink.tsx             # Plaid Link integration button
+│   │   ├── PaymentTransferForm.tsx   # Fund transfer form (amount, recipient, bank)
+│   │   ├── AnimatedCounter.tsx       # Animated number counter (for balance display)
+│   │   │
+│   │   │  ─── Auth & Misc ───
+│   │   ├── AuthForm.tsx              # Sign-in/Sign-up form (OTP + Google OAuth)
+│   │   ├── CustomInput.tsx           # Reusable form input with react-hook-form
+│   │   ├── Category.tsx              # Category badge component
+│   │   ├── Copy.tsx                  # Click-to-copy component
+│   │   │
+│   │   └── ui/                       # ── SHADCN/UI PRIMITIVES ──
+│   │       ├── button.tsx            # Button variants (default, outline, ghost, link)
+│   │       ├── form.tsx              # Form wrapper with react-hook-form
+│   │       ├── input.tsx             # Text input
+│   │       ├── label.tsx             # Form label
+│   │       ├── progress.tsx          # Progress bar
+│   │       ├── select.tsx            # Select dropdown
+│   │       ├── sheet.tsx             # Slide-over panel (mobile nav)
+│   │       ├── table.tsx             # Table primitives
+│   │       ├── tabs.tsx              # Tab switcher
+│   │       └── textarea.tsx          # Textarea input
+│   │
+│   ├── constants/
+│   │   └── index.ts                  # App constants:
+│   │                                 #   sidebarLinks[] — 13 sidebar navigation items
+│   │                                 #   aiCategoryColors — hex colors for 10 AI categories
+│   │                                 #   aiCategoryStyles — Tailwind classes per category
+│   │                                 #   topCategoryStyles — dashboard category card styles
+│   │                                 #   transactionCategoryStyles — Plaid category styles
+│   │                                 #   TEST_USER_ID, TEST_ACCESS_TOKEN, ITEMS (dev helpers)
+│   │
+│   ├── lib/
+│   │   │
+│   │   ├── utils.ts                  # Utility functions:
+│   │   │                             #   formatAmount() — currency formatting
+│   │   │                             #   formatDateTime() — date/time display
+│   │   │                             #   getTransactionStatus() — processing/success status
+│   │   │                             #   removeSpecialCharacters() — clean display names
+│   │   │                             #   cn() — Tailwind class merge (clsx + twMerge)
+│   │   │
+│   │   └── api/                      # ── API CLIENT LAYER (17 files) ──
+│   │       │
+│   │       ├── client.ts             # Base client: apiRequest<T>(path, options)
+│   │       │                         #   — credentials: 'include' for cookie auth
+│   │       │                         #   — Content-Type: application/json
+│   │       │                         #   — Error handling with typed responses
+│   │       │
+│   │       ├── server-client.ts      # Server-side client: serverApiRequest<T>(path)
+│   │       │                         #   — Extracts session-token from Next.js cookies
+│   │       │                         #   — cache: 'no-store' (no stale data)
+│   │       │                         #   — Returns null on 401 (redirect to login)
+│   │       │
+│   │       ├── auth.api.ts           # Auth: requestOtp, verifyOtp, googleSignIn, getMe, logout
+│   │       ├── accounts.api.ts       # Accounts: getAccounts, getAccount
+│   │       ├── banks.api.ts          # Banks: getBanks, getBank, getBankByAccountId
+│   │       ├── transactions.api.ts   # Transactions: createTransaction, getByBank
+│   │       ├── plaid.api.ts          # Plaid: createLinkToken, exchangeToken
+│   │       ├── transfers.api.ts      # Transfers: createTransfer
+│   │       ├── ai.api.ts             # AI: getInsights
+│   │       ├── chat.api.ts           # Chat: sendMessage
+│   │       ├── budgets.api.ts        # Budgets: getBudgets, getBudgetStatus, upsert, delete
+│   │       │                         #   + buildExportUrl() for CSV/PDF download links
+│   │       ├── goals.api.ts          # Goals: getGoals, create, update, delete, contribute
+│   │       ├── analytics.api.ts      # Analytics: trends, recurring, income/expense, merchants
+│   │       ├── alerts.api.ts         # Alerts: getAlerts, create, update, delete
+│   │       ├── health-score.api.ts   # Health: getHealthScore
+│   │       ├── search.api.ts         # Search: searchTransactions with filter params
+│   │       └── notes.api.ts          # Notes: batchGetNotes, upsertNote, deleteNote, getUserTags
+│   │
+│   ├── types/
+│   │   └── index.d.ts               # Global TypeScript declarations:
+│   │                                 #   SearchParamProps, Transaction (with aiCategory)
+│   │                                 #   CategoryBadgeProps, TransactionTableProps, etc.
+│   │
+│   └── public/
+│       └── icons/                    # ── 40+ SVG/PNG ICONS ──
+│           ├── home.svg              # Sidebar: home
+│           ├── dollar-circle.svg     # Sidebar: my banks
+│           ├── transaction.svg       # Sidebar: transactions
+│           ├── money-send.svg        # Sidebar: transfers
+│           ├── monitor.svg           # Sidebar: insights, budgets, goals, trends, etc.
+│           ├── logo.svg              # App logo
+│           ├── google.svg            # Google sign-in button
+│           ├── mastercard.svg        # Bank card brand
+│           ├── visa.svg              # Bank card brand
+│           ├── Paypass.svg           # Bank card contactless icon
+│           ├── Lines.svg             # Bank card design lines
+│           ├── auth-image.svg        # Auth page illustration
+│           ├── connect-bank.svg      # Plaid Link illustration
+│           ├── gradient-mesh.svg     # Background gradient mesh
+│           ├── search.svg            # Search icon
+│           ├── filter-lines.svg      # Filter icon
+│           ├── arrow-up/down/left/right.svg  # Navigation arrows
+│           ├── plus.svg              # Add button
+│           ├── edit.svg              # Edit button
+│           ├── logout.svg            # Logout button
+│           ├── hamburger.svg         # Mobile menu
+│           ├── loader.svg            # Loading spinner
+│           ├── coins.svg             # Category icon
+│           ├── shopping-bag.svg      # Category icon
+│           ├── credit-card.svg       # Payment icon
+│           ├── deposit.svg           # Deposit icon
+│           ├── dollar.svg            # Dollar icon
+│           ├── bank-transfer.svg     # Transfer illustration
+│           ├── payment-transfer.svg  # Payment illustration
+│           └── ... (more icons)      # Various UI icons
+
+
+================================================================================
+                              ARCHITECTURE SUMMARY
+================================================================================
+
+  FRONTEND (Next.js 14)          BACKEND (Express.js)           DATABASE (PostgreSQL)
+  ─────────────────────          ────────────────────           ──────────────────────
+  Server Components              Routes (Zod validation)         12 Prisma models
+       │                              │
+       ▼                              ▼
+  serverApiRequest()             Services (business logic)
+  apiRequest()                        │
+       │                              ├── In-memory caches (5min-24hr TTL)
+       │                              ├── Rate limiters (5-30 req/min)
+       │                              └── External APIs:
+       │                                   ├── Plaid (bank data)
+       │                                   ├── Gemini (AI categorization, insights, chat, health score)
+       │                                   ├── Resend (email alerts, OTP)
+       │                                   └── Razorpay (transfers, test mode)
+
+  CACHING LAYERS:
+  ┌─────────────────────────────────────────────────────────────────┐
+  │ L1: In-memory Maps   │ getAccount (5m), getAccounts (5m),      │
+  │     (per-process)     │ institution (24h), insights (5m),       │
+  │                       │ trends (5m), recurring (1h),            │
+  │                       │ income/expense (5m), merchants (5m),    │
+  │                       │ health score (1h), chat context (5m),   │
+  │                       │ notes (2m), tags (5m)                   │
+  ├───────────────────────┼─────────────────────────────────────────┤
+  │ L2: PostgreSQL        │ cached_categories (permanent),          │
+  │     (persistent)      │ financial_health_scores (survives       │
+  │                       │ restarts)                               │
+  ├───────────────────────┼─────────────────────────────────────────┤
+  │ L3: External API      │ Gemini (only on cache miss),            │
+  │     (last resort)     │ Plaid (only on cache miss)              │
+  └───────────────────────┴─────────────────────────────────────────┘
+
+================================================================================
+                                    STATS
+================================================================================
+
+  Frontend Pages ............ 12
+  React Components .......... 37 (+ 10 shadcn/ui primitives)
+  API Client Files .......... 17
+  Backend Route Files ....... 16
+  Backend Service Files ..... 17
+  Database Tables ........... 12
+  Shared Types .............. 20+
+  Public Icons .............. 40+
+  In-Memory Caches .......... 12
+  Rate Limit Tiers .......... 5
+
+================================================================================
