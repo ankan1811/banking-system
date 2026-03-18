@@ -1,12 +1,17 @@
 import { getAccount } from './bank.service.js';
-import type { AICategory, TrendsData, RecurringPattern } from '@shared/types';
+import type { AICategory, TrendsData, RecurringPattern, IncomeExpenseData, MerchantInsight } from '@shared/types';
 import { AI_CATEGORIES } from '@shared/types';
 
 // ─── In-memory caches ────────────────────────────────────────
-const trendsCache = new Map<string, { data: TrendsData; expiresAt: number }>();
-const recurringCache = new Map<string, { data: RecurringPattern[]; expiresAt: number }>();
+type CacheEntry<T> = { data: T; expiresAt: number };
+const trendsCache = new Map<string, CacheEntry<TrendsData>>();
+const recurringCache = new Map<string, CacheEntry<RecurringPattern[]>>();
+const incomeExpenseCache = new Map<string, CacheEntry<IncomeExpenseData>>();
+const merchantCache = new Map<string, CacheEntry<MerchantInsight[]>>();
 const TRENDS_TTL = 5 * 60 * 1000;
 const RECURRING_TTL = 60 * 60 * 1000;
+const IE_TTL = 5 * 60 * 1000;
+const MERCHANT_TTL = 5 * 60 * 1000;
 
 // ─── Spending Trends ─────────────────────────────────────────
 
