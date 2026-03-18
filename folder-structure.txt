@@ -157,10 +157,13 @@ bank/
 │       │   │
 │       │   ├── search.routes.ts      # GET /api/search?bankRecordId&q&category&amountMin&...
 │       │   │
-│       │   └── notes.routes.ts       # POST   /api/notes — upsert note
-│       │                             # DELETE /api/notes/:hash
-│       │                             # GET    /api/notes/batch?hashes=h1,h2,...
-│       │                             # GET    /api/notes/tags — user's tags (autocomplete)
+│       │   ├── notes.routes.ts       # POST   /api/notes — upsert note
+│       │   │                         # DELETE /api/notes/:hash
+│       │   │                         # GET    /api/notes/batch?hashes=h1,h2,...
+│       │   │                         # GET    /api/notes/tags — user's tags (autocomplete)
+│       │   │
+│       │   └── reports.routes.ts     # GET /api/reports/digest?bankRecordId&month — monthly digest
+│       │                             # GET /api/reports/digest/pdf — PDF export of digest
 │       │
 │       └── services/                 # ── BUSINESS LOGIC (17 files) ──
 │           │
@@ -223,6 +226,13 @@ bank/
 │           │                         #   batchGetNotes()  — 2-min cache, batch by hashes
 │           │                         #   upsertNote()     — create/update with cache invalidation
 │           │                         #   getUserTags()    — 5-min cache, distinct tags
+│           │
+│           ├── digest.service.ts    # Monthly Digest (3-layer cache like health score):
+│           │                         #   Layer 1: In-memory (1-hr TTL)
+│           │                         #   Layer 2: DB (MonthlyDigest table, permanent for past months)
+│           │                         #   Layer 3: Aggregates all services + single Gemini narrative call
+│           │                         #   generateDigestPDF() — PDFKit full report export
+│           │                         #   Local fallback narrative if Gemini fails
 │           │
 │           ├── otp.service.ts        # OTP generation, hashing, verification:
 │           │                         #   sendOtp() — generates 6-digit code, sends via Resend

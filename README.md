@@ -39,7 +39,14 @@ Built with **Next.js 14**, **Express.js**, **Prisma**, **PostgreSQL**, **Plaid**
 - **Income vs expenses** — Monthly P&L report with grouped bar chart (green income, red expenses), net savings line, and summary cards (total income, total expenses, net savings, avg monthly).
 - **Merchant insights** — Top 50 merchants ranked by total spend. Shows transaction count, average amount, category badge, month-over-month trend arrows, and a client-side search filter.
 - **Recurring transaction detection** — Algorithm detects subscriptions by grouping transactions with similar names/amounts at regular intervals (weekly, monthly, quarterly). Shows on dashboard with next expected date.
+- **Bill calendar** — Visual monthly calendar grid showing projected recurring charges on their expected dates. Color-coded by AI category, click-to-expand daily details, monthly committed total. Zero new API calls — reuses existing recurring detection data.
+- **AI monthly digest** — Comprehensive monthly report page aggregating health score, budget adherence, goal progress, top merchants, and income vs expenses into one view. AI-generated narrative summary (1 Gemini call per user per month, cached in DB). One-click PDF export.
 - **Transaction export** — Export any date range to CSV (for spreadsheets/accountants) or a formatted PDF bank statement with account info, transaction table, and debit/credit totals.
+
+### Profile & Settings
+- **Profile management** — View and edit personal info (name, address, city, state, zip). Email shown as read-only.
+- **Connected banks management** — View all linked banks with account mask, disconnect banks (revokes Plaid access token).
+- **Account actions** — Logout all devices (invalidates all JWTs via tokenVersion increment), delete account with safety confirmation (type "DELETE"). Cascade deletes all user data.
 
 ### Smart Search & Filters
 - **Full-text search** across transaction names and merchant names
@@ -73,6 +80,7 @@ All external API calls are aggressively cached to stay within free tier limits:
 | Spending insights | 5 min | Gemini called once per user/month window |
 | Analytics (trends, recurring, income/expense, merchants) | 5-60 min | Pure aggregation on cached data |
 | Financial health score | 1 hr (memory) + DB | At most 1 Gemini call per user per hour |
+| Monthly digest | 1 hr (memory) + DB | At most 1 Gemini call per user per month |
 
 Rate limits per user per minute:
 
