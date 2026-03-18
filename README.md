@@ -153,7 +153,7 @@ Rate limits per user per minute:
 | **Payments** | Razorpay (test mode) |
 | **Email** | Resend |
 | **AI** | Google Gemini 2.0 Flash (free tier) |
-| **Charts** | Chart.js (Bar, Doughnut) |
+| **Charts** | Chart.js (Bar, Doughnut, Line) |
 | **Export** | PDFKit (PDF statements), csv-stringify (CSV) |
 
 ---
@@ -209,12 +209,15 @@ bank/
 │   │   ├── alerts.api.ts             # Alerts API
 │   │   ├── health-score.api.ts       # Health Score API
 │   │   ├── search.api.ts             # Transaction search API
-│   │   └── notes.api.ts              # Transaction notes/tags API
+│   │   ├── notes.api.ts              # Transaction notes/tags API
+│   │   ├── splits.api.ts             # Split expenses API
+│   │   ├── net-worth.api.ts          # Net worth + assets/liabilities API
+│   │   └── challenges.api.ts         # Spending challenges API
 │   └── constants/                    # Style configs (AI category colors, sidebar links)
 │
 ├── backend/                          # Express API (port 8787)
 │   ├── src/
-│   │   ├── routes/                   # 13 route files
+│   │   ├── routes/                   # 16 route files
 │   │   │   ├── ai.routes.ts          # POST /api/ai/insights
 │   │   │   ├── chat.routes.ts        # POST /api/chat
 │   │   │   ├── budgets.routes.ts     # CRUD /api/budgets + status
@@ -224,8 +227,11 @@ bank/
 │   │   │   ├── alerts.routes.ts      # CRUD /api/alerts
 │   │   │   ├── health-score.routes.ts  # GET /api/health-score
 │   │   │   ├── search.routes.ts      # GET /api/search
-│   │   │   └── notes.routes.ts       # CRUD /api/notes + batch + tags
-│   │   ├── services/                 # 10 service files
+│   │   │   ├── notes.routes.ts       # CRUD /api/notes + batch + tags
+│   │   │   ├── splits.routes.ts     # CRUD /api/splits + summary
+│   │   │   ├── net-worth.routes.ts  # /api/net-worth + assets + liabilities
+│   │   │   └── challenges.routes.ts # /api/challenges + overview + suggestions
+│   │   ├── services/                 # 13 service files
 │   │   │   ├── gemini.service.ts     # categorize, insights, chat (cached)
 │   │   │   ├── bank.service.ts       # Plaid calls (5-min + 24-hr caches)
 │   │   │   ├── budget.service.ts     # Budget CRUD + status
@@ -235,14 +241,17 @@ bank/
 │   │   │   ├── export.service.ts     # CSV/PDF generation
 │   │   │   ├── health-score.service.ts  # 3-layer cached health score
 │   │   │   ├── search.service.ts     # Transaction search/filter
-│   │   │   └── notes.service.ts      # Transaction notes/tags CRUD
+│   │   │   ├── notes.service.ts      # Transaction notes/tags CRUD
+│   │   │   ├── splits.service.ts    # Split expenses CRUD + auto-settle
+│   │   │   ├── net-worth.service.ts # Assets/liabilities + net worth + AI insight
+│   │   │   └── challenges.service.ts # Challenges + progress + AI suggestions + streaks
 │   │   ├── middleware/               # JWT auth + rate limiter factory
 │   │   └── lib/                      # Prisma, Plaid, Gemini clients
 │   └── prisma/
-│       └── schema.prisma             # Database schema (12 tables)
+│       └── schema.prisma             # Database schema (20 tables)
 │
 ├── shared/                           # Shared between frontend & backend
-│   ├── types.ts                      # TypeScript types (20+ types)
+│   ├── types.ts                      # TypeScript types (35+ types)
 │   └── validators.ts                 # Zod schemas, utilities
 │
 └── package.json                      # Root scripts (dev:frontend, dev:backend)
@@ -345,7 +354,7 @@ cd backend
 npx prisma migrate dev --name init
 ```
 
-This creates 12 tables: `users`, `banks`, `transactions`, `otp_codes`, `cached_categories`, `budgets`, `savings_goals`, `goal_contributions`, `alert_rules`, `alert_trigger_logs`, `transaction_notes`, `financial_health_scores`.
+This creates 20 tables: `users`, `banks`, `transactions`, `otp_codes`, `cached_categories`, `budgets`, `savings_goals`, `goal_contributions`, `alert_rules`, `alert_trigger_logs`, `transaction_notes`, `financial_health_scores`, `monthly_digests`, `split_groups`, `split_participants`, `spending_challenges`, `challenge_streaks`, `badges`, `manual_assets`, `manual_liabilities`, `net_worth_snapshots`.
 
 ### 5. Start the app
 
@@ -377,6 +386,9 @@ Open [http://localhost:3003](http://localhost:3003).
 14. Go to **Alerts** — set email notifications for spending thresholds
 15. On **Transaction History** — use the search bar to filter by text, category, amount, or date range
 16. On **Transaction History** — click Export to download transactions as CSV or PDF
+17. Go to **Split Expenses** — create a split, add participants, toggle paid/unpaid, see auto-settle
+18. Go to **Net Worth** — view linked account balances, add manual assets/liabilities, see the line chart
+19. Go to **Challenges** — accept an AI suggestion or create a custom challenge, track progress, earn badges
 
 ---
 
@@ -491,6 +503,38 @@ Open [http://localhost:3003](http://localhost:3003).
 |--------|------|-------------|
 | GET | `/api/health-score?bankRecordId=x&month=YYYY-MM` | AI-generated financial health score |
 
+### Split Expenses (Protected)
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/splits` | List all splits (optional `?status=pending\|settled`) |
+| GET | `/api/splits/summary` | Get split summary (owed to you, pending, settled counts) |
+| GET | `/api/splits/:id` | Get a single split with participants |
+| POST | `/api/splits` | Create a new split (equal or custom) |
+| PATCH | `/api/splits/:id/participants/:pid` | Toggle participant paid/unpaid |
+| DELETE | `/api/splits/:id` | Delete a split |
+
+### Net Worth (Protected)
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/net-worth?months=12` | Get net worth data with history and AI insight |
+| GET | `/api/net-worth/assets` | List manual assets |
+| POST | `/api/net-worth/assets` | Add a manual asset |
+| PATCH | `/api/net-worth/assets/:id` | Update a manual asset |
+| DELETE | `/api/net-worth/assets/:id` | Delete a manual asset |
+| GET | `/api/net-worth/liabilities` | List manual liabilities |
+| POST | `/api/net-worth/liabilities` | Add a manual liability |
+| PATCH | `/api/net-worth/liabilities/:id` | Update a manual liability |
+| DELETE | `/api/net-worth/liabilities/:id` | Delete a manual liability |
+
+### Spending Challenges (Protected)
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/challenges` | List all challenges (optional `?status=active\|completed\|failed`) |
+| GET | `/api/challenges/overview?bankRecordId=x` | Bundled progress + streak + badges |
+| GET | `/api/challenges/suggestions?bankRecordId=x` | AI-generated challenge suggestions |
+| POST | `/api/challenges` | Create a new challenge |
+| PATCH | `/api/challenges/:id/abandon` | Abandon an active challenge |
+
 ### Health
 | Method | Path | Description |
 |--------|------|-------------|
@@ -498,7 +542,7 @@ Open [http://localhost:3003](http://localhost:3003).
 
 ---
 
-## Database Schema (12 Tables)
+## Database Schema (20 Tables)
 
 ### Core Tables
 | Table | Purpose |
@@ -513,6 +557,7 @@ Open [http://localhost:3003](http://localhost:3003).
 |-------|---------|
 | `cached_categories` | Gemini category decisions keyed by SHA-256 hash of `(name, amount, date)` |
 | `financial_health_scores` | AI health score cache per user/month (survives server restart) |
+| `monthly_digests` | AI monthly report cache per user/month |
 
 ### Financial Planning Tables
 | Table | Purpose |
@@ -527,6 +572,26 @@ Open [http://localhost:3003](http://localhost:3003).
 | `alert_rules` | User-defined spending alert rules (category limit, single txn, balance) |
 | `alert_trigger_logs` | Deduplication log preventing duplicate alert emails |
 | `transaction_notes` | User notes and tags on transactions, keyed by transaction hash |
+
+### Split Expenses Tables
+| Table | Purpose |
+|-------|---------|
+| `split_groups` | Split expense groups with title, total amount, split type, status |
+| `split_participants` | Participants in a split with email, name, amount, paid status |
+
+### Spending Challenges Tables
+| Table | Purpose |
+|-------|---------|
+| `spending_challenges` | User challenges with type, category, target, duration, dates, status |
+| `challenge_streaks` | Per-user streak tracking (current, longest, total completed) |
+| `badges` | Earned achievement badges. Unique on `(userId, badgeType)` |
+
+### Net Worth Tables
+| Table | Purpose |
+|-------|---------|
+| `manual_assets` | User-added assets (property, vehicle, investment, cash) |
+| `manual_liabilities` | User-added liabilities (mortgage, auto loan, student loan, credit card) |
+| `net_worth_snapshots` | Monthly net worth snapshots with breakdown. Unique on `(userId, month)` |
 
 ---
 

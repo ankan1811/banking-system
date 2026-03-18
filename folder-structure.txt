@@ -34,7 +34,7 @@ bank/
 │
 ├── prisma/                           # ── DATABASE SCHEMA ──
 │   │
-│   └── schema.prisma                 # Prisma schema defining 12 PostgreSQL tables:
+│   └── schema.prisma                 # Prisma schema defining 20 PostgreSQL tables:
 │                                     #   CORE:
 │                                     #     users              — User profiles, auth fields, relations
 │                                     #     banks              — Linked Plaid bank accounts + access tokens
@@ -52,6 +52,17 @@ bank/
 │                                     #     alert_rules        — User-defined spending alert rules
 │                                     #     alert_trigger_logs — Dedup log preventing duplicate emails
 │                                     #     transaction_notes  — User notes/tags per transaction
+│                                     #   SPLIT EXPENSES:
+│                                     #     split_groups       — Bill split groups (title, amount, type, status)
+│                                     #     split_participants — Participants with email, amount, paid status
+│                                     #   SPENDING CHALLENGES:
+│                                     #     spending_challenges — Challenges with type, target, duration, status
+│                                     #     challenge_streaks  — Per-user streak tracking
+│                                     #     badges             — Earned achievement badges
+│                                     #   NET WORTH:
+│                                     #     manual_assets      — User-added assets (property, vehicle, etc.)
+│                                     #     manual_liabilities — User-added liabilities (mortgage, loan, etc.)
+│                                     #     net_worth_snapshots — Monthly net worth snapshots with breakdown
 │
 │
 ├── backend/                          # ══════════════════════════════════════════════════
