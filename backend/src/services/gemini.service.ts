@@ -198,7 +198,17 @@ Total transactions this month: ${currentTxns.length}`;
 
 // ─── 3. AI Chatbot ──────────────────────────────────────────
 
+// Cache built financial context per user (5-min TTL) to avoid redundant Plaid calls per chat message
+const chatContextCache = new Map<string, { data: string; expiresAt: number }>();
+const CHAT_CONTEXT_TTL = 5 * 60 * 1000;
+
 async function buildFinancialContext(userId: string): Promise<string> {
+  const cached = chatContextCache.get(userId);
+  if (cached && cached.expiresAt > Date.now()) {
+    console.log(`[CACHE HIT] chat context for ${userId}`);
+    return cached.data;
+  }
+
   const { data: accounts, totalBanks, totalCurrentBalance } = await getAccounts(userId);
 
   const accountDetails = await Promise.all(
@@ -232,7 +242,7 @@ async function buildFinancialContext(userId: string): Promise<string> {
     })
   );
 
-  return `
+  const context = `
 FINANCIAL SUMMARY:
 - Total linked banks: ${totalBanks}
 - Total current balance across all accounts: $${totalCurrentBalance.toFixed(2)}
@@ -246,6 +256,9 @@ Account: ${a.name} (${a.type}/${a.subtype})
 ${a.recentTransactions.map((t: any) => `    - ${t.date}: ${t.name} | $${t.amount} | ${t.category} | ${t.type}`).join('\n')}
 `).join('\n')}
   `.trim();
+
+  chatContextCache.set(userId, { data: context, expiresAt: Date.now() + CHAT_CONTEXT_TTL });
+  return context;
 }
 
 const SYSTEM_PROMPT = `You are a helpful financial assistant for a banking application called "Ankan's Bank".
