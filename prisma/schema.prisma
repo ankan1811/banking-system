@@ -32,6 +32,13 @@ model User {
   transactionNotes     TransactionNote[]
   healthScores         FinancialHealthScore[]
   monthlyDigests       MonthlyDigest[]
+  splitGroups          SplitGroup[]
+  spendingChallenges   SpendingChallenge[]
+  challengeStreak      ChallengeStreak?
+  badges               Badge[]
+  manualAssets         ManualAsset[]
+  manualLiabilities    ManualLiability[]
+  netWorthSnapshots    NetWorthSnapshot[]
 
   @@map("users")
 }
