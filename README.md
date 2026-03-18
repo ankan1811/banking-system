@@ -104,7 +104,9 @@ Rate limits per user per minute:
 | **Bank Data** | Plaid API (sandbox) |
 | **Payments** | Razorpay (test mode) |
 | **Email** | Resend |
-| **AI** | Google Gemini 1.5 Flash (free tier) |
+| **AI** | Google Gemini 2.0 Flash (free tier) |
+| **Charts** | Chart.js (Bar, Doughnut) |
+| **Export** | PDFKit (PDF statements), csv-stringify (CSV) |
 
 ---
 
