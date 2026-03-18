@@ -3,6 +3,7 @@ import HeaderBox from '@/components/HeaderBox'
 import RecentTransactions from '@/components/RecentTransactions';
 import RightSidebar from '@/components/RightSidebar';
 import TotalBalanceBox from '@/components/TotalBalanceBox';
+import RecurringTransactionsCard from '@/components/RecurringTransactionsCard';
 import { serverApiRequest } from '@/lib/api/server-client';
 
 const Home = async ({ searchParams: { id, page } }: SearchParamProps) => {
@@ -35,6 +36,10 @@ const Home = async ({ searchParams: { id, page } }: SearchParamProps) => {
 
         {account?.transactions?.length > 0 && (
           <CategoryBreakdownChart transactions={account.transactions} />
+        )}
+
+        {bankRecordId && (
+          <RecurringTransactionsCard bankRecordId={bankRecordId} />
         )}
 
         <RecentTransactions
