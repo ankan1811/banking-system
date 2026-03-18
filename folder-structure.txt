@@ -236,6 +236,8 @@ bank/
 │           ├── razorpay.service.ts   # Razorpay integration (test mode):
 │           │                         #   createContact() — RazorpayX business contact on signup
 │           │                         #   createTransfer() — demo mode, records in DB only
+│           │                         #   Transfers are mapped to Plaid-like format in bank.service
+│           │                         #   so they appear identical to bank transactions in the UI
 │           │
 │           ├── transaction.service.ts # In-app transaction CRUD:
 │           │                         #   createTransaction() — records fund transfers
@@ -506,6 +508,20 @@ bank/
        │                                   ├── Gemini (AI categorization, insights, chat, health score)
        │                                   ├── Resend (email alerts, OTP)
        │                                   └── Razorpay (transfers, test mode)
+
+  TRANSACTION SYNC (Plaid ↔ Razorpay):
+  ┌─────────────────────────────────────────────────────────────────┐
+  │ Plaid transactions (external bank data) and internal Razorpay  │
+  │ transfers are merged into a SINGLE unified array in            │
+  │ bank.service.ts → getAccount(). Both share identical fields:   │
+  │   id, name, merchantName, amount, date, paymentChannel,        │
+  │   category, aiCategory, type, accountId, pending, image, hash  │
+  │                                                                 │
+  │ After a transfer, cache is instantly cleared for both sender    │
+  │ and receiver so the transaction shows up on dashboard           │
+  │ immediately. All analytics, budgets, trends, insights, and     │
+  │ search treat both types identically.                            │
+  └─────────────────────────────────────────────────────────────────┘
 
   CACHING LAYERS:
   ┌─────────────────────────────────────────────────────────────────┐
