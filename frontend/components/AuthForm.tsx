@@ -28,7 +28,6 @@ import {
 import CustomInput from './CustomInput';
 import { authFormSchema, otpSchema } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { requestSignInOTP, verifySignInOTP, requestSignUpOTP, verifySignUpOTP, googleSignIn, updateProfile } from '@/lib/api/auth.api';
 import PlaidLink from './PlaidLink';
 import { countries, getStatesForCountry } from '@/lib/countryStateData';
@@ -36,9 +35,9 @@ import { completeProfileSchema } from '@/lib/utils';
 import DatePicker from './DatePicker';
 
 const AuthForm = ({ type }: { type: string }) => {
-  const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [step, setStep] = useState<'form' | 'otp' | 'complete-profile'>('form');
   const [savedFormData, setSavedFormData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
@@ -144,7 +143,7 @@ const AuthForm = ({ type }: { type: string }) => {
 
   // Google Sign-In handler
   const handleGoogleResponse = useCallback(async (response: any) => {
-    setIsLoading(true);
+    setIsGoogleLoading(true);
     setError(null);
     try {
       const result: any = await googleSignIn(response.credential);
@@ -153,7 +152,7 @@ const AuthForm = ({ type }: { type: string }) => {
         setSavedFormData(result);
         setStep('complete-profile');
       } else if (type === 'sign-in') {
-        router.push('/');
+        window.location.href = '/';
       } else {
         setUser(result);
       }
@@ -161,9 +160,9 @@ const AuthForm = ({ type }: { type: string }) => {
       const message = err instanceof Error ? err.message : 'Google sign-in failed';
       setError(message);
     } finally {
-      setIsLoading(false);
+      setIsGoogleLoading(false);
     }
-  }, [type, router]);
+  }, [type]);
 
   const onSubmitCompleteProfile = async (data: z.infer<typeof completeProfileSchema>) => {
     setIsLoading(true);
@@ -221,7 +220,7 @@ const AuthForm = ({ type }: { type: string }) => {
           email: savedFormData.email,
           otp: data.otp,
         });
-        if (response) router.push('/');
+        if (response) window.location.href = '/';
       }
     } catch (error: any) {
       setError(error?.message || 'Invalid or expired OTP');

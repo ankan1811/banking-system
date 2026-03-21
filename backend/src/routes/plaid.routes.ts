@@ -39,20 +39,7 @@ router.post('/exchange-token', async (req: Request, res: Response) => {
       return;
     }
 
-    const result = await exchangePublicToken(publicToken, {
-      id: user.id,
-      email: user.email,
-      razorpayContactId: user.razorpayContactId || '',
-      firstName: user.firstName,
-      lastName: user.lastName,
-      name: user.name,
-      address1: user.address1,
-      city: user.city,
-      state: user.state,
-      postalCode: user.postalCode,
-      dateOfBirth: user.dateOfBirth,
-      ssn: user.ssn,
-    });
+    const result = await exchangePublicToken(publicToken, user as any);
 
     res.json(result);
   } catch (error) {

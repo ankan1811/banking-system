@@ -17,10 +17,19 @@ router.get('/', async (req: Request, res: Response) => {
 // GET /api/accounts/:bankRecordId
 router.get('/:bankRecordId', async (req: Request, res: Response) => {
   try {
-    const bankRecordId = req.params.bankRecordId as string;
+    const bankRecordId = req.params.bankRecordId;
+    if (!bankRecordId || bankRecordId === 'undefined') {
+      res.status(404).json({ error: 'No bank specified' });
+      return;
+    }
     const result = await getAccount(bankRecordId, req.userId);
     res.json(result);
   } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to get account';
+    if (message === 'Bank not found') {
+      res.status(404).json({ error: message });
+      return;
+    }
     console.error('Error getting account:', error);
     res.status(500).json({ error: 'Failed to get account' });
   }

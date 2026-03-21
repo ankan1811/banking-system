@@ -1,94 +1,36 @@
-export const sidebarLinks = [
-  {
-    imgURL: "/icons/home.svg",
-    route: "/",
-    label: "Home",
-  },
-  {
-    imgURL: "/icons/dollar-circle.svg",
-    route: "/my-banks",
-    label: "My Banks",
-  },
-  {
-    imgURL: "/icons/transaction.svg",
-    route: "/transaction-history",
-    label: "Transaction History",
-  },
-  {
-    imgURL: "/icons/money-send.svg",
-    route: "/payment-transfer",
-    label: "Transfer Funds",
-  },
-  {
-    imgURL: "/icons/monitor.svg",
-    route: "/splits",
-    label: "Split Expenses",
-  },
-  {
-    imgURL: "/icons/monitor.svg",
-    route: "/insights",
-    label: "AI Insights",
-  },
-  {
-    imgURL: "/icons/monitor.svg",
-    route: "/budgets",
-    label: "Budgets",
-  },
-  {
-    imgURL: "/icons/monitor.svg",
-    route: "/goals",
-    label: "Savings Goals",
-  },
-  {
-    imgURL: "/icons/monitor.svg",
-    route: "/trends",
-    label: "Trends",
-  },
-  {
-    imgURL: "/icons/monitor.svg",
-    route: "/alerts",
-    label: "Alerts",
-  },
-  {
-    imgURL: "/icons/monitor.svg",
-    route: "/health-score",
-    label: "Health Score",
-  },
-  {
-    imgURL: "/icons/monitor.svg",
-    route: "/challenges",
-    label: "Challenges",
-  },
-  {
-    imgURL: "/icons/monitor.svg",
-    route: "/income-expense",
-    label: "Income/Expense",
-  },
-  {
-    imgURL: "/icons/monitor.svg",
-    route: "/net-worth",
-    label: "Net Worth",
-  },
-  {
-    imgURL: "/icons/monitor.svg",
-    route: "/merchants",
-    label: "Merchants",
-  },
-  {
-    imgURL: "/icons/monitor.svg",
-    route: "/calendar",
-    label: "Bill Calendar",
-  },
-  {
-    imgURL: "/icons/monitor.svg",
-    route: "/reports",
-    label: "Reports",
-  },
-  {
-    imgURL: "/icons/monitor.svg",
-    route: "/settings",
-    label: "Settings",
-  },
+import {
+  LayoutDashboard, Landmark, ArrowLeftRight, SendHorizonal,
+  SplitSquareHorizontal, Sparkles, Wallet, Target, TrendingUp,
+  Bell, HeartPulse, Trophy, ArrowDownUp, PiggyBank,
+  Store, CalendarDays, FileBarChart, Settings,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+
+export type SidebarLink = {
+  icon: LucideIcon;
+  route: string;
+  label: string;
+};
+
+export const sidebarLinks: SidebarLink[] = [
+  { icon: LayoutDashboard, route: "/", label: "Home" },
+  { icon: Landmark, route: "/my-banks", label: "My Banks" },
+  { icon: ArrowLeftRight, route: "/transaction-history", label: "Transaction History" },
+  { icon: SendHorizonal, route: "/payment-transfer", label: "Transfer Funds" },
+  { icon: SplitSquareHorizontal, route: "/splits", label: "Split Expenses" },
+  { icon: Sparkles, route: "/insights", label: "AI Insights" },
+  { icon: Wallet, route: "/budgets", label: "Budgets" },
+  { icon: Target, route: "/goals", label: "Savings Goals" },
+  { icon: TrendingUp, route: "/trends", label: "Trends" },
+  { icon: Bell, route: "/alerts", label: "Alerts" },
+  { icon: HeartPulse, route: "/health-score", label: "Health Score" },
+  { icon: Trophy, route: "/challenges", label: "Challenges" },
+  { icon: ArrowDownUp, route: "/income-expense", label: "Income/Expense" },
+  { icon: PiggyBank, route: "/net-worth", label: "Net Worth" },
+  { icon: Store, route: "/merchants", label: "Merchants" },
+  { icon: CalendarDays, route: "/calendar", label: "Bill Calendar" },
+  { icon: FileBarChart, route: "/reports", label: "Reports" },
+  { icon: Settings, route: "/settings", label: "Settings" },
 ];
 
 // good_user / good_password - Bank of America

@@ -1,9 +1,11 @@
-import Image from 'next/image'
+'use client'
+
 import Link from 'next/link'
 import React from 'react'
 import BankCard from './BankCard'
 import { countTransactionCategories } from '@/lib/utils'
 import Category from './Category'
+import PlaidLink from './PlaidLink'
 
 const RightSidebar = ({ user, transactions, banks }: RightSidebarProps) => {
   const categories: CategoryCount[] = countTransactionCategories(transactions);
@@ -33,18 +35,7 @@ const RightSidebar = ({ user, transactions, banks }: RightSidebarProps) => {
       <section className="banks">
         <div className="flex w-full justify-between items-center">
           <h2 className="header-2">My Banks</h2>
-          <Link href="/" className="flex items-center gap-2 group">
-            <Image
-              src="/icons/plus.svg"
-              width={18}
-              height={18}
-              alt="plus"
-              className="opacity-60 group-hover:opacity-100 transition-opacity"
-            />
-            <h2 className="text-sm font-semibold text-slate-500 group-hover:text-slate-300 transition-colors">
-              Add Bank
-            </h2>
-          </Link>
+          <PlaidLink user={user} variant="ghost" />
         </div>
 
         {banks?.length > 0 && (

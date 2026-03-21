@@ -9,14 +9,14 @@ import { serverApiRequest } from '@/lib/api/server-client';
 const Home = async ({ searchParams: { id, page } }: SearchParamProps) => {
   const currentPage = Number(page as string) || 1;
   const loggedIn = await serverApiRequest('/api/auth/me');
-  const accounts = await serverApiRequest('/api/accounts');
+  const accounts = await serverApiRequest('/api/accounts').catch(() => null);
 
-  if(!accounts) return;
-
-  const accountsData = accounts?.data;
+  const accountsData = accounts?.data ?? [];
   const bankRecordId = (id as string) || accountsData[0]?.bankRecordId;
 
-  const account = await serverApiRequest('/api/accounts/' + bankRecordId);
+  const account = bankRecordId
+    ? await serverApiRequest('/api/accounts/' + bankRecordId).catch(() => null)
+    : null;
 
   return (
     <section className="home">

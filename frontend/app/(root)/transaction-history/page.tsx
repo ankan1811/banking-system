@@ -10,17 +10,17 @@ import React from 'react'
 const TransactionHistory = async ({ searchParams: { id, page }}:SearchParamProps) => {
   const currentPage = Number(page as string) || 1;
   const loggedIn = await serverApiRequest('/api/auth/me');
-  const accounts = await serverApiRequest('/api/accounts');
+  const accounts = await serverApiRequest('/api/accounts').catch(() => null);
 
-  if(!accounts) return;
-
-  const accountsData = accounts?.data;
+  const accountsData = accounts?.data ?? [];
   const bankRecordId = (id as string) || accountsData[0]?.bankRecordId;
 
-  const account = await serverApiRequest('/api/accounts/' + bankRecordId);
+  const account = bankRecordId
+    ? await serverApiRequest('/api/accounts/' + bankRecordId).catch(() => null)
+    : null;
 
   const rowsPerPage = 10;
-  const totalPages = Math.ceil(account?.transactions.length / rowsPerPage);
+  const totalPages = Math.ceil((account?.transactions?.length ?? 0) / rowsPerPage);
 
   const indexOfLastTransaction = currentPage * rowsPerPage;
   const indexOfFirstTransaction = indexOfLastTransaction - rowsPerPage;
