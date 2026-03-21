@@ -128,7 +128,10 @@ Total transactions this month: ${currentTxns.length}`;
     return insight;
   } catch (err) {
     console.error('Gemini insights error:', err);
-    return {
+
+    // Cache the fallback so we stop hammering Gemini while rate-limited.
+    // Use a shorter TTL (5 minutes) so it auto-retries after cooldown.
+    const fallback: SpendingInsight = {
       summary: 'Unable to generate insights at this time. Please try again later.',
       monthComparison: [],
       topCategories: Object.entries(currentAgg).map(([category, { amount, count }]) => ({
@@ -140,6 +143,8 @@ Total transactions this month: ${currentTxns.length}`;
       savingsTips: [],
       generatedAt: new Date().toISOString(),
     };
+    insightsCache.set(cacheKey, { data: fallback, expiresAt: Date.now() + 5 * 60 * 1000 });
+    return fallback;
   }
 }
 
