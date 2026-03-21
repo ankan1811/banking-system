@@ -24,9 +24,10 @@ const signUpSchema = z.object({
   firstName: z.string().min(1),
   lastName: z.string().min(1),
   address1: z.string().min(1),
+  country: z.string().min(2).max(3),
   city: z.string().min(1),
-  state: z.string().min(2).max(2),
-  postalCode: z.string().min(3).max(6),
+  state: z.string().min(2).max(5),
+  postalCode: z.string().min(3).max(10),
   dateOfBirth: z.string().min(1),
   ssn: z.string().min(1),
 });
@@ -209,9 +210,10 @@ const profileSchema = z.object({
   firstName: z.string().min(1).optional(),
   lastName: z.string().min(1).optional(),
   address1: z.string().min(1).optional(),
+  country: z.string().min(2).max(3).optional(),
   city: z.string().min(1).optional(),
-  state: z.string().min(2).max(2).optional(),
-  postalCode: z.string().min(3).max(6).optional(),
+  state: z.string().min(2).max(5).optional(),
+  postalCode: z.string().min(3).max(10).optional(),
 });
 
 router.patch('/profile', requireAuth, async (req: Request, res: Response) => {

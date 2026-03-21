@@ -2,6 +2,7 @@ export type SignUpParams = {
   firstName: string;
   lastName: string;
   address1: string;
+  country: string;
   city: string;
   state: string;
   postalCode: string;
@@ -18,6 +19,7 @@ export type User = {
   lastName: string;
   name: string;
   address1: string;
+  country: string;
   city: string;
   state: string;
   postalCode: string;

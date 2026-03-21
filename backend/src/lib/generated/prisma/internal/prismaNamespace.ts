@@ -2029,6 +2029,7 @@ export const UserScalarFieldEnum = {
   firstName: 'firstName',
   lastName: 'lastName',
   address1: 'address1',
+  country: 'country',
   city: 'city',
   state: 'state',
   postalCode: 'postalCode',
