@@ -123,6 +123,11 @@ export type ManualLiability = Prisma.ManualLiabilityModel
  */
 export type NetWorthSnapshot = Prisma.NetWorthSnapshotModel
 /**
+ * Model ChallengeSuggestionCache
+ * 
+ */
+export type ChallengeSuggestionCache = Prisma.ChallengeSuggestionCacheModel
+/**
  * Model PlaidTransaction
  * 
  */

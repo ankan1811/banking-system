@@ -70,6 +70,7 @@ export const ModelName = {
   ManualAsset: 'ManualAsset',
   ManualLiability: 'ManualLiability',
   NetWorthSnapshot: 'NetWorthSnapshot',
+  ChallengeSuggestionCache: 'ChallengeSuggestionCache',
   PlaidTransaction: 'PlaidTransaction'
 } as const
 
@@ -387,6 +388,18 @@ export const NetWorthSnapshotScalarFieldEnum = {
 } as const
 
 export type NetWorthSnapshotScalarFieldEnum = (typeof NetWorthSnapshotScalarFieldEnum)[keyof typeof NetWorthSnapshotScalarFieldEnum]
+
+
+export const ChallengeSuggestionCacheScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  bankRecordId: 'bankRecordId',
+  month: 'month',
+  suggestions: 'suggestions',
+  generatedAt: 'generatedAt'
+} as const
+
+export type ChallengeSuggestionCacheScalarFieldEnum = (typeof ChallengeSuggestionCacheScalarFieldEnum)[keyof typeof ChallengeSuggestionCacheScalarFieldEnum]
 
 
 export const PlaidTransactionScalarFieldEnum = {

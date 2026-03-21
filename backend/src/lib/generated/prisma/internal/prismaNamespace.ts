@@ -411,6 +411,7 @@ export const ModelName = {
   ManualAsset: 'ManualAsset',
   ManualLiability: 'ManualLiability',
   NetWorthSnapshot: 'NetWorthSnapshot',
+  ChallengeSuggestionCache: 'ChallengeSuggestionCache',
   PlaidTransaction: 'PlaidTransaction'
 } as const
 
@@ -427,7 +428,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "bank" | "transaction" | "cachedCategory" | "otpCode" | "budget" | "savingsGoal" | "goalContribution" | "alertRule" | "alertTriggerLog" | "transactionNote" | "financialHealthScore" | "monthlyDigest" | "splitGroup" | "splitParticipant" | "spendingChallenge" | "challengeStreak" | "badge" | "manualAsset" | "manualLiability" | "netWorthSnapshot" | "plaidTransaction"
+    modelProps: "user" | "bank" | "transaction" | "cachedCategory" | "otpCode" | "budget" | "savingsGoal" | "goalContribution" | "alertRule" | "alertTriggerLog" | "transactionNote" | "financialHealthScore" | "monthlyDigest" | "splitGroup" | "splitParticipant" | "spendingChallenge" | "challengeStreak" | "badge" | "manualAsset" | "manualLiability" | "netWorthSnapshot" | "challengeSuggestionCache" | "plaidTransaction"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1985,6 +1986,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ChallengeSuggestionCache: {
+      payload: Prisma.$ChallengeSuggestionCachePayload<ExtArgs>
+      fields: Prisma.ChallengeSuggestionCacheFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ChallengeSuggestionCacheFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeSuggestionCachePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ChallengeSuggestionCacheFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeSuggestionCachePayload>
+        }
+        findFirst: {
+          args: Prisma.ChallengeSuggestionCacheFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeSuggestionCachePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ChallengeSuggestionCacheFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeSuggestionCachePayload>
+        }
+        findMany: {
+          args: Prisma.ChallengeSuggestionCacheFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeSuggestionCachePayload>[]
+        }
+        create: {
+          args: Prisma.ChallengeSuggestionCacheCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeSuggestionCachePayload>
+        }
+        createMany: {
+          args: Prisma.ChallengeSuggestionCacheCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ChallengeSuggestionCacheCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeSuggestionCachePayload>[]
+        }
+        delete: {
+          args: Prisma.ChallengeSuggestionCacheDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeSuggestionCachePayload>
+        }
+        update: {
+          args: Prisma.ChallengeSuggestionCacheUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeSuggestionCachePayload>
+        }
+        deleteMany: {
+          args: Prisma.ChallengeSuggestionCacheDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ChallengeSuggestionCacheUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ChallengeSuggestionCacheUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeSuggestionCachePayload>[]
+        }
+        upsert: {
+          args: Prisma.ChallengeSuggestionCacheUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeSuggestionCachePayload>
+        }
+        aggregate: {
+          args: Prisma.ChallengeSuggestionCacheAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateChallengeSuggestionCache>
+        }
+        groupBy: {
+          args: Prisma.ChallengeSuggestionCacheGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChallengeSuggestionCacheGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ChallengeSuggestionCacheCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChallengeSuggestionCacheCountAggregateOutputType> | number
+        }
+      }
+    }
     PlaidTransaction: {
       payload: Prisma.$PlaidTransactionPayload<ExtArgs>
       fields: Prisma.PlaidTransactionFieldRefs
@@ -2398,6 +2473,18 @@ export const NetWorthSnapshotScalarFieldEnum = {
 export type NetWorthSnapshotScalarFieldEnum = (typeof NetWorthSnapshotScalarFieldEnum)[keyof typeof NetWorthSnapshotScalarFieldEnum]
 
 
+export const ChallengeSuggestionCacheScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  bankRecordId: 'bankRecordId',
+  month: 'month',
+  suggestions: 'suggestions',
+  generatedAt: 'generatedAt'
+} as const
+
+export type ChallengeSuggestionCacheScalarFieldEnum = (typeof ChallengeSuggestionCacheScalarFieldEnum)[keyof typeof ChallengeSuggestionCacheScalarFieldEnum]
+
+
 export const PlaidTransactionScalarFieldEnum = {
   id: 'id',
   bankId: 'bankId',
@@ -2661,6 +2748,7 @@ export type GlobalOmitConfig = {
   manualAsset?: Prisma.ManualAssetOmit
   manualLiability?: Prisma.ManualLiabilityOmit
   netWorthSnapshot?: Prisma.NetWorthSnapshotOmit
+  challengeSuggestionCache?: Prisma.ChallengeSuggestionCacheOmit
   plaidTransaction?: Prisma.PlaidTransactionOmit
 }
 

@@ -4,14 +4,16 @@ import { getAccount } from './bank.service.js';
 import { AI_CATEGORIES } from '@shared/types';
 import type { AiChallengeSuggestion, ChallengeProgress, ChallengeStreak, Badge } from '@shared/types';
 
-// ─── Cache for AI suggestions (24-hour TTL) ──────────────────
+// ─── Cache for AI suggestions (30-day TTL, DB-backed + in-memory) ──
 const suggestionsCache = new Map<string, { data: AiChallengeSuggestion[]; expiresAt: number }>();
-const SUGGESTIONS_TTL = 24 * 60 * 60 * 1000;
+const SUGGESTIONS_TTL = 30 * 24 * 60 * 60 * 1000; // 30 days
 
 export function clearSuggestionsCache(bankRecordId: string) {
   for (const key of suggestionsCache.keys()) {
-    if (key.endsWith(`:${bankRecordId}`)) suggestionsCache.delete(key);
+    if (key.includes(`:${bankRecordId}:`)) suggestionsCache.delete(key);
   }
+  // Also clear from DB
+  prisma.challengeSuggestionCache.deleteMany({ where: { bankRecordId } }).catch(() => {});
 }
 
 function extractJSON(text: string): string {
@@ -232,15 +234,30 @@ export async function getAiSuggestions(
   userId: string,
   bankRecordId: string
 ): Promise<AiChallengeSuggestion[]> {
-  const cacheKey = `${userId}:${bankRecordId}`;
-  const cached = suggestionsCache.get(cacheKey);
-  if (cached && cached.expiresAt > Date.now()) return cached.data;
+  const currentMonth = new Date().toISOString().slice(0, 7);
+  const cacheKey = `${userId}:${bankRecordId}:${currentMonth}`;
 
+  // Layer 1: In-memory cache
+  const memCached = suggestionsCache.get(cacheKey);
+  if (memCached && memCached.expiresAt > Date.now()) return memCached.data;
+
+  // Layer 2: DB cache (survives server restarts)
+  const dbCached = await prisma.challengeSuggestionCache.findUnique({
+    where: { userId_bankRecordId_month: { userId, bankRecordId, month: currentMonth } },
+  });
+  if (dbCached) {
+    const ageMs = Date.now() - dbCached.generatedAt.getTime();
+    if (ageMs < SUGGESTIONS_TTL) {
+      console.log(`[CACHE HIT] challenge suggestions DB ${cacheKey}`);
+      const suggestions = dbCached.suggestions as AiChallengeSuggestion[];
+      suggestionsCache.set(cacheKey, { data: suggestions, expiresAt: dbCached.generatedAt.getTime() + SUGGESTIONS_TTL });
+      return suggestions;
+    }
+  }
+
+  // Layer 3: Gemini call
   try {
     const { transactions } = await getAccount(bankRecordId);
-
-    // Aggregate top spending categories this month
-    const currentMonth = new Date().toISOString().slice(0, 7);
     const monthTxns = transactions.filter((t: any) => (t.date || '').startsWith(currentMonth) && t.amount > 0);
 
     const byCategory: Record<string, number> = {};
@@ -273,11 +290,17 @@ Respond ONLY with a valid JSON array:
       duration: s.duration === 'weekly' ? 'weekly' : 'monthly',
     })) : getDefaultSuggestions();
 
+    // Persist to DB + in-memory
+    await prisma.challengeSuggestionCache.upsert({
+      where: { userId_bankRecordId_month: { userId, bankRecordId, month: currentMonth } },
+      update: { suggestions: suggestions as any, generatedAt: new Date() },
+      create: { userId, bankRecordId, month: currentMonth, suggestions: suggestions as any },
+    });
     suggestionsCache.set(cacheKey, { data: suggestions, expiresAt: Date.now() + SUGGESTIONS_TTL });
     return suggestions;
   } catch (err) {
     console.error('AI suggestions error:', err);
-    // Cache defaults so we stop hammering Gemini while rate-limited (5 min cooldown)
+    // Cache defaults in memory (5 min cooldown) so we don't hammer Gemini
     const defaults = getDefaultSuggestions();
     suggestionsCache.set(cacheKey, { data: defaults, expiresAt: Date.now() + 5 * 60 * 1000 });
     return defaults;

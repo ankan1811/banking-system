@@ -386,6 +386,19 @@ model NetWorthSnapshot {
   @@map("net_worth_snapshots")
 }
 
+model ChallengeSuggestionCache {
+  id           String   @id @default(uuid())
+  userId       String
+  bankRecordId String
+  month        String
+  suggestions  Json
+  generatedAt  DateTime @default(now())
+
+  @@unique([userId, bankRecordId, month])
+  @@index([userId, bankRecordId])
+  @@map("challenge_suggestion_cache")
+}
+
 model PlaidTransaction {
   id             String   @id                  // Plaid transaction_id (stable)
   bankId         String
