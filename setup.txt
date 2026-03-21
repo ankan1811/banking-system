@@ -1,0 +1,141 @@
+================================================================================
+                    ANKAN'S BANK — ENVIRONMENT SETUP GUIDE
+================================================================================
+
+  This file walks you through getting every API key and service credential
+  needed to run the app locally. Follow the priority order at the bottom
+  if you want to get up and running fast.
+
+--------------------------------------------------------------------------------
+ 1. DATABASE_URL — PostgreSQL
+--------------------------------------------------------------------------------
+
+  Your .env currently uses:
+    postgresql://postgres:postgres@localhost:5432/horizon_bank
+
+  If the "postgres" role doesn't exist on your machine, pick one of these:
+
+  OPTION A  Local PostgreSQL (fix the role)
+  ─────────────────────────────────────────
+    Run these in your terminal:
+
+      createuser -s postgres
+      createdb -U postgres horizon_bank
+
+    Then keep the default DATABASE_URL as-is.
+
+  OPTION B  Neon (free cloud DB)
+  ──────────────────────────────
+    1. Sign up free at  https://neon.tech
+    2. Create a project  →  copy the connection string
+    3. Paste it into BOTH fields in backend/.env:
+
+         DATABASE_URL="postgresql://user:pass@ep-xxx.neon.tech/neondb?sslmode=require"
+         DIRECT_URL="postgresql://user:pass@ep-xxx.neon.tech/neondb?sslmode=require"
+
+  OPTION C  Supabase
+  ──────────────────
+    1. Sign up at  https://supabase.com
+    2. Create a project
+    3. Settings  →  Database  →  Connection string (URI)
+    4. Paste into DATABASE_URL and DIRECT_URL (same as above)
+
+  All three options (Local, Neon, Supabase) are fully supported.
+
+--------------------------------------------------------------------------------
+ 2. PLAID_CLIENT_ID & PLAID_SECRET — Bank Linking
+--------------------------------------------------------------------------------
+
+    1. Sign up free at      https://dashboard.plaid.com
+    2. Sidebar  →  Keys
+    3. Copy  client_id       →  PLAID_CLIENT_ID
+    4. Copy  Sandbox secret  →  PLAID_SECRET
+
+    PLAID_ENV=sandbox is already set — no change needed.
+
+    Test credentials (Plaid sandbox):
+      Username:  user_good
+      Password:  pass_good
+
+--------------------------------------------------------------------------------
+ 3. GEMINI_API_KEY — AI Features
+--------------------------------------------------------------------------------
+
+    1. Go to   https://aistudio.google.com/apikey
+    2. Click   Create API Key  →  select any Google Cloud project
+    3. Copy    →  GEMINI_API_KEY
+
+    Powers:  transaction categorization, spending insights, AI chatbot,
+             health score, monthly digest, challenge suggestions
+
+--------------------------------------------------------------------------------
+ 4. GOOGLE_CLIENT_ID — Google OAuth Login
+--------------------------------------------------------------------------------
+
+    1. Go to   https://console.cloud.google.com
+    2. APIs & Services  →  Credentials
+    3. Create  OAuth 2.0 Client ID  (type: Web application)
+    4. Authorized JavaScript origins:   http://localhost:3003
+    5. Authorized redirect URIs:        http://localhost:3003
+    6. Copy the Client ID
+
+    Set it in TWO places:
+      backend/.env   →  GOOGLE_CLIENT_ID=<your-id>
+      frontend/.env  →  NEXT_PUBLIC_GOOGLE_CLIENT_ID=<your-id>
+
+    Note: OTP login works without this, so it's not blocking.
+
+--------------------------------------------------------------------------------
+ 5. RAZORPAY_KEY_ID & RAZORPAY_KEY_SECRET — Payments
+--------------------------------------------------------------------------------
+
+    1. Sign up at   https://dashboard.razorpay.com
+    2. Toggle       Test Mode  (switch at the top of dashboard)
+    3. Settings  →  API Keys  →  Generate Test Key
+    4. Copy  Key ID      →  RAZORPAY_KEY_ID
+    5. Copy  Key Secret  →  RAZORPAY_KEY_SECRET
+
+    No real money moves in test mode.
+
+--------------------------------------------------------------------------------
+ 6. RESEND_API_KEY — Email (OTP Delivery)
+--------------------------------------------------------------------------------
+
+    1. Sign up free at   https://resend.com
+    2. API Keys  →  Create API Key
+    3. Copy  →  RESEND_API_KEY
+
+    Free tier: 100 emails/day — more than enough for dev.
+    Tip: You can skip this entirely and use MASTER_OTP=123456 to log in.
+
+================================================================================
+                          PRIORITY ORDER
+================================================================================
+
+  Set things up in this order to get running as fast as possible:
+
+  PRIORITY       KEY                  WHY
+  ──────────────────────────────────────────────────────────────────────
+  Must have      DATABASE_URL         Nothing works without a database
+  Must have      PLAID_*              Core banking — accounts & transactions
+  ──────────────────────────────────────────────────────────────────────
+  Nice to have   GEMINI_API_KEY       AI categorization, insights, chatbot
+  Nice to have   GOOGLE_CLIENT_ID     Google OAuth (OTP login still works)
+  ──────────────────────────────────────────────────────────────────────
+  Optional       RAZORPAY_*           Only needed for payment transfers
+  Optional       RESEND_API_KEY       Only for real emails (MASTER_OTP bypasses)
+  ──────────────────────────────────────────────────────────────────────
+
+================================================================================
+                          QUICK START (TL;DR)
+================================================================================
+
+  1.  Set DATABASE_URL  →  run: npx prisma migrate dev
+  2.  Set PLAID keys    →  link a sandbox bank
+  3.  npm run dev:backend   (port 8787)
+  4.  npm run dev:frontend  (port 3003)
+  5.  Log in with any email + OTP 123456
+
+  You're up.
+
+================================================================================

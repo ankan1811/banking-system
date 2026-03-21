@@ -147,7 +147,7 @@ Rate limits per user per minute:
 | **Frontend** | Next.js 14, React 18, TypeScript, Tailwind CSS, shadcn/ui |
 | **Backend** | Express.js, TypeScript |
 | **ORM** | Prisma |
-| **Database** | PostgreSQL (Neon / Supabase — your choice) |
+| **Database** | PostgreSQL (Local / Neon / Supabase — your choice) |
 | **Auth** | Custom JWT + OTP (jose, Resend) + Google OAuth |
 | **Bank Data** | Plaid API (sandbox) |
 | **Payments** | Razorpay (test mode) |
@@ -263,7 +263,7 @@ bank/
 
 ### Prerequisites
 - Node.js 18+
-- A PostgreSQL database ([Neon](https://neon.tech) or [Supabase](https://supabase.com) — see below)
+- A PostgreSQL database (Local install, [Neon](https://neon.tech), or [Supabase](https://supabase.com) — all three work, see below)
 
 ### 1. Install dependencies
 
@@ -273,12 +273,21 @@ npm run install:all
 
 ### 2. Set up your database
 
-#### Option A: Neon (Recommended)
+All three options below are fully supported — pick whichever suits you.
+
+#### Option A: Local PostgreSQL
+1. Install PostgreSQL ([Homebrew](https://formulae.brew.sh/formula/postgresql@16): `brew install postgresql@16`, or [Postgres.app](https://postgresapp.com) for macOS)
+2. Create a database: `createdb horizon_bank`
+3. Connection string: `postgresql://your_user:your_password@localhost:5432/horizon_bank`
+
+> No `sslmode` needed for local. If your local user has no password, you can omit it: `postgresql://localhost:5432/horizon_bank`
+
+#### Option B: Neon (Recommended for cloud)
 1. Sign up at [neon.tech](https://neon.tech) (free tier: 512MB)
 2. Create a project
 3. Copy the connection string
 
-#### Option B: Supabase
+#### Option C: Supabase
 1. Sign up at [supabase.com](https://supabase.com) (free tier: 500MB)
 2. Create a project
 3. Go to Settings > Database > Connection string (URI)
@@ -305,7 +314,7 @@ npm run install:all
 
 **Backend** — Create `backend/.env`:
 ```env
-# DATABASE (paste your Neon/Supabase/local connection string)
+# DATABASE (paste your Local/Neon/Supabase connection string — all three work)
 DATABASE_URL="postgresql://user:password@host/dbname?sslmode=require"
 DIRECT_URL="postgresql://user:password@host/dbname?sslmode=require"
 
@@ -659,7 +668,7 @@ No code changes needed. Just swap the URL.
 - **Environment**: Set all frontend env vars (point `API_URL` to backend service URL)
 
 ### Database
-- Use **Neon** or **Supabase** free tier (no need to host PostgreSQL on Render)
+- Use **local PostgreSQL**, **Neon**, or **Supabase** free tier — all three work out of the box (no need to host PostgreSQL on Render)
 
 ---
 
@@ -672,7 +681,7 @@ This project runs entirely in test/sandbox mode — perfect for portfolio demos:
 | **Plaid** | Sandbox | Fake test banks, no real bank data. Credentials: `user_good` / `pass_good` |
 | **Razorpay** | Test | No real money moves. Use test API keys from dashboard |
 | **Resend** | Free tier | 100 emails/day. Or use `MASTER_OTP=123456` to skip emails |
-| **Neon/Supabase** | Free tier | Real database, fully functional |
+| **Local/Neon/Supabase** | Free tier (or local) | Real database, fully functional — all three supported |
 | **Gemini** | Free tier | 15 RPM, 1M TPM. Categorization results cached in DB to minimize calls |
 
 ---
