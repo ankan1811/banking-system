@@ -8,8 +8,12 @@ import { serverApiRequest } from '@/lib/api/server-client';
 
 const Home = async ({ searchParams: { id, page } }: SearchParamProps) => {
   const currentPage = Number(page as string) || 1;
-  const loggedIn = await serverApiRequest('/api/auth/me');
-  const accounts = await serverApiRequest('/api/accounts').catch(() => null);
+
+  // auth/me already called in layout — fetch only accounts
+  const [loggedIn, accounts] = await Promise.all([
+    serverApiRequest('/api/auth/me').catch(() => null),
+    serverApiRequest('/api/accounts').catch(() => null),
+  ]);
 
   const accountsData = accounts?.data ?? [];
   const bankRecordId = (id as string) || accountsData[0]?.bankRecordId;

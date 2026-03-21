@@ -9,8 +9,10 @@ import React from 'react'
 
 const TransactionHistory = async ({ searchParams: { id, page }}:SearchParamProps) => {
   const currentPage = Number(page as string) || 1;
-  const loggedIn = await serverApiRequest('/api/auth/me');
-  const accounts = await serverApiRequest('/api/accounts').catch(() => null);
+  const [loggedIn, accounts] = await Promise.all([
+    serverApiRequest('/api/auth/me'),
+    serverApiRequest('/api/accounts').catch(() => null),
+  ]);
 
   const accountsData = accounts?.data ?? [];
   const bankRecordId = (id as string) || accountsData[0]?.bankRecordId;

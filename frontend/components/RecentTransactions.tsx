@@ -50,7 +50,7 @@ const RecentTransactions = ({
           <TabsContent
             value={account.bankRecordId}
             key={account.id}
-            className="space-y-4"
+            className="space-y-4 mt-4"
           >
             <BankInfo
               account={account}
