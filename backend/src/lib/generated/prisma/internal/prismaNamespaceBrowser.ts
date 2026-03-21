@@ -53,7 +53,23 @@ export const ModelName = {
   Bank: 'Bank',
   Transaction: 'Transaction',
   CachedCategory: 'CachedCategory',
-  OtpCode: 'OtpCode'
+  OtpCode: 'OtpCode',
+  Budget: 'Budget',
+  SavingsGoal: 'SavingsGoal',
+  GoalContribution: 'GoalContribution',
+  AlertRule: 'AlertRule',
+  AlertTriggerLog: 'AlertTriggerLog',
+  TransactionNote: 'TransactionNote',
+  FinancialHealthScore: 'FinancialHealthScore',
+  MonthlyDigest: 'MonthlyDigest',
+  SplitGroup: 'SplitGroup',
+  SplitParticipant: 'SplitParticipant',
+  SpendingChallenge: 'SpendingChallenge',
+  ChallengeStreak: 'ChallengeStreak',
+  Badge: 'Badge',
+  ManualAsset: 'ManualAsset',
+  ManualLiability: 'ManualLiability',
+  NetWorthSnapshot: 'NetWorthSnapshot'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -147,12 +163,243 @@ export const OtpCodeScalarFieldEnum = {
 export type OtpCodeScalarFieldEnum = (typeof OtpCodeScalarFieldEnum)[keyof typeof OtpCodeScalarFieldEnum]
 
 
+export const BudgetScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  category: 'category',
+  monthlyLimit: 'monthlyLimit',
+  month: 'month',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BudgetScalarFieldEnum = (typeof BudgetScalarFieldEnum)[keyof typeof BudgetScalarFieldEnum]
+
+
+export const SavingsGoalScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  targetAmount: 'targetAmount',
+  savedAmount: 'savedAmount',
+  targetDate: 'targetDate',
+  emoji: 'emoji',
+  color: 'color',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SavingsGoalScalarFieldEnum = (typeof SavingsGoalScalarFieldEnum)[keyof typeof SavingsGoalScalarFieldEnum]
+
+
+export const GoalContributionScalarFieldEnum = {
+  id: 'id',
+  goalId: 'goalId',
+  amount: 'amount',
+  note: 'note',
+  createdAt: 'createdAt'
+} as const
+
+export type GoalContributionScalarFieldEnum = (typeof GoalContributionScalarFieldEnum)[keyof typeof GoalContributionScalarFieldEnum]
+
+
+export const AlertRuleScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  type: 'type',
+  category: 'category',
+  threshold: 'threshold',
+  channel: 'channel',
+  enabled: 'enabled',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AlertRuleScalarFieldEnum = (typeof AlertRuleScalarFieldEnum)[keyof typeof AlertRuleScalarFieldEnum]
+
+
+export const AlertTriggerLogScalarFieldEnum = {
+  id: 'id',
+  ruleId: 'ruleId',
+  triggeredAt: 'triggeredAt',
+  details: 'details'
+} as const
+
+export type AlertTriggerLogScalarFieldEnum = (typeof AlertTriggerLogScalarFieldEnum)[keyof typeof AlertTriggerLogScalarFieldEnum]
+
+
+export const TransactionNoteScalarFieldEnum = {
+  id: 'id',
+  transactionHash: 'transactionHash',
+  userId: 'userId',
+  note: 'note',
+  tags: 'tags',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TransactionNoteScalarFieldEnum = (typeof TransactionNoteScalarFieldEnum)[keyof typeof TransactionNoteScalarFieldEnum]
+
+
+export const FinancialHealthScoreScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  month: 'month',
+  score: 'score',
+  breakdown: 'breakdown',
+  tips: 'tips',
+  generatedAt: 'generatedAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type FinancialHealthScoreScalarFieldEnum = (typeof FinancialHealthScoreScalarFieldEnum)[keyof typeof FinancialHealthScoreScalarFieldEnum]
+
+
+export const MonthlyDigestScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  month: 'month',
+  bankRecordId: 'bankRecordId',
+  sections: 'sections',
+  narrative: 'narrative',
+  generatedAt: 'generatedAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MonthlyDigestScalarFieldEnum = (typeof MonthlyDigestScalarFieldEnum)[keyof typeof MonthlyDigestScalarFieldEnum]
+
+
+export const SplitGroupScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  title: 'title',
+  totalAmount: 'totalAmount',
+  transactionId: 'transactionId',
+  splitType: 'splitType',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SplitGroupScalarFieldEnum = (typeof SplitGroupScalarFieldEnum)[keyof typeof SplitGroupScalarFieldEnum]
+
+
+export const SplitParticipantScalarFieldEnum = {
+  id: 'id',
+  splitGroupId: 'splitGroupId',
+  email: 'email',
+  name: 'name',
+  amount: 'amount',
+  isPaid: 'isPaid',
+  paidAt: 'paidAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SplitParticipantScalarFieldEnum = (typeof SplitParticipantScalarFieldEnum)[keyof typeof SplitParticipantScalarFieldEnum]
+
+
+export const SpendingChallengeScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  title: 'title',
+  description: 'description',
+  type: 'type',
+  category: 'category',
+  targetAmount: 'targetAmount',
+  duration: 'duration',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  status: 'status',
+  isAiGenerated: 'isAiGenerated',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SpendingChallengeScalarFieldEnum = (typeof SpendingChallengeScalarFieldEnum)[keyof typeof SpendingChallengeScalarFieldEnum]
+
+
+export const ChallengeStreakScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  currentStreak: 'currentStreak',
+  longestStreak: 'longestStreak',
+  totalCompleted: 'totalCompleted',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ChallengeStreakScalarFieldEnum = (typeof ChallengeStreakScalarFieldEnum)[keyof typeof ChallengeStreakScalarFieldEnum]
+
+
+export const BadgeScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  badgeType: 'badgeType',
+  earnedAt: 'earnedAt'
+} as const
+
+export type BadgeScalarFieldEnum = (typeof BadgeScalarFieldEnum)[keyof typeof BadgeScalarFieldEnum]
+
+
+export const ManualAssetScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  category: 'category',
+  value: 'value',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ManualAssetScalarFieldEnum = (typeof ManualAssetScalarFieldEnum)[keyof typeof ManualAssetScalarFieldEnum]
+
+
+export const ManualLiabilityScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  category: 'category',
+  value: 'value',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ManualLiabilityScalarFieldEnum = (typeof ManualLiabilityScalarFieldEnum)[keyof typeof ManualLiabilityScalarFieldEnum]
+
+
+export const NetWorthSnapshotScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  month: 'month',
+  linkedAssets: 'linkedAssets',
+  manualAssets: 'manualAssets',
+  totalAssets: 'totalAssets',
+  totalLiabilities: 'totalLiabilities',
+  netWorth: 'netWorth',
+  breakdown: 'breakdown',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type NetWorthSnapshotScalarFieldEnum = (typeof NetWorthSnapshotScalarFieldEnum)[keyof typeof NetWorthSnapshotScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
@@ -169,4 +416,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 

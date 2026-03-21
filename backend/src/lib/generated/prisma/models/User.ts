@@ -299,6 +299,19 @@ export type UserWhereInput = {
   banks?: Prisma.BankListRelationFilter
   sentTransactions?: Prisma.TransactionListRelationFilter
   receivedTransactions?: Prisma.TransactionListRelationFilter
+  budgets?: Prisma.BudgetListRelationFilter
+  savingsGoals?: Prisma.SavingsGoalListRelationFilter
+  alertRules?: Prisma.AlertRuleListRelationFilter
+  transactionNotes?: Prisma.TransactionNoteListRelationFilter
+  healthScores?: Prisma.FinancialHealthScoreListRelationFilter
+  monthlyDigests?: Prisma.MonthlyDigestListRelationFilter
+  splitGroups?: Prisma.SplitGroupListRelationFilter
+  spendingChallenges?: Prisma.SpendingChallengeListRelationFilter
+  challengeStreak?: Prisma.XOR<Prisma.ChallengeStreakNullableScalarRelationFilter, Prisma.ChallengeStreakWhereInput> | null
+  badges?: Prisma.BadgeListRelationFilter
+  manualAssets?: Prisma.ManualAssetListRelationFilter
+  manualLiabilities?: Prisma.ManualLiabilityListRelationFilter
+  netWorthSnapshots?: Prisma.NetWorthSnapshotListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -320,6 +333,19 @@ export type UserOrderByWithRelationInput = {
   banks?: Prisma.BankOrderByRelationAggregateInput
   sentTransactions?: Prisma.TransactionOrderByRelationAggregateInput
   receivedTransactions?: Prisma.TransactionOrderByRelationAggregateInput
+  budgets?: Prisma.BudgetOrderByRelationAggregateInput
+  savingsGoals?: Prisma.SavingsGoalOrderByRelationAggregateInput
+  alertRules?: Prisma.AlertRuleOrderByRelationAggregateInput
+  transactionNotes?: Prisma.TransactionNoteOrderByRelationAggregateInput
+  healthScores?: Prisma.FinancialHealthScoreOrderByRelationAggregateInput
+  monthlyDigests?: Prisma.MonthlyDigestOrderByRelationAggregateInput
+  splitGroups?: Prisma.SplitGroupOrderByRelationAggregateInput
+  spendingChallenges?: Prisma.SpendingChallengeOrderByRelationAggregateInput
+  challengeStreak?: Prisma.ChallengeStreakOrderByWithRelationInput
+  badges?: Prisma.BadgeOrderByRelationAggregateInput
+  manualAssets?: Prisma.ManualAssetOrderByRelationAggregateInput
+  manualLiabilities?: Prisma.ManualLiabilityOrderByRelationAggregateInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -344,6 +370,19 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   banks?: Prisma.BankListRelationFilter
   sentTransactions?: Prisma.TransactionListRelationFilter
   receivedTransactions?: Prisma.TransactionListRelationFilter
+  budgets?: Prisma.BudgetListRelationFilter
+  savingsGoals?: Prisma.SavingsGoalListRelationFilter
+  alertRules?: Prisma.AlertRuleListRelationFilter
+  transactionNotes?: Prisma.TransactionNoteListRelationFilter
+  healthScores?: Prisma.FinancialHealthScoreListRelationFilter
+  monthlyDigests?: Prisma.MonthlyDigestListRelationFilter
+  splitGroups?: Prisma.SplitGroupListRelationFilter
+  spendingChallenges?: Prisma.SpendingChallengeListRelationFilter
+  challengeStreak?: Prisma.XOR<Prisma.ChallengeStreakNullableScalarRelationFilter, Prisma.ChallengeStreakWhereInput> | null
+  badges?: Prisma.BadgeListRelationFilter
+  manualAssets?: Prisma.ManualAssetListRelationFilter
+  manualLiabilities?: Prisma.ManualLiabilityListRelationFilter
+  netWorthSnapshots?: Prisma.NetWorthSnapshotListRelationFilter
 }, "id" | "email" | "googleId">
 
 export type UserOrderByWithAggregationInput = {
@@ -409,6 +448,19 @@ export type UserCreateInput = {
   banks?: Prisma.BankCreateNestedManyWithoutUserInput
   sentTransactions?: Prisma.TransactionCreateNestedManyWithoutSenderInput
   receivedTransactions?: Prisma.TransactionCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -430,6 +482,19 @@ export type UserUncheckedCreateInput = {
   banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
   sentTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutSenderInput
   receivedTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleUncheckedCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupUncheckedCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeUncheckedCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetUncheckedCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -451,6 +516,19 @@ export type UserUpdateInput = {
   banks?: Prisma.BankUpdateManyWithoutUserNestedInput
   sentTransactions?: Prisma.TransactionUpdateManyWithoutSenderNestedInput
   receivedTransactions?: Prisma.TransactionUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -472,6 +550,19 @@ export type UserUncheckedUpdateInput = {
   banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
   sentTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutSenderNestedInput
   receivedTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUncheckedUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUncheckedUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUncheckedUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUncheckedUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -657,6 +748,188 @@ export type UserUpdateOneRequiredWithoutReceivedTransactionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReceivedTransactionsInput, Prisma.UserUpdateWithoutReceivedTransactionsInput>, Prisma.UserUncheckedUpdateWithoutReceivedTransactionsInput>
 }
 
+export type UserCreateNestedOneWithoutBudgetsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBudgetsInput, Prisma.UserUncheckedCreateWithoutBudgetsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBudgetsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutBudgetsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBudgetsInput, Prisma.UserUncheckedCreateWithoutBudgetsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBudgetsInput
+  upsert?: Prisma.UserUpsertWithoutBudgetsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutBudgetsInput, Prisma.UserUpdateWithoutBudgetsInput>, Prisma.UserUncheckedUpdateWithoutBudgetsInput>
+}
+
+export type UserCreateNestedOneWithoutSavingsGoalsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSavingsGoalsInput, Prisma.UserUncheckedCreateWithoutSavingsGoalsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSavingsGoalsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSavingsGoalsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSavingsGoalsInput, Prisma.UserUncheckedCreateWithoutSavingsGoalsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSavingsGoalsInput
+  upsert?: Prisma.UserUpsertWithoutSavingsGoalsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSavingsGoalsInput, Prisma.UserUpdateWithoutSavingsGoalsInput>, Prisma.UserUncheckedUpdateWithoutSavingsGoalsInput>
+}
+
+export type UserCreateNestedOneWithoutAlertRulesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAlertRulesInput, Prisma.UserUncheckedCreateWithoutAlertRulesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAlertRulesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutAlertRulesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAlertRulesInput, Prisma.UserUncheckedCreateWithoutAlertRulesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAlertRulesInput
+  upsert?: Prisma.UserUpsertWithoutAlertRulesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAlertRulesInput, Prisma.UserUpdateWithoutAlertRulesInput>, Prisma.UserUncheckedUpdateWithoutAlertRulesInput>
+}
+
+export type UserCreateNestedOneWithoutTransactionNotesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTransactionNotesInput, Prisma.UserUncheckedCreateWithoutTransactionNotesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTransactionNotesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutTransactionNotesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTransactionNotesInput, Prisma.UserUncheckedCreateWithoutTransactionNotesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTransactionNotesInput
+  upsert?: Prisma.UserUpsertWithoutTransactionNotesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutTransactionNotesInput, Prisma.UserUpdateWithoutTransactionNotesInput>, Prisma.UserUncheckedUpdateWithoutTransactionNotesInput>
+}
+
+export type UserCreateNestedOneWithoutHealthScoresInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutHealthScoresInput, Prisma.UserUncheckedCreateWithoutHealthScoresInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutHealthScoresInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutHealthScoresNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutHealthScoresInput, Prisma.UserUncheckedCreateWithoutHealthScoresInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutHealthScoresInput
+  upsert?: Prisma.UserUpsertWithoutHealthScoresInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutHealthScoresInput, Prisma.UserUpdateWithoutHealthScoresInput>, Prisma.UserUncheckedUpdateWithoutHealthScoresInput>
+}
+
+export type UserCreateNestedOneWithoutMonthlyDigestsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutMonthlyDigestsInput, Prisma.UserUncheckedCreateWithoutMonthlyDigestsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutMonthlyDigestsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutMonthlyDigestsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutMonthlyDigestsInput, Prisma.UserUncheckedCreateWithoutMonthlyDigestsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutMonthlyDigestsInput
+  upsert?: Prisma.UserUpsertWithoutMonthlyDigestsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutMonthlyDigestsInput, Prisma.UserUpdateWithoutMonthlyDigestsInput>, Prisma.UserUncheckedUpdateWithoutMonthlyDigestsInput>
+}
+
+export type UserCreateNestedOneWithoutSplitGroupsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSplitGroupsInput, Prisma.UserUncheckedCreateWithoutSplitGroupsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSplitGroupsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSplitGroupsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSplitGroupsInput, Prisma.UserUncheckedCreateWithoutSplitGroupsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSplitGroupsInput
+  upsert?: Prisma.UserUpsertWithoutSplitGroupsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSplitGroupsInput, Prisma.UserUpdateWithoutSplitGroupsInput>, Prisma.UserUncheckedUpdateWithoutSplitGroupsInput>
+}
+
+export type UserCreateNestedOneWithoutSpendingChallengesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSpendingChallengesInput, Prisma.UserUncheckedCreateWithoutSpendingChallengesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSpendingChallengesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSpendingChallengesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSpendingChallengesInput, Prisma.UserUncheckedCreateWithoutSpendingChallengesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSpendingChallengesInput
+  upsert?: Prisma.UserUpsertWithoutSpendingChallengesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSpendingChallengesInput, Prisma.UserUpdateWithoutSpendingChallengesInput>, Prisma.UserUncheckedUpdateWithoutSpendingChallengesInput>
+}
+
+export type UserCreateNestedOneWithoutChallengeStreakInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutChallengeStreakInput, Prisma.UserUncheckedCreateWithoutChallengeStreakInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutChallengeStreakInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutChallengeStreakNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutChallengeStreakInput, Prisma.UserUncheckedCreateWithoutChallengeStreakInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutChallengeStreakInput
+  upsert?: Prisma.UserUpsertWithoutChallengeStreakInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutChallengeStreakInput, Prisma.UserUpdateWithoutChallengeStreakInput>, Prisma.UserUncheckedUpdateWithoutChallengeStreakInput>
+}
+
+export type UserCreateNestedOneWithoutBadgesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBadgesInput, Prisma.UserUncheckedCreateWithoutBadgesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBadgesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutBadgesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBadgesInput, Prisma.UserUncheckedCreateWithoutBadgesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBadgesInput
+  upsert?: Prisma.UserUpsertWithoutBadgesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutBadgesInput, Prisma.UserUpdateWithoutBadgesInput>, Prisma.UserUncheckedUpdateWithoutBadgesInput>
+}
+
+export type UserCreateNestedOneWithoutManualAssetsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutManualAssetsInput, Prisma.UserUncheckedCreateWithoutManualAssetsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutManualAssetsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutManualAssetsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutManualAssetsInput, Prisma.UserUncheckedCreateWithoutManualAssetsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutManualAssetsInput
+  upsert?: Prisma.UserUpsertWithoutManualAssetsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutManualAssetsInput, Prisma.UserUpdateWithoutManualAssetsInput>, Prisma.UserUncheckedUpdateWithoutManualAssetsInput>
+}
+
+export type UserCreateNestedOneWithoutManualLiabilitiesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutManualLiabilitiesInput, Prisma.UserUncheckedCreateWithoutManualLiabilitiesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutManualLiabilitiesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutManualLiabilitiesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutManualLiabilitiesInput, Prisma.UserUncheckedCreateWithoutManualLiabilitiesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutManualLiabilitiesInput
+  upsert?: Prisma.UserUpsertWithoutManualLiabilitiesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutManualLiabilitiesInput, Prisma.UserUpdateWithoutManualLiabilitiesInput>, Prisma.UserUncheckedUpdateWithoutManualLiabilitiesInput>
+}
+
+export type UserCreateNestedOneWithoutNetWorthSnapshotsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutNetWorthSnapshotsInput, Prisma.UserUncheckedCreateWithoutNetWorthSnapshotsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutNetWorthSnapshotsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutNetWorthSnapshotsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutNetWorthSnapshotsInput, Prisma.UserUncheckedCreateWithoutNetWorthSnapshotsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutNetWorthSnapshotsInput
+  upsert?: Prisma.UserUpsertWithoutNetWorthSnapshotsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutNetWorthSnapshotsInput, Prisma.UserUpdateWithoutNetWorthSnapshotsInput>, Prisma.UserUncheckedUpdateWithoutNetWorthSnapshotsInput>
+}
+
 export type UserCreateWithoutBanksInput = {
   id?: string
   email: string
@@ -675,6 +948,19 @@ export type UserCreateWithoutBanksInput = {
   updatedAt?: Date | string
   sentTransactions?: Prisma.TransactionCreateNestedManyWithoutSenderInput
   receivedTransactions?: Prisma.TransactionCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBanksInput = {
@@ -695,6 +981,19 @@ export type UserUncheckedCreateWithoutBanksInput = {
   updatedAt?: Date | string
   sentTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutSenderInput
   receivedTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleUncheckedCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupUncheckedCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeUncheckedCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetUncheckedCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBanksInput = {
@@ -731,6 +1030,19 @@ export type UserUpdateWithoutBanksInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sentTransactions?: Prisma.TransactionUpdateManyWithoutSenderNestedInput
   receivedTransactions?: Prisma.TransactionUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBanksInput = {
@@ -751,6 +1063,19 @@ export type UserUncheckedUpdateWithoutBanksInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sentTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutSenderNestedInput
   receivedTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUncheckedUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUncheckedUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUncheckedUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUncheckedUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSentTransactionsInput = {
@@ -771,6 +1096,19 @@ export type UserCreateWithoutSentTransactionsInput = {
   updatedAt?: Date | string
   banks?: Prisma.BankCreateNestedManyWithoutUserInput
   receivedTransactions?: Prisma.TransactionCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSentTransactionsInput = {
@@ -791,6 +1129,19 @@ export type UserUncheckedCreateWithoutSentTransactionsInput = {
   updatedAt?: Date | string
   banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
   receivedTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleUncheckedCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupUncheckedCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeUncheckedCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetUncheckedCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSentTransactionsInput = {
@@ -816,6 +1167,19 @@ export type UserCreateWithoutReceivedTransactionsInput = {
   updatedAt?: Date | string
   banks?: Prisma.BankCreateNestedManyWithoutUserInput
   sentTransactions?: Prisma.TransactionCreateNestedManyWithoutSenderInput
+  budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReceivedTransactionsInput = {
@@ -836,6 +1200,19 @@ export type UserUncheckedCreateWithoutReceivedTransactionsInput = {
   updatedAt?: Date | string
   banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
   sentTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutSenderInput
+  budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleUncheckedCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupUncheckedCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeUncheckedCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetUncheckedCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReceivedTransactionsInput = {
@@ -872,6 +1249,19 @@ export type UserUpdateWithoutSentTransactionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   banks?: Prisma.BankUpdateManyWithoutUserNestedInput
   receivedTransactions?: Prisma.TransactionUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSentTransactionsInput = {
@@ -892,6 +1282,19 @@ export type UserUncheckedUpdateWithoutSentTransactionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
   receivedTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUncheckedUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUncheckedUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUncheckedUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUncheckedUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutReceivedTransactionsInput = {
@@ -923,6 +1326,19 @@ export type UserUpdateWithoutReceivedTransactionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   banks?: Prisma.BankUpdateManyWithoutUserNestedInput
   sentTransactions?: Prisma.TransactionUpdateManyWithoutSenderNestedInput
+  budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReceivedTransactionsInput = {
@@ -943,6 +1359,1943 @@ export type UserUncheckedUpdateWithoutReceivedTransactionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
   sentTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutSenderNestedInput
+  budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUncheckedUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUncheckedUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUncheckedUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUncheckedUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutBudgetsInput = {
+  id?: string
+  email: string
+  firstName: string
+  lastName: string
+  address1: string
+  city: string
+  state: string
+  postalCode: string
+  dateOfBirth: string
+  ssn: string
+  razorpayContactId?: string | null
+  googleId?: string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  banks?: Prisma.BankCreateNestedManyWithoutUserInput
+  sentTransactions?: Prisma.TransactionCreateNestedManyWithoutSenderInput
+  receivedTransactions?: Prisma.TransactionCreateNestedManyWithoutReceiverInput
+  savingsGoals?: Prisma.SavingsGoalCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutBudgetsInput = {
+  id?: string
+  email: string
+  firstName: string
+  lastName: string
+  address1: string
+  city: string
+  state: string
+  postalCode: string
+  dateOfBirth: string
+  ssn: string
+  razorpayContactId?: string | null
+  googleId?: string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
+  sentTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutSenderInput
+  receivedTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutReceiverInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleUncheckedCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupUncheckedCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeUncheckedCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetUncheckedCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutBudgetsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutBudgetsInput, Prisma.UserUncheckedCreateWithoutBudgetsInput>
+}
+
+export type UserUpsertWithoutBudgetsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutBudgetsInput, Prisma.UserUncheckedUpdateWithoutBudgetsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutBudgetsInput, Prisma.UserUncheckedCreateWithoutBudgetsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutBudgetsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutBudgetsInput, Prisma.UserUncheckedUpdateWithoutBudgetsInput>
+}
+
+export type UserUpdateWithoutBudgetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  address1?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  ssn?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayContactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  banks?: Prisma.BankUpdateManyWithoutUserNestedInput
+  sentTransactions?: Prisma.TransactionUpdateManyWithoutSenderNestedInput
+  receivedTransactions?: Prisma.TransactionUpdateManyWithoutReceiverNestedInput
+  savingsGoals?: Prisma.SavingsGoalUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutBudgetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  address1?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  ssn?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayContactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
+  sentTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutSenderNestedInput
+  receivedTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutReceiverNestedInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUncheckedUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUncheckedUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUncheckedUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUncheckedUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutSavingsGoalsInput = {
+  id?: string
+  email: string
+  firstName: string
+  lastName: string
+  address1: string
+  city: string
+  state: string
+  postalCode: string
+  dateOfBirth: string
+  ssn: string
+  razorpayContactId?: string | null
+  googleId?: string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  banks?: Prisma.BankCreateNestedManyWithoutUserInput
+  sentTransactions?: Prisma.TransactionCreateNestedManyWithoutSenderInput
+  receivedTransactions?: Prisma.TransactionCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutSavingsGoalsInput = {
+  id?: string
+  email: string
+  firstName: string
+  lastName: string
+  address1: string
+  city: string
+  state: string
+  postalCode: string
+  dateOfBirth: string
+  ssn: string
+  razorpayContactId?: string | null
+  googleId?: string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
+  sentTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutSenderInput
+  receivedTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleUncheckedCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupUncheckedCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeUncheckedCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetUncheckedCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutSavingsGoalsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSavingsGoalsInput, Prisma.UserUncheckedCreateWithoutSavingsGoalsInput>
+}
+
+export type UserUpsertWithoutSavingsGoalsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSavingsGoalsInput, Prisma.UserUncheckedUpdateWithoutSavingsGoalsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSavingsGoalsInput, Prisma.UserUncheckedCreateWithoutSavingsGoalsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSavingsGoalsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSavingsGoalsInput, Prisma.UserUncheckedUpdateWithoutSavingsGoalsInput>
+}
+
+export type UserUpdateWithoutSavingsGoalsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  address1?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  ssn?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayContactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  banks?: Prisma.BankUpdateManyWithoutUserNestedInput
+  sentTransactions?: Prisma.TransactionUpdateManyWithoutSenderNestedInput
+  receivedTransactions?: Prisma.TransactionUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSavingsGoalsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  address1?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  ssn?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayContactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
+  sentTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutSenderNestedInput
+  receivedTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUncheckedUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUncheckedUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUncheckedUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUncheckedUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutAlertRulesInput = {
+  id?: string
+  email: string
+  firstName: string
+  lastName: string
+  address1: string
+  city: string
+  state: string
+  postalCode: string
+  dateOfBirth: string
+  ssn: string
+  razorpayContactId?: string | null
+  googleId?: string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  banks?: Prisma.BankCreateNestedManyWithoutUserInput
+  sentTransactions?: Prisma.TransactionCreateNestedManyWithoutSenderInput
+  receivedTransactions?: Prisma.TransactionCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutAlertRulesInput = {
+  id?: string
+  email: string
+  firstName: string
+  lastName: string
+  address1: string
+  city: string
+  state: string
+  postalCode: string
+  dateOfBirth: string
+  ssn: string
+  razorpayContactId?: string | null
+  googleId?: string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
+  sentTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutSenderInput
+  receivedTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupUncheckedCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeUncheckedCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetUncheckedCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutAlertRulesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAlertRulesInput, Prisma.UserUncheckedCreateWithoutAlertRulesInput>
+}
+
+export type UserUpsertWithoutAlertRulesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAlertRulesInput, Prisma.UserUncheckedUpdateWithoutAlertRulesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAlertRulesInput, Prisma.UserUncheckedCreateWithoutAlertRulesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAlertRulesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAlertRulesInput, Prisma.UserUncheckedUpdateWithoutAlertRulesInput>
+}
+
+export type UserUpdateWithoutAlertRulesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  address1?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  ssn?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayContactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  banks?: Prisma.BankUpdateManyWithoutUserNestedInput
+  sentTransactions?: Prisma.TransactionUpdateManyWithoutSenderNestedInput
+  receivedTransactions?: Prisma.TransactionUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAlertRulesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  address1?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  ssn?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayContactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
+  sentTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutSenderNestedInput
+  receivedTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUncheckedUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUncheckedUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUncheckedUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutTransactionNotesInput = {
+  id?: string
+  email: string
+  firstName: string
+  lastName: string
+  address1: string
+  city: string
+  state: string
+  postalCode: string
+  dateOfBirth: string
+  ssn: string
+  razorpayContactId?: string | null
+  googleId?: string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  banks?: Prisma.BankCreateNestedManyWithoutUserInput
+  sentTransactions?: Prisma.TransactionCreateNestedManyWithoutSenderInput
+  receivedTransactions?: Prisma.TransactionCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutTransactionNotesInput = {
+  id?: string
+  email: string
+  firstName: string
+  lastName: string
+  address1: string
+  city: string
+  state: string
+  postalCode: string
+  dateOfBirth: string
+  ssn: string
+  razorpayContactId?: string | null
+  googleId?: string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
+  sentTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutSenderInput
+  receivedTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleUncheckedCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupUncheckedCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeUncheckedCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetUncheckedCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutTransactionNotesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutTransactionNotesInput, Prisma.UserUncheckedCreateWithoutTransactionNotesInput>
+}
+
+export type UserUpsertWithoutTransactionNotesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutTransactionNotesInput, Prisma.UserUncheckedUpdateWithoutTransactionNotesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutTransactionNotesInput, Prisma.UserUncheckedCreateWithoutTransactionNotesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutTransactionNotesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutTransactionNotesInput, Prisma.UserUncheckedUpdateWithoutTransactionNotesInput>
+}
+
+export type UserUpdateWithoutTransactionNotesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  address1?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  ssn?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayContactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  banks?: Prisma.BankUpdateManyWithoutUserNestedInput
+  sentTransactions?: Prisma.TransactionUpdateManyWithoutSenderNestedInput
+  receivedTransactions?: Prisma.TransactionUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutTransactionNotesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  address1?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  ssn?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayContactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
+  sentTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutSenderNestedInput
+  receivedTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUncheckedUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUncheckedUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUncheckedUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUncheckedUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutHealthScoresInput = {
+  id?: string
+  email: string
+  firstName: string
+  lastName: string
+  address1: string
+  city: string
+  state: string
+  postalCode: string
+  dateOfBirth: string
+  ssn: string
+  razorpayContactId?: string | null
+  googleId?: string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  banks?: Prisma.BankCreateNestedManyWithoutUserInput
+  sentTransactions?: Prisma.TransactionCreateNestedManyWithoutSenderInput
+  receivedTransactions?: Prisma.TransactionCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutHealthScoresInput = {
+  id?: string
+  email: string
+  firstName: string
+  lastName: string
+  address1: string
+  city: string
+  state: string
+  postalCode: string
+  dateOfBirth: string
+  ssn: string
+  razorpayContactId?: string | null
+  googleId?: string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
+  sentTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutSenderInput
+  receivedTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleUncheckedCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupUncheckedCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeUncheckedCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetUncheckedCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutHealthScoresInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutHealthScoresInput, Prisma.UserUncheckedCreateWithoutHealthScoresInput>
+}
+
+export type UserUpsertWithoutHealthScoresInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutHealthScoresInput, Prisma.UserUncheckedUpdateWithoutHealthScoresInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutHealthScoresInput, Prisma.UserUncheckedCreateWithoutHealthScoresInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutHealthScoresInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutHealthScoresInput, Prisma.UserUncheckedUpdateWithoutHealthScoresInput>
+}
+
+export type UserUpdateWithoutHealthScoresInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  address1?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  ssn?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayContactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  banks?: Prisma.BankUpdateManyWithoutUserNestedInput
+  sentTransactions?: Prisma.TransactionUpdateManyWithoutSenderNestedInput
+  receivedTransactions?: Prisma.TransactionUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutHealthScoresInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  address1?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  ssn?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayContactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
+  sentTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutSenderNestedInput
+  receivedTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUncheckedUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUncheckedUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUncheckedUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUncheckedUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutMonthlyDigestsInput = {
+  id?: string
+  email: string
+  firstName: string
+  lastName: string
+  address1: string
+  city: string
+  state: string
+  postalCode: string
+  dateOfBirth: string
+  ssn: string
+  razorpayContactId?: string | null
+  googleId?: string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  banks?: Prisma.BankCreateNestedManyWithoutUserInput
+  sentTransactions?: Prisma.TransactionCreateNestedManyWithoutSenderInput
+  receivedTransactions?: Prisma.TransactionCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutMonthlyDigestsInput = {
+  id?: string
+  email: string
+  firstName: string
+  lastName: string
+  address1: string
+  city: string
+  state: string
+  postalCode: string
+  dateOfBirth: string
+  ssn: string
+  razorpayContactId?: string | null
+  googleId?: string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
+  sentTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutSenderInput
+  receivedTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleUncheckedCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupUncheckedCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeUncheckedCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetUncheckedCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutMonthlyDigestsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutMonthlyDigestsInput, Prisma.UserUncheckedCreateWithoutMonthlyDigestsInput>
+}
+
+export type UserUpsertWithoutMonthlyDigestsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutMonthlyDigestsInput, Prisma.UserUncheckedUpdateWithoutMonthlyDigestsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutMonthlyDigestsInput, Prisma.UserUncheckedCreateWithoutMonthlyDigestsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutMonthlyDigestsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutMonthlyDigestsInput, Prisma.UserUncheckedUpdateWithoutMonthlyDigestsInput>
+}
+
+export type UserUpdateWithoutMonthlyDigestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  address1?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  ssn?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayContactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  banks?: Prisma.BankUpdateManyWithoutUserNestedInput
+  sentTransactions?: Prisma.TransactionUpdateManyWithoutSenderNestedInput
+  receivedTransactions?: Prisma.TransactionUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutMonthlyDigestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  address1?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  ssn?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayContactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
+  sentTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutSenderNestedInput
+  receivedTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUncheckedUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUncheckedUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUncheckedUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUncheckedUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutSplitGroupsInput = {
+  id?: string
+  email: string
+  firstName: string
+  lastName: string
+  address1: string
+  city: string
+  state: string
+  postalCode: string
+  dateOfBirth: string
+  ssn: string
+  razorpayContactId?: string | null
+  googleId?: string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  banks?: Prisma.BankCreateNestedManyWithoutUserInput
+  sentTransactions?: Prisma.TransactionCreateNestedManyWithoutSenderInput
+  receivedTransactions?: Prisma.TransactionCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutSplitGroupsInput = {
+  id?: string
+  email: string
+  firstName: string
+  lastName: string
+  address1: string
+  city: string
+  state: string
+  postalCode: string
+  dateOfBirth: string
+  ssn: string
+  razorpayContactId?: string | null
+  googleId?: string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
+  sentTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutSenderInput
+  receivedTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleUncheckedCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeUncheckedCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetUncheckedCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutSplitGroupsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSplitGroupsInput, Prisma.UserUncheckedCreateWithoutSplitGroupsInput>
+}
+
+export type UserUpsertWithoutSplitGroupsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSplitGroupsInput, Prisma.UserUncheckedUpdateWithoutSplitGroupsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSplitGroupsInput, Prisma.UserUncheckedCreateWithoutSplitGroupsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSplitGroupsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSplitGroupsInput, Prisma.UserUncheckedUpdateWithoutSplitGroupsInput>
+}
+
+export type UserUpdateWithoutSplitGroupsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  address1?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  ssn?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayContactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  banks?: Prisma.BankUpdateManyWithoutUserNestedInput
+  sentTransactions?: Prisma.TransactionUpdateManyWithoutSenderNestedInput
+  receivedTransactions?: Prisma.TransactionUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSplitGroupsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  address1?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  ssn?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayContactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
+  sentTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutSenderNestedInput
+  receivedTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUncheckedUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUncheckedUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUncheckedUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutSpendingChallengesInput = {
+  id?: string
+  email: string
+  firstName: string
+  lastName: string
+  address1: string
+  city: string
+  state: string
+  postalCode: string
+  dateOfBirth: string
+  ssn: string
+  razorpayContactId?: string | null
+  googleId?: string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  banks?: Prisma.BankCreateNestedManyWithoutUserInput
+  sentTransactions?: Prisma.TransactionCreateNestedManyWithoutSenderInput
+  receivedTransactions?: Prisma.TransactionCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutSpendingChallengesInput = {
+  id?: string
+  email: string
+  firstName: string
+  lastName: string
+  address1: string
+  city: string
+  state: string
+  postalCode: string
+  dateOfBirth: string
+  ssn: string
+  razorpayContactId?: string | null
+  googleId?: string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
+  sentTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutSenderInput
+  receivedTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleUncheckedCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupUncheckedCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeUncheckedCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetUncheckedCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutSpendingChallengesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSpendingChallengesInput, Prisma.UserUncheckedCreateWithoutSpendingChallengesInput>
+}
+
+export type UserUpsertWithoutSpendingChallengesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSpendingChallengesInput, Prisma.UserUncheckedUpdateWithoutSpendingChallengesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSpendingChallengesInput, Prisma.UserUncheckedCreateWithoutSpendingChallengesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSpendingChallengesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSpendingChallengesInput, Prisma.UserUncheckedUpdateWithoutSpendingChallengesInput>
+}
+
+export type UserUpdateWithoutSpendingChallengesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  address1?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  ssn?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayContactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  banks?: Prisma.BankUpdateManyWithoutUserNestedInput
+  sentTransactions?: Prisma.TransactionUpdateManyWithoutSenderNestedInput
+  receivedTransactions?: Prisma.TransactionUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSpendingChallengesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  address1?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  ssn?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayContactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
+  sentTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutSenderNestedInput
+  receivedTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUncheckedUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUncheckedUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUncheckedUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUncheckedUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutChallengeStreakInput = {
+  id?: string
+  email: string
+  firstName: string
+  lastName: string
+  address1: string
+  city: string
+  state: string
+  postalCode: string
+  dateOfBirth: string
+  ssn: string
+  razorpayContactId?: string | null
+  googleId?: string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  banks?: Prisma.BankCreateNestedManyWithoutUserInput
+  sentTransactions?: Prisma.TransactionCreateNestedManyWithoutSenderInput
+  receivedTransactions?: Prisma.TransactionCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeCreateNestedManyWithoutUserInput
+  badges?: Prisma.BadgeCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutChallengeStreakInput = {
+  id?: string
+  email: string
+  firstName: string
+  lastName: string
+  address1: string
+  city: string
+  state: string
+  postalCode: string
+  dateOfBirth: string
+  ssn: string
+  razorpayContactId?: string | null
+  googleId?: string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
+  sentTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutSenderInput
+  receivedTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleUncheckedCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupUncheckedCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedCreateNestedManyWithoutUserInput
+  badges?: Prisma.BadgeUncheckedCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetUncheckedCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutChallengeStreakInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutChallengeStreakInput, Prisma.UserUncheckedCreateWithoutChallengeStreakInput>
+}
+
+export type UserUpsertWithoutChallengeStreakInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutChallengeStreakInput, Prisma.UserUncheckedUpdateWithoutChallengeStreakInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutChallengeStreakInput, Prisma.UserUncheckedCreateWithoutChallengeStreakInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutChallengeStreakInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutChallengeStreakInput, Prisma.UserUncheckedUpdateWithoutChallengeStreakInput>
+}
+
+export type UserUpdateWithoutChallengeStreakInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  address1?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  ssn?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayContactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  banks?: Prisma.BankUpdateManyWithoutUserNestedInput
+  sentTransactions?: Prisma.TransactionUpdateManyWithoutSenderNestedInput
+  receivedTransactions?: Prisma.TransactionUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUpdateManyWithoutUserNestedInput
+  badges?: Prisma.BadgeUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutChallengeStreakInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  address1?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  ssn?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayContactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
+  sentTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutSenderNestedInput
+  receivedTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUncheckedUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUncheckedUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedUpdateManyWithoutUserNestedInput
+  badges?: Prisma.BadgeUncheckedUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUncheckedUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutBadgesInput = {
+  id?: string
+  email: string
+  firstName: string
+  lastName: string
+  address1: string
+  city: string
+  state: string
+  postalCode: string
+  dateOfBirth: string
+  ssn: string
+  razorpayContactId?: string | null
+  googleId?: string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  banks?: Prisma.BankCreateNestedManyWithoutUserInput
+  sentTransactions?: Prisma.TransactionCreateNestedManyWithoutSenderInput
+  receivedTransactions?: Prisma.TransactionCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakCreateNestedOneWithoutUserInput
+  manualAssets?: Prisma.ManualAssetCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutBadgesInput = {
+  id?: string
+  email: string
+  firstName: string
+  lastName: string
+  address1: string
+  city: string
+  state: string
+  postalCode: string
+  dateOfBirth: string
+  ssn: string
+  razorpayContactId?: string | null
+  googleId?: string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
+  sentTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutSenderInput
+  receivedTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleUncheckedCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupUncheckedCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedCreateNestedOneWithoutUserInput
+  manualAssets?: Prisma.ManualAssetUncheckedCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutBadgesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutBadgesInput, Prisma.UserUncheckedCreateWithoutBadgesInput>
+}
+
+export type UserUpsertWithoutBadgesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutBadgesInput, Prisma.UserUncheckedUpdateWithoutBadgesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutBadgesInput, Prisma.UserUncheckedCreateWithoutBadgesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutBadgesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutBadgesInput, Prisma.UserUncheckedUpdateWithoutBadgesInput>
+}
+
+export type UserUpdateWithoutBadgesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  address1?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  ssn?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayContactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  banks?: Prisma.BankUpdateManyWithoutUserNestedInput
+  sentTransactions?: Prisma.TransactionUpdateManyWithoutSenderNestedInput
+  receivedTransactions?: Prisma.TransactionUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUpdateOneWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutBadgesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  address1?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  ssn?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayContactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
+  sentTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutSenderNestedInput
+  receivedTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUncheckedUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUncheckedUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedUpdateOneWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUncheckedUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutManualAssetsInput = {
+  id?: string
+  email: string
+  firstName: string
+  lastName: string
+  address1: string
+  city: string
+  state: string
+  postalCode: string
+  dateOfBirth: string
+  ssn: string
+  razorpayContactId?: string | null
+  googleId?: string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  banks?: Prisma.BankCreateNestedManyWithoutUserInput
+  sentTransactions?: Prisma.TransactionCreateNestedManyWithoutSenderInput
+  receivedTransactions?: Prisma.TransactionCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutManualAssetsInput = {
+  id?: string
+  email: string
+  firstName: string
+  lastName: string
+  address1: string
+  city: string
+  state: string
+  postalCode: string
+  dateOfBirth: string
+  ssn: string
+  razorpayContactId?: string | null
+  googleId?: string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
+  sentTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutSenderInput
+  receivedTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleUncheckedCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupUncheckedCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeUncheckedCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutManualAssetsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutManualAssetsInput, Prisma.UserUncheckedCreateWithoutManualAssetsInput>
+}
+
+export type UserUpsertWithoutManualAssetsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutManualAssetsInput, Prisma.UserUncheckedUpdateWithoutManualAssetsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutManualAssetsInput, Prisma.UserUncheckedCreateWithoutManualAssetsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutManualAssetsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutManualAssetsInput, Prisma.UserUncheckedUpdateWithoutManualAssetsInput>
+}
+
+export type UserUpdateWithoutManualAssetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  address1?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  ssn?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayContactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  banks?: Prisma.BankUpdateManyWithoutUserNestedInput
+  sentTransactions?: Prisma.TransactionUpdateManyWithoutSenderNestedInput
+  receivedTransactions?: Prisma.TransactionUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutManualAssetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  address1?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  ssn?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayContactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
+  sentTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutSenderNestedInput
+  receivedTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUncheckedUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUncheckedUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUncheckedUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutManualLiabilitiesInput = {
+  id?: string
+  email: string
+  firstName: string
+  lastName: string
+  address1: string
+  city: string
+  state: string
+  postalCode: string
+  dateOfBirth: string
+  ssn: string
+  razorpayContactId?: string | null
+  googleId?: string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  banks?: Prisma.BankCreateNestedManyWithoutUserInput
+  sentTransactions?: Prisma.TransactionCreateNestedManyWithoutSenderInput
+  receivedTransactions?: Prisma.TransactionCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutManualLiabilitiesInput = {
+  id?: string
+  email: string
+  firstName: string
+  lastName: string
+  address1: string
+  city: string
+  state: string
+  postalCode: string
+  dateOfBirth: string
+  ssn: string
+  razorpayContactId?: string | null
+  googleId?: string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
+  sentTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutSenderInput
+  receivedTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleUncheckedCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupUncheckedCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeUncheckedCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetUncheckedCreateNestedManyWithoutUserInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutManualLiabilitiesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutManualLiabilitiesInput, Prisma.UserUncheckedCreateWithoutManualLiabilitiesInput>
+}
+
+export type UserUpsertWithoutManualLiabilitiesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutManualLiabilitiesInput, Prisma.UserUncheckedUpdateWithoutManualLiabilitiesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutManualLiabilitiesInput, Prisma.UserUncheckedCreateWithoutManualLiabilitiesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutManualLiabilitiesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutManualLiabilitiesInput, Prisma.UserUncheckedUpdateWithoutManualLiabilitiesInput>
+}
+
+export type UserUpdateWithoutManualLiabilitiesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  address1?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  ssn?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayContactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  banks?: Prisma.BankUpdateManyWithoutUserNestedInput
+  sentTransactions?: Prisma.TransactionUpdateManyWithoutSenderNestedInput
+  receivedTransactions?: Prisma.TransactionUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutManualLiabilitiesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  address1?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  ssn?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayContactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
+  sentTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutSenderNestedInput
+  receivedTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUncheckedUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUncheckedUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUncheckedUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUncheckedUpdateManyWithoutUserNestedInput
+  netWorthSnapshots?: Prisma.NetWorthSnapshotUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutNetWorthSnapshotsInput = {
+  id?: string
+  email: string
+  firstName: string
+  lastName: string
+  address1: string
+  city: string
+  state: string
+  postalCode: string
+  dateOfBirth: string
+  ssn: string
+  razorpayContactId?: string | null
+  googleId?: string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  banks?: Prisma.BankCreateNestedManyWithoutUserInput
+  sentTransactions?: Prisma.TransactionCreateNestedManyWithoutSenderInput
+  receivedTransactions?: Prisma.TransactionCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutNetWorthSnapshotsInput = {
+  id?: string
+  email: string
+  firstName: string
+  lastName: string
+  address1: string
+  city: string
+  state: string
+  postalCode: string
+  dateOfBirth: string
+  ssn: string
+  razorpayContactId?: string | null
+  googleId?: string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
+  sentTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutSenderInput
+  receivedTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutReceiverInput
+  budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedCreateNestedManyWithoutUserInput
+  alertRules?: Prisma.AlertRuleUncheckedCreateNestedManyWithoutUserInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedCreateNestedManyWithoutUserInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedCreateNestedManyWithoutUserInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedCreateNestedManyWithoutUserInput
+  splitGroups?: Prisma.SplitGroupUncheckedCreateNestedManyWithoutUserInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedCreateNestedManyWithoutUserInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedCreateNestedOneWithoutUserInput
+  badges?: Prisma.BadgeUncheckedCreateNestedManyWithoutUserInput
+  manualAssets?: Prisma.ManualAssetUncheckedCreateNestedManyWithoutUserInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutNetWorthSnapshotsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutNetWorthSnapshotsInput, Prisma.UserUncheckedCreateWithoutNetWorthSnapshotsInput>
+}
+
+export type UserUpsertWithoutNetWorthSnapshotsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutNetWorthSnapshotsInput, Prisma.UserUncheckedUpdateWithoutNetWorthSnapshotsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutNetWorthSnapshotsInput, Prisma.UserUncheckedCreateWithoutNetWorthSnapshotsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutNetWorthSnapshotsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutNetWorthSnapshotsInput, Prisma.UserUncheckedUpdateWithoutNetWorthSnapshotsInput>
+}
+
+export type UserUpdateWithoutNetWorthSnapshotsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  address1?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  ssn?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayContactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  banks?: Prisma.BankUpdateManyWithoutUserNestedInput
+  sentTransactions?: Prisma.TransactionUpdateManyWithoutSenderNestedInput
+  receivedTransactions?: Prisma.TransactionUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutNetWorthSnapshotsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  address1?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  postalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfBirth?: Prisma.StringFieldUpdateOperationsInput | string
+  ssn?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayContactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
+  sentTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutSenderNestedInput
+  receivedTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutReceiverNestedInput
+  budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedUpdateManyWithoutUserNestedInput
+  alertRules?: Prisma.AlertRuleUncheckedUpdateManyWithoutUserNestedInput
+  transactionNotes?: Prisma.TransactionNoteUncheckedUpdateManyWithoutUserNestedInput
+  healthScores?: Prisma.FinancialHealthScoreUncheckedUpdateManyWithoutUserNestedInput
+  monthlyDigests?: Prisma.MonthlyDigestUncheckedUpdateManyWithoutUserNestedInput
+  splitGroups?: Prisma.SplitGroupUncheckedUpdateManyWithoutUserNestedInput
+  spendingChallenges?: Prisma.SpendingChallengeUncheckedUpdateManyWithoutUserNestedInput
+  challengeStreak?: Prisma.ChallengeStreakUncheckedUpdateOneWithoutUserNestedInput
+  badges?: Prisma.BadgeUncheckedUpdateManyWithoutUserNestedInput
+  manualAssets?: Prisma.ManualAssetUncheckedUpdateManyWithoutUserNestedInput
+  manualLiabilities?: Prisma.ManualLiabilityUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -954,12 +3307,36 @@ export type UserCountOutputType = {
   banks: number
   sentTransactions: number
   receivedTransactions: number
+  budgets: number
+  savingsGoals: number
+  alertRules: number
+  transactionNotes: number
+  healthScores: number
+  monthlyDigests: number
+  splitGroups: number
+  spendingChallenges: number
+  badges: number
+  manualAssets: number
+  manualLiabilities: number
+  netWorthSnapshots: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   banks?: boolean | UserCountOutputTypeCountBanksArgs
   sentTransactions?: boolean | UserCountOutputTypeCountSentTransactionsArgs
   receivedTransactions?: boolean | UserCountOutputTypeCountReceivedTransactionsArgs
+  budgets?: boolean | UserCountOutputTypeCountBudgetsArgs
+  savingsGoals?: boolean | UserCountOutputTypeCountSavingsGoalsArgs
+  alertRules?: boolean | UserCountOutputTypeCountAlertRulesArgs
+  transactionNotes?: boolean | UserCountOutputTypeCountTransactionNotesArgs
+  healthScores?: boolean | UserCountOutputTypeCountHealthScoresArgs
+  monthlyDigests?: boolean | UserCountOutputTypeCountMonthlyDigestsArgs
+  splitGroups?: boolean | UserCountOutputTypeCountSplitGroupsArgs
+  spendingChallenges?: boolean | UserCountOutputTypeCountSpendingChallengesArgs
+  badges?: boolean | UserCountOutputTypeCountBadgesArgs
+  manualAssets?: boolean | UserCountOutputTypeCountManualAssetsArgs
+  manualLiabilities?: boolean | UserCountOutputTypeCountManualLiabilitiesArgs
+  netWorthSnapshots?: boolean | UserCountOutputTypeCountNetWorthSnapshotsArgs
 }
 
 /**
@@ -993,6 +3370,90 @@ export type UserCountOutputTypeCountReceivedTransactionsArgs<ExtArgs extends run
   where?: Prisma.TransactionWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountBudgetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.BudgetWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSavingsGoalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SavingsGoalWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAlertRulesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AlertRuleWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountTransactionNotesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TransactionNoteWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountHealthScoresArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.FinancialHealthScoreWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountMonthlyDigestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MonthlyDigestWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSplitGroupsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SplitGroupWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSpendingChallengesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SpendingChallengeWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountBadgesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.BadgeWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountManualAssetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ManualAssetWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountManualLiabilitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ManualLiabilityWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountNetWorthSnapshotsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NetWorthSnapshotWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1013,6 +3474,19 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   banks?: boolean | Prisma.User$banksArgs<ExtArgs>
   sentTransactions?: boolean | Prisma.User$sentTransactionsArgs<ExtArgs>
   receivedTransactions?: boolean | Prisma.User$receivedTransactionsArgs<ExtArgs>
+  budgets?: boolean | Prisma.User$budgetsArgs<ExtArgs>
+  savingsGoals?: boolean | Prisma.User$savingsGoalsArgs<ExtArgs>
+  alertRules?: boolean | Prisma.User$alertRulesArgs<ExtArgs>
+  transactionNotes?: boolean | Prisma.User$transactionNotesArgs<ExtArgs>
+  healthScores?: boolean | Prisma.User$healthScoresArgs<ExtArgs>
+  monthlyDigests?: boolean | Prisma.User$monthlyDigestsArgs<ExtArgs>
+  splitGroups?: boolean | Prisma.User$splitGroupsArgs<ExtArgs>
+  spendingChallenges?: boolean | Prisma.User$spendingChallengesArgs<ExtArgs>
+  challengeStreak?: boolean | Prisma.User$challengeStreakArgs<ExtArgs>
+  badges?: boolean | Prisma.User$badgesArgs<ExtArgs>
+  manualAssets?: boolean | Prisma.User$manualAssetsArgs<ExtArgs>
+  manualLiabilities?: boolean | Prisma.User$manualLiabilitiesArgs<ExtArgs>
+  netWorthSnapshots?: boolean | Prisma.User$netWorthSnapshotsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1075,6 +3549,19 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   banks?: boolean | Prisma.User$banksArgs<ExtArgs>
   sentTransactions?: boolean | Prisma.User$sentTransactionsArgs<ExtArgs>
   receivedTransactions?: boolean | Prisma.User$receivedTransactionsArgs<ExtArgs>
+  budgets?: boolean | Prisma.User$budgetsArgs<ExtArgs>
+  savingsGoals?: boolean | Prisma.User$savingsGoalsArgs<ExtArgs>
+  alertRules?: boolean | Prisma.User$alertRulesArgs<ExtArgs>
+  transactionNotes?: boolean | Prisma.User$transactionNotesArgs<ExtArgs>
+  healthScores?: boolean | Prisma.User$healthScoresArgs<ExtArgs>
+  monthlyDigests?: boolean | Prisma.User$monthlyDigestsArgs<ExtArgs>
+  splitGroups?: boolean | Prisma.User$splitGroupsArgs<ExtArgs>
+  spendingChallenges?: boolean | Prisma.User$spendingChallengesArgs<ExtArgs>
+  challengeStreak?: boolean | Prisma.User$challengeStreakArgs<ExtArgs>
+  badges?: boolean | Prisma.User$badgesArgs<ExtArgs>
+  manualAssets?: boolean | Prisma.User$manualAssetsArgs<ExtArgs>
+  manualLiabilities?: boolean | Prisma.User$manualLiabilitiesArgs<ExtArgs>
+  netWorthSnapshots?: boolean | Prisma.User$netWorthSnapshotsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1086,6 +3573,19 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     banks: Prisma.$BankPayload<ExtArgs>[]
     sentTransactions: Prisma.$TransactionPayload<ExtArgs>[]
     receivedTransactions: Prisma.$TransactionPayload<ExtArgs>[]
+    budgets: Prisma.$BudgetPayload<ExtArgs>[]
+    savingsGoals: Prisma.$SavingsGoalPayload<ExtArgs>[]
+    alertRules: Prisma.$AlertRulePayload<ExtArgs>[]
+    transactionNotes: Prisma.$TransactionNotePayload<ExtArgs>[]
+    healthScores: Prisma.$FinancialHealthScorePayload<ExtArgs>[]
+    monthlyDigests: Prisma.$MonthlyDigestPayload<ExtArgs>[]
+    splitGroups: Prisma.$SplitGroupPayload<ExtArgs>[]
+    spendingChallenges: Prisma.$SpendingChallengePayload<ExtArgs>[]
+    challengeStreak: Prisma.$ChallengeStreakPayload<ExtArgs> | null
+    badges: Prisma.$BadgePayload<ExtArgs>[]
+    manualAssets: Prisma.$ManualAssetPayload<ExtArgs>[]
+    manualLiabilities: Prisma.$ManualLiabilityPayload<ExtArgs>[]
+    netWorthSnapshots: Prisma.$NetWorthSnapshotPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1500,6 +4000,19 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   banks<T extends Prisma.User$banksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$banksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BankPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sentTransactions<T extends Prisma.User$sentTransactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sentTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   receivedTransactions<T extends Prisma.User$receivedTransactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$receivedTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  budgets<T extends Prisma.User$budgetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$budgetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BudgetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  savingsGoals<T extends Prisma.User$savingsGoalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$savingsGoalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SavingsGoalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  alertRules<T extends Prisma.User$alertRulesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$alertRulesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AlertRulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  transactionNotes<T extends Prisma.User$transactionNotesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$transactionNotesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransactionNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  healthScores<T extends Prisma.User$healthScoresArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$healthScoresArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FinancialHealthScorePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  monthlyDigests<T extends Prisma.User$monthlyDigestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$monthlyDigestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MonthlyDigestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  splitGroups<T extends Prisma.User$splitGroupsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$splitGroupsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SplitGroupPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  spendingChallenges<T extends Prisma.User$spendingChallengesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$spendingChallengesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SpendingChallengePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  challengeStreak<T extends Prisma.User$challengeStreakArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$challengeStreakArgs<ExtArgs>>): Prisma.Prisma__ChallengeStreakClient<runtime.Types.Result.GetResult<Prisma.$ChallengeStreakPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  badges<T extends Prisma.User$badgesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$badgesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BadgePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  manualAssets<T extends Prisma.User$manualAssetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$manualAssetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ManualAssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  manualLiabilities<T extends Prisma.User$manualLiabilitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$manualLiabilitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ManualLiabilityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  netWorthSnapshots<T extends Prisma.User$netWorthSnapshotsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$netWorthSnapshotsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NetWorthSnapshotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2001,6 +4514,313 @@ export type User$receivedTransactionsArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.TransactionScalarFieldEnum | Prisma.TransactionScalarFieldEnum[]
+}
+
+/**
+ * User.budgets
+ */
+export type User$budgetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Budget
+   */
+  select?: Prisma.BudgetSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Budget
+   */
+  omit?: Prisma.BudgetOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BudgetInclude<ExtArgs> | null
+  where?: Prisma.BudgetWhereInput
+  orderBy?: Prisma.BudgetOrderByWithRelationInput | Prisma.BudgetOrderByWithRelationInput[]
+  cursor?: Prisma.BudgetWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.BudgetScalarFieldEnum | Prisma.BudgetScalarFieldEnum[]
+}
+
+/**
+ * User.savingsGoals
+ */
+export type User$savingsGoalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SavingsGoal
+   */
+  select?: Prisma.SavingsGoalSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SavingsGoal
+   */
+  omit?: Prisma.SavingsGoalOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SavingsGoalInclude<ExtArgs> | null
+  where?: Prisma.SavingsGoalWhereInput
+  orderBy?: Prisma.SavingsGoalOrderByWithRelationInput | Prisma.SavingsGoalOrderByWithRelationInput[]
+  cursor?: Prisma.SavingsGoalWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SavingsGoalScalarFieldEnum | Prisma.SavingsGoalScalarFieldEnum[]
+}
+
+/**
+ * User.alertRules
+ */
+export type User$alertRulesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AlertRule
+   */
+  select?: Prisma.AlertRuleSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AlertRule
+   */
+  omit?: Prisma.AlertRuleOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AlertRuleInclude<ExtArgs> | null
+  where?: Prisma.AlertRuleWhereInput
+  orderBy?: Prisma.AlertRuleOrderByWithRelationInput | Prisma.AlertRuleOrderByWithRelationInput[]
+  cursor?: Prisma.AlertRuleWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AlertRuleScalarFieldEnum | Prisma.AlertRuleScalarFieldEnum[]
+}
+
+/**
+ * User.transactionNotes
+ */
+export type User$transactionNotesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TransactionNote
+   */
+  select?: Prisma.TransactionNoteSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TransactionNote
+   */
+  omit?: Prisma.TransactionNoteOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TransactionNoteInclude<ExtArgs> | null
+  where?: Prisma.TransactionNoteWhereInput
+  orderBy?: Prisma.TransactionNoteOrderByWithRelationInput | Prisma.TransactionNoteOrderByWithRelationInput[]
+  cursor?: Prisma.TransactionNoteWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TransactionNoteScalarFieldEnum | Prisma.TransactionNoteScalarFieldEnum[]
+}
+
+/**
+ * User.healthScores
+ */
+export type User$healthScoresArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the FinancialHealthScore
+   */
+  select?: Prisma.FinancialHealthScoreSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the FinancialHealthScore
+   */
+  omit?: Prisma.FinancialHealthScoreOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FinancialHealthScoreInclude<ExtArgs> | null
+  where?: Prisma.FinancialHealthScoreWhereInput
+  orderBy?: Prisma.FinancialHealthScoreOrderByWithRelationInput | Prisma.FinancialHealthScoreOrderByWithRelationInput[]
+  cursor?: Prisma.FinancialHealthScoreWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.FinancialHealthScoreScalarFieldEnum | Prisma.FinancialHealthScoreScalarFieldEnum[]
+}
+
+/**
+ * User.monthlyDigests
+ */
+export type User$monthlyDigestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MonthlyDigest
+   */
+  select?: Prisma.MonthlyDigestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MonthlyDigest
+   */
+  omit?: Prisma.MonthlyDigestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MonthlyDigestInclude<ExtArgs> | null
+  where?: Prisma.MonthlyDigestWhereInput
+  orderBy?: Prisma.MonthlyDigestOrderByWithRelationInput | Prisma.MonthlyDigestOrderByWithRelationInput[]
+  cursor?: Prisma.MonthlyDigestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MonthlyDigestScalarFieldEnum | Prisma.MonthlyDigestScalarFieldEnum[]
+}
+
+/**
+ * User.splitGroups
+ */
+export type User$splitGroupsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SplitGroup
+   */
+  select?: Prisma.SplitGroupSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SplitGroup
+   */
+  omit?: Prisma.SplitGroupOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SplitGroupInclude<ExtArgs> | null
+  where?: Prisma.SplitGroupWhereInput
+  orderBy?: Prisma.SplitGroupOrderByWithRelationInput | Prisma.SplitGroupOrderByWithRelationInput[]
+  cursor?: Prisma.SplitGroupWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SplitGroupScalarFieldEnum | Prisma.SplitGroupScalarFieldEnum[]
+}
+
+/**
+ * User.spendingChallenges
+ */
+export type User$spendingChallengesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SpendingChallenge
+   */
+  select?: Prisma.SpendingChallengeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SpendingChallenge
+   */
+  omit?: Prisma.SpendingChallengeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SpendingChallengeInclude<ExtArgs> | null
+  where?: Prisma.SpendingChallengeWhereInput
+  orderBy?: Prisma.SpendingChallengeOrderByWithRelationInput | Prisma.SpendingChallengeOrderByWithRelationInput[]
+  cursor?: Prisma.SpendingChallengeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SpendingChallengeScalarFieldEnum | Prisma.SpendingChallengeScalarFieldEnum[]
+}
+
+/**
+ * User.challengeStreak
+ */
+export type User$challengeStreakArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ChallengeStreak
+   */
+  select?: Prisma.ChallengeStreakSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ChallengeStreak
+   */
+  omit?: Prisma.ChallengeStreakOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ChallengeStreakInclude<ExtArgs> | null
+  where?: Prisma.ChallengeStreakWhereInput
+}
+
+/**
+ * User.badges
+ */
+export type User$badgesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Badge
+   */
+  select?: Prisma.BadgeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Badge
+   */
+  omit?: Prisma.BadgeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BadgeInclude<ExtArgs> | null
+  where?: Prisma.BadgeWhereInput
+  orderBy?: Prisma.BadgeOrderByWithRelationInput | Prisma.BadgeOrderByWithRelationInput[]
+  cursor?: Prisma.BadgeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.BadgeScalarFieldEnum | Prisma.BadgeScalarFieldEnum[]
+}
+
+/**
+ * User.manualAssets
+ */
+export type User$manualAssetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ManualAsset
+   */
+  select?: Prisma.ManualAssetSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ManualAsset
+   */
+  omit?: Prisma.ManualAssetOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ManualAssetInclude<ExtArgs> | null
+  where?: Prisma.ManualAssetWhereInput
+  orderBy?: Prisma.ManualAssetOrderByWithRelationInput | Prisma.ManualAssetOrderByWithRelationInput[]
+  cursor?: Prisma.ManualAssetWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ManualAssetScalarFieldEnum | Prisma.ManualAssetScalarFieldEnum[]
+}
+
+/**
+ * User.manualLiabilities
+ */
+export type User$manualLiabilitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ManualLiability
+   */
+  select?: Prisma.ManualLiabilitySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ManualLiability
+   */
+  omit?: Prisma.ManualLiabilityOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ManualLiabilityInclude<ExtArgs> | null
+  where?: Prisma.ManualLiabilityWhereInput
+  orderBy?: Prisma.ManualLiabilityOrderByWithRelationInput | Prisma.ManualLiabilityOrderByWithRelationInput[]
+  cursor?: Prisma.ManualLiabilityWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ManualLiabilityScalarFieldEnum | Prisma.ManualLiabilityScalarFieldEnum[]
+}
+
+/**
+ * User.netWorthSnapshots
+ */
+export type User$netWorthSnapshotsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the NetWorthSnapshot
+   */
+  select?: Prisma.NetWorthSnapshotSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the NetWorthSnapshot
+   */
+  omit?: Prisma.NetWorthSnapshotOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NetWorthSnapshotInclude<ExtArgs> | null
+  where?: Prisma.NetWorthSnapshotWhereInput
+  orderBy?: Prisma.NetWorthSnapshotOrderByWithRelationInput | Prisma.NetWorthSnapshotOrderByWithRelationInput[]
+  cursor?: Prisma.NetWorthSnapshotWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NetWorthSnapshotScalarFieldEnum | Prisma.NetWorthSnapshotScalarFieldEnum[]
 }
 
 /**

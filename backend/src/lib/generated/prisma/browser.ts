@@ -42,3 +42,83 @@ export type CachedCategory = Prisma.CachedCategoryModel
  * 
  */
 export type OtpCode = Prisma.OtpCodeModel
+/**
+ * Model Budget
+ * 
+ */
+export type Budget = Prisma.BudgetModel
+/**
+ * Model SavingsGoal
+ * 
+ */
+export type SavingsGoal = Prisma.SavingsGoalModel
+/**
+ * Model GoalContribution
+ * 
+ */
+export type GoalContribution = Prisma.GoalContributionModel
+/**
+ * Model AlertRule
+ * 
+ */
+export type AlertRule = Prisma.AlertRuleModel
+/**
+ * Model AlertTriggerLog
+ * 
+ */
+export type AlertTriggerLog = Prisma.AlertTriggerLogModel
+/**
+ * Model TransactionNote
+ * 
+ */
+export type TransactionNote = Prisma.TransactionNoteModel
+/**
+ * Model FinancialHealthScore
+ * 
+ */
+export type FinancialHealthScore = Prisma.FinancialHealthScoreModel
+/**
+ * Model MonthlyDigest
+ * 
+ */
+export type MonthlyDigest = Prisma.MonthlyDigestModel
+/**
+ * Model SplitGroup
+ * 
+ */
+export type SplitGroup = Prisma.SplitGroupModel
+/**
+ * Model SplitParticipant
+ * 
+ */
+export type SplitParticipant = Prisma.SplitParticipantModel
+/**
+ * Model SpendingChallenge
+ * 
+ */
+export type SpendingChallenge = Prisma.SpendingChallengeModel
+/**
+ * Model ChallengeStreak
+ * 
+ */
+export type ChallengeStreak = Prisma.ChallengeStreakModel
+/**
+ * Model Badge
+ * 
+ */
+export type Badge = Prisma.BadgeModel
+/**
+ * Model ManualAsset
+ * 
+ */
+export type ManualAsset = Prisma.ManualAssetModel
+/**
+ * Model ManualLiability
+ * 
+ */
+export type ManualLiability = Prisma.ManualLiabilityModel
+/**
+ * Model NetWorthSnapshot
+ * 
+ */
+export type NetWorthSnapshot = Prisma.NetWorthSnapshotModel
