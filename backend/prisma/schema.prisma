@@ -15,6 +15,7 @@ model User {
   firstName          String
   lastName           String
   address1           String
+  country            String   @default("US")
   city               String
   state              String
   postalCode         String
