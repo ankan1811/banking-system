@@ -1,9 +1,9 @@
 import AIChatbot from "@/components/AIChatbot";
+import LandingPreview from "@/components/LandingPreview";
 import MobileNav from "@/components/MobileNav";
 import Sidebar from "@/components/Sidebar";
 import { serverApiRequest } from "@/lib/api/server-client";
 import Image from "next/image";
-import { redirect } from "next/navigation";
 
 export default async function RootLayout({
   children,
@@ -12,7 +12,7 @@ export default async function RootLayout({
 }>) {
   const loggedIn = await serverApiRequest('/api/auth/me');
 
-  if(!loggedIn) redirect('/sign-in')
+  if (!loggedIn) return <LandingPreview />;
 
   return (
     <main className="flex h-screen w-full bg-[#0a0e1a]">

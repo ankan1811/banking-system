@@ -10,5 +10,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/my-banks', '/payment-transfer', '/transaction-history'],
+  matcher: ['/my-banks', '/payment-transfer', '/transaction-history'],
 };

@@ -38,3 +38,10 @@ export async function googleSignIn(idToken: string) {
     body: JSON.stringify({ idToken }),
   });
 }
+
+export async function updateProfile(data: Record<string, string>) {
+  return apiRequest('/api/auth/profile', {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  });
+}

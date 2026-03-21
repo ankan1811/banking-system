@@ -193,6 +193,16 @@ export const otpSchema = z.object({
   otp: z.string().length(6, "OTP must be 6 digits"),
 });
 
+export const completeProfileSchema = z.object({
+  address1: z.string().min(1, 'Address is required').max(50),
+  country: z.string().min(2, 'Select a country'),
+  city: z.string().min(1, 'City is required').max(50),
+  state: z.string().min(2, 'Select a state'),
+  postalCode: z.string().min(3).max(10),
+  dateOfBirth: z.string().min(1, 'Select your date of birth'),
+  ssn: z.string().min(3, 'SSN is required'),
+});
+
 export function decryptId(id: string) {
   return atob(id);
 }
