@@ -410,7 +410,8 @@ export const ModelName = {
   Badge: 'Badge',
   ManualAsset: 'ManualAsset',
   ManualLiability: 'ManualLiability',
-  NetWorthSnapshot: 'NetWorthSnapshot'
+  NetWorthSnapshot: 'NetWorthSnapshot',
+  PlaidTransaction: 'PlaidTransaction'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -426,7 +427,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "bank" | "transaction" | "cachedCategory" | "otpCode" | "budget" | "savingsGoal" | "goalContribution" | "alertRule" | "alertTriggerLog" | "transactionNote" | "financialHealthScore" | "monthlyDigest" | "splitGroup" | "splitParticipant" | "spendingChallenge" | "challengeStreak" | "badge" | "manualAsset" | "manualLiability" | "netWorthSnapshot"
+    modelProps: "user" | "bank" | "transaction" | "cachedCategory" | "otpCode" | "budget" | "savingsGoal" | "goalContribution" | "alertRule" | "alertTriggerLog" | "transactionNote" | "financialHealthScore" | "monthlyDigest" | "splitGroup" | "splitParticipant" | "spendingChallenge" | "challengeStreak" | "badge" | "manualAsset" | "manualLiability" | "netWorthSnapshot" | "plaidTransaction"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1984,6 +1985,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PlaidTransaction: {
+      payload: Prisma.$PlaidTransactionPayload<ExtArgs>
+      fields: Prisma.PlaidTransactionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PlaidTransactionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlaidTransactionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PlaidTransactionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlaidTransactionPayload>
+        }
+        findFirst: {
+          args: Prisma.PlaidTransactionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlaidTransactionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PlaidTransactionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlaidTransactionPayload>
+        }
+        findMany: {
+          args: Prisma.PlaidTransactionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlaidTransactionPayload>[]
+        }
+        create: {
+          args: Prisma.PlaidTransactionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlaidTransactionPayload>
+        }
+        createMany: {
+          args: Prisma.PlaidTransactionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PlaidTransactionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlaidTransactionPayload>[]
+        }
+        delete: {
+          args: Prisma.PlaidTransactionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlaidTransactionPayload>
+        }
+        update: {
+          args: Prisma.PlaidTransactionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlaidTransactionPayload>
+        }
+        deleteMany: {
+          args: Prisma.PlaidTransactionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PlaidTransactionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PlaidTransactionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlaidTransactionPayload>[]
+        }
+        upsert: {
+          args: Prisma.PlaidTransactionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlaidTransactionPayload>
+        }
+        aggregate: {
+          args: Prisma.PlaidTransactionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePlaidTransaction>
+        }
+        groupBy: {
+          args: Prisma.PlaidTransactionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlaidTransactionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PlaidTransactionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlaidTransactionCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2323,6 +2398,25 @@ export const NetWorthSnapshotScalarFieldEnum = {
 export type NetWorthSnapshotScalarFieldEnum = (typeof NetWorthSnapshotScalarFieldEnum)[keyof typeof NetWorthSnapshotScalarFieldEnum]
 
 
+export const PlaidTransactionScalarFieldEnum = {
+  id: 'id',
+  bankId: 'bankId',
+  name: 'name',
+  merchantName: 'merchantName',
+  paymentChannel: 'paymentChannel',
+  type: 'type',
+  accountId: 'accountId',
+  amount: 'amount',
+  pending: 'pending',
+  category: 'category',
+  date: 'date',
+  image: 'image',
+  syncedAt: 'syncedAt'
+} as const
+
+export type PlaidTransactionScalarFieldEnum = (typeof PlaidTransactionScalarFieldEnum)[keyof typeof PlaidTransactionScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -2567,6 +2661,7 @@ export type GlobalOmitConfig = {
   manualAsset?: Prisma.ManualAssetOmit
   manualLiability?: Prisma.ManualLiabilityOmit
   netWorthSnapshot?: Prisma.NetWorthSnapshotOmit
+  plaidTransaction?: Prisma.PlaidTransactionOmit
 }
 
 /* Types for Logging */

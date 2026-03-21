@@ -209,6 +209,7 @@ export type BankWhereInput = {
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   sentTransactions?: Prisma.TransactionListRelationFilter
   receivedTransactions?: Prisma.TransactionListRelationFilter
+  plaidTransactions?: Prisma.PlaidTransactionListRelationFilter
 }
 
 export type BankOrderByWithRelationInput = {
@@ -223,6 +224,7 @@ export type BankOrderByWithRelationInput = {
   user?: Prisma.UserOrderByWithRelationInput
   sentTransactions?: Prisma.TransactionOrderByRelationAggregateInput
   receivedTransactions?: Prisma.TransactionOrderByRelationAggregateInput
+  plaidTransactions?: Prisma.PlaidTransactionOrderByRelationAggregateInput
 }
 
 export type BankWhereUniqueInput = Prisma.AtLeast<{
@@ -240,6 +242,7 @@ export type BankWhereUniqueInput = Prisma.AtLeast<{
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   sentTransactions?: Prisma.TransactionListRelationFilter
   receivedTransactions?: Prisma.TransactionListRelationFilter
+  plaidTransactions?: Prisma.PlaidTransactionListRelationFilter
 }, "id">
 
 export type BankOrderByWithAggregationInput = {
@@ -281,6 +284,7 @@ export type BankCreateInput = {
   user: Prisma.UserCreateNestedOneWithoutBanksInput
   sentTransactions?: Prisma.TransactionCreateNestedManyWithoutSenderBankInput
   receivedTransactions?: Prisma.TransactionCreateNestedManyWithoutReceiverBankInput
+  plaidTransactions?: Prisma.PlaidTransactionCreateNestedManyWithoutBankInput
 }
 
 export type BankUncheckedCreateInput = {
@@ -294,6 +298,7 @@ export type BankUncheckedCreateInput = {
   createdAt?: Date | string
   sentTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutSenderBankInput
   receivedTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutReceiverBankInput
+  plaidTransactions?: Prisma.PlaidTransactionUncheckedCreateNestedManyWithoutBankInput
 }
 
 export type BankUpdateInput = {
@@ -307,6 +312,7 @@ export type BankUpdateInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutBanksNestedInput
   sentTransactions?: Prisma.TransactionUpdateManyWithoutSenderBankNestedInput
   receivedTransactions?: Prisma.TransactionUpdateManyWithoutReceiverBankNestedInput
+  plaidTransactions?: Prisma.PlaidTransactionUpdateManyWithoutBankNestedInput
 }
 
 export type BankUncheckedUpdateInput = {
@@ -320,6 +326,7 @@ export type BankUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sentTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutSenderBankNestedInput
   receivedTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutReceiverBankNestedInput
+  plaidTransactions?: Prisma.PlaidTransactionUncheckedUpdateManyWithoutBankNestedInput
 }
 
 export type BankCreateManyInput = {
@@ -472,6 +479,20 @@ export type BankUpdateOneRequiredWithoutReceivedTransactionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.BankUpdateToOneWithWhereWithoutReceivedTransactionsInput, Prisma.BankUpdateWithoutReceivedTransactionsInput>, Prisma.BankUncheckedUpdateWithoutReceivedTransactionsInput>
 }
 
+export type BankCreateNestedOneWithoutPlaidTransactionsInput = {
+  create?: Prisma.XOR<Prisma.BankCreateWithoutPlaidTransactionsInput, Prisma.BankUncheckedCreateWithoutPlaidTransactionsInput>
+  connectOrCreate?: Prisma.BankCreateOrConnectWithoutPlaidTransactionsInput
+  connect?: Prisma.BankWhereUniqueInput
+}
+
+export type BankUpdateOneRequiredWithoutPlaidTransactionsNestedInput = {
+  create?: Prisma.XOR<Prisma.BankCreateWithoutPlaidTransactionsInput, Prisma.BankUncheckedCreateWithoutPlaidTransactionsInput>
+  connectOrCreate?: Prisma.BankCreateOrConnectWithoutPlaidTransactionsInput
+  upsert?: Prisma.BankUpsertWithoutPlaidTransactionsInput
+  connect?: Prisma.BankWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.BankUpdateToOneWithWhereWithoutPlaidTransactionsInput, Prisma.BankUpdateWithoutPlaidTransactionsInput>, Prisma.BankUncheckedUpdateWithoutPlaidTransactionsInput>
+}
+
 export type BankCreateWithoutUserInput = {
   id?: string
   bankId: string
@@ -482,6 +503,7 @@ export type BankCreateWithoutUserInput = {
   createdAt?: Date | string
   sentTransactions?: Prisma.TransactionCreateNestedManyWithoutSenderBankInput
   receivedTransactions?: Prisma.TransactionCreateNestedManyWithoutReceiverBankInput
+  plaidTransactions?: Prisma.PlaidTransactionCreateNestedManyWithoutBankInput
 }
 
 export type BankUncheckedCreateWithoutUserInput = {
@@ -494,6 +516,7 @@ export type BankUncheckedCreateWithoutUserInput = {
   createdAt?: Date | string
   sentTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutSenderBankInput
   receivedTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutReceiverBankInput
+  plaidTransactions?: Prisma.PlaidTransactionUncheckedCreateNestedManyWithoutBankInput
 }
 
 export type BankCreateOrConnectWithoutUserInput = {
@@ -546,6 +569,7 @@ export type BankCreateWithoutSentTransactionsInput = {
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutBanksInput
   receivedTransactions?: Prisma.TransactionCreateNestedManyWithoutReceiverBankInput
+  plaidTransactions?: Prisma.PlaidTransactionCreateNestedManyWithoutBankInput
 }
 
 export type BankUncheckedCreateWithoutSentTransactionsInput = {
@@ -558,6 +582,7 @@ export type BankUncheckedCreateWithoutSentTransactionsInput = {
   shareableId?: string | null
   createdAt?: Date | string
   receivedTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutReceiverBankInput
+  plaidTransactions?: Prisma.PlaidTransactionUncheckedCreateNestedManyWithoutBankInput
 }
 
 export type BankCreateOrConnectWithoutSentTransactionsInput = {
@@ -575,6 +600,7 @@ export type BankCreateWithoutReceivedTransactionsInput = {
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutBanksInput
   sentTransactions?: Prisma.TransactionCreateNestedManyWithoutSenderBankInput
+  plaidTransactions?: Prisma.PlaidTransactionCreateNestedManyWithoutBankInput
 }
 
 export type BankUncheckedCreateWithoutReceivedTransactionsInput = {
@@ -587,6 +613,7 @@ export type BankUncheckedCreateWithoutReceivedTransactionsInput = {
   shareableId?: string | null
   createdAt?: Date | string
   sentTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutSenderBankInput
+  plaidTransactions?: Prisma.PlaidTransactionUncheckedCreateNestedManyWithoutBankInput
 }
 
 export type BankCreateOrConnectWithoutReceivedTransactionsInput = {
@@ -615,6 +642,7 @@ export type BankUpdateWithoutSentTransactionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutBanksNestedInput
   receivedTransactions?: Prisma.TransactionUpdateManyWithoutReceiverBankNestedInput
+  plaidTransactions?: Prisma.PlaidTransactionUpdateManyWithoutBankNestedInput
 }
 
 export type BankUncheckedUpdateWithoutSentTransactionsInput = {
@@ -627,6 +655,7 @@ export type BankUncheckedUpdateWithoutSentTransactionsInput = {
   shareableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   receivedTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutReceiverBankNestedInput
+  plaidTransactions?: Prisma.PlaidTransactionUncheckedUpdateManyWithoutBankNestedInput
 }
 
 export type BankUpsertWithoutReceivedTransactionsInput = {
@@ -650,6 +679,7 @@ export type BankUpdateWithoutReceivedTransactionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutBanksNestedInput
   sentTransactions?: Prisma.TransactionUpdateManyWithoutSenderBankNestedInput
+  plaidTransactions?: Prisma.PlaidTransactionUpdateManyWithoutBankNestedInput
 }
 
 export type BankUncheckedUpdateWithoutReceivedTransactionsInput = {
@@ -662,6 +692,75 @@ export type BankUncheckedUpdateWithoutReceivedTransactionsInput = {
   shareableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sentTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutSenderBankNestedInput
+  plaidTransactions?: Prisma.PlaidTransactionUncheckedUpdateManyWithoutBankNestedInput
+}
+
+export type BankCreateWithoutPlaidTransactionsInput = {
+  id?: string
+  bankId: string
+  accountId: string
+  accessToken: string
+  razorpayFundAccountId?: string | null
+  shareableId?: string | null
+  createdAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutBanksInput
+  sentTransactions?: Prisma.TransactionCreateNestedManyWithoutSenderBankInput
+  receivedTransactions?: Prisma.TransactionCreateNestedManyWithoutReceiverBankInput
+}
+
+export type BankUncheckedCreateWithoutPlaidTransactionsInput = {
+  id?: string
+  userId: string
+  bankId: string
+  accountId: string
+  accessToken: string
+  razorpayFundAccountId?: string | null
+  shareableId?: string | null
+  createdAt?: Date | string
+  sentTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutSenderBankInput
+  receivedTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutReceiverBankInput
+}
+
+export type BankCreateOrConnectWithoutPlaidTransactionsInput = {
+  where: Prisma.BankWhereUniqueInput
+  create: Prisma.XOR<Prisma.BankCreateWithoutPlaidTransactionsInput, Prisma.BankUncheckedCreateWithoutPlaidTransactionsInput>
+}
+
+export type BankUpsertWithoutPlaidTransactionsInput = {
+  update: Prisma.XOR<Prisma.BankUpdateWithoutPlaidTransactionsInput, Prisma.BankUncheckedUpdateWithoutPlaidTransactionsInput>
+  create: Prisma.XOR<Prisma.BankCreateWithoutPlaidTransactionsInput, Prisma.BankUncheckedCreateWithoutPlaidTransactionsInput>
+  where?: Prisma.BankWhereInput
+}
+
+export type BankUpdateToOneWithWhereWithoutPlaidTransactionsInput = {
+  where?: Prisma.BankWhereInput
+  data: Prisma.XOR<Prisma.BankUpdateWithoutPlaidTransactionsInput, Prisma.BankUncheckedUpdateWithoutPlaidTransactionsInput>
+}
+
+export type BankUpdateWithoutPlaidTransactionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  bankId?: Prisma.StringFieldUpdateOperationsInput | string
+  accountId?: Prisma.StringFieldUpdateOperationsInput | string
+  accessToken?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayFundAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shareableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutBanksNestedInput
+  sentTransactions?: Prisma.TransactionUpdateManyWithoutSenderBankNestedInput
+  receivedTransactions?: Prisma.TransactionUpdateManyWithoutReceiverBankNestedInput
+}
+
+export type BankUncheckedUpdateWithoutPlaidTransactionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  bankId?: Prisma.StringFieldUpdateOperationsInput | string
+  accountId?: Prisma.StringFieldUpdateOperationsInput | string
+  accessToken?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayFundAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shareableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sentTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutSenderBankNestedInput
+  receivedTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutReceiverBankNestedInput
 }
 
 export type BankCreateManyUserInput = {
@@ -684,6 +783,7 @@ export type BankUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sentTransactions?: Prisma.TransactionUpdateManyWithoutSenderBankNestedInput
   receivedTransactions?: Prisma.TransactionUpdateManyWithoutReceiverBankNestedInput
+  plaidTransactions?: Prisma.PlaidTransactionUpdateManyWithoutBankNestedInput
 }
 
 export type BankUncheckedUpdateWithoutUserInput = {
@@ -696,6 +796,7 @@ export type BankUncheckedUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sentTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutSenderBankNestedInput
   receivedTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutReceiverBankNestedInput
+  plaidTransactions?: Prisma.PlaidTransactionUncheckedUpdateManyWithoutBankNestedInput
 }
 
 export type BankUncheckedUpdateManyWithoutUserInput = {
@@ -716,11 +817,13 @@ export type BankUncheckedUpdateManyWithoutUserInput = {
 export type BankCountOutputType = {
   sentTransactions: number
   receivedTransactions: number
+  plaidTransactions: number
 }
 
 export type BankCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sentTransactions?: boolean | BankCountOutputTypeCountSentTransactionsArgs
   receivedTransactions?: boolean | BankCountOutputTypeCountReceivedTransactionsArgs
+  plaidTransactions?: boolean | BankCountOutputTypeCountPlaidTransactionsArgs
 }
 
 /**
@@ -747,6 +850,13 @@ export type BankCountOutputTypeCountReceivedTransactionsArgs<ExtArgs extends run
   where?: Prisma.TransactionWhereInput
 }
 
+/**
+ * BankCountOutputType without action
+ */
+export type BankCountOutputTypeCountPlaidTransactionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PlaidTransactionWhereInput
+}
+
 
 export type BankSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -760,6 +870,7 @@ export type BankSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   sentTransactions?: boolean | Prisma.Bank$sentTransactionsArgs<ExtArgs>
   receivedTransactions?: boolean | Prisma.Bank$receivedTransactionsArgs<ExtArgs>
+  plaidTransactions?: boolean | Prisma.Bank$plaidTransactionsArgs<ExtArgs>
   _count?: boolean | Prisma.BankCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["bank"]>
 
@@ -803,6 +914,7 @@ export type BankInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   sentTransactions?: boolean | Prisma.Bank$sentTransactionsArgs<ExtArgs>
   receivedTransactions?: boolean | Prisma.Bank$receivedTransactionsArgs<ExtArgs>
+  plaidTransactions?: boolean | Prisma.Bank$plaidTransactionsArgs<ExtArgs>
   _count?: boolean | Prisma.BankCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type BankIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -818,6 +930,7 @@ export type $BankPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     user: Prisma.$UserPayload<ExtArgs>
     sentTransactions: Prisma.$TransactionPayload<ExtArgs>[]
     receivedTransactions: Prisma.$TransactionPayload<ExtArgs>[]
+    plaidTransactions: Prisma.$PlaidTransactionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1225,6 +1338,7 @@ export interface Prisma__BankClient<T, Null = never, ExtArgs extends runtime.Typ
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   sentTransactions<T extends Prisma.Bank$sentTransactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Bank$sentTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   receivedTransactions<T extends Prisma.Bank$receivedTransactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Bank$receivedTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  plaidTransactions<T extends Prisma.Bank$plaidTransactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Bank$plaidTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlaidTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1703,6 +1817,30 @@ export type Bank$receivedTransactionsArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.TransactionScalarFieldEnum | Prisma.TransactionScalarFieldEnum[]
+}
+
+/**
+ * Bank.plaidTransactions
+ */
+export type Bank$plaidTransactionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PlaidTransaction
+   */
+  select?: Prisma.PlaidTransactionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PlaidTransaction
+   */
+  omit?: Prisma.PlaidTransactionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PlaidTransactionInclude<ExtArgs> | null
+  where?: Prisma.PlaidTransactionWhereInput
+  orderBy?: Prisma.PlaidTransactionOrderByWithRelationInput | Prisma.PlaidTransactionOrderByWithRelationInput[]
+  cursor?: Prisma.PlaidTransactionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PlaidTransactionScalarFieldEnum | Prisma.PlaidTransactionScalarFieldEnum[]
 }
 
 /**

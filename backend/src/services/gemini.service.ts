@@ -1,15 +1,8 @@
-import { createHash } from 'crypto';
 import { geminiModel } from '../lib/gemini.js';
-import { prisma } from '../lib/db.js';
 import { getAccounts, getAccount } from './bank.service.js';
 import type { AICategory, SpendingInsight, ChatMessage } from '@shared/types';
-import { AI_CATEGORIES } from '@shared/types';
 
 // ─── Helpers ────────────────────────────────────────────────
-
-function hashTransaction(name: string, amount: number, date: string): string {
-  return createHash('sha256').update(`${name}|${amount}|${date}`).digest('hex');
-}
 
 function extractJSON(text: string): string {
   // Strip markdown code fences if present
@@ -17,7 +10,7 @@ function extractJSON(text: string): string {
   return match ? match[1].trim() : text.trim();
 }
 
-// ─── 1. Transaction Categorization ──────────────────────────
+// ─── 1. Transaction Categorization (rule-based, no API call) ─
 
 type RawTransaction = {
   id: string;
@@ -25,76 +18,30 @@ type RawTransaction = {
   amount: number;
   date: string;
   merchantName?: string;
+  category?: string;
   [key: string]: any;
 };
 
-export async function categorizeTransactions(
+function mapCategory(name: string, plaidCategory: string): AICategory {
+  const text = `${name} ${plaidCategory}`.toLowerCase();
+  if (/food|restaurant|dining|coffee|cafe|starbucks|mcdonald|burger|pizza|grocery|bakery|bar|pub/.test(text)) return 'Food & Dining';
+  if (/airline|flight|uber|lyft|taxi|transit|train|bus|travel|hotel|airbnb|parking/.test(text))               return 'Transport';
+  if (/shopping|amazon|retail|mall|store|merchandise|clothing|fashion|electronics|sparkfun/.test(text))        return 'Shopping';
+  if (/entertainment|netflix|spotify|movie|cinema|game|sport|concert|recreation/.test(text))                   return 'Entertainment';
+  if (/utility|utilities|electric|gas|water|internet|phone|insurance|bill|subscription/.test(text))            return 'Bills & Utilities';
+  if (/health|medical|pharmacy|doctor|hospital|dental|gym|fitness/.test(text))                                 return 'Health';
+  if (/education|school|university|tuition|course|book|learning/.test(text))                                   return 'Education';
+  if (/income|payroll|salary|direct deposit|dividend|interest income/.test(text))                              return 'Income';
+  if (/transfer|payment|zelle|venmo|paypal|wire/.test(text))                                                   return 'Transfers';
+  return 'Other';
+}
+
+export function categorizeTransactions(
   transactions: RawTransaction[]
-): Promise<(RawTransaction & { aiCategory: AICategory })[]> {
-  if (!transactions.length) return [];
-
-  // Compute hashes and check DB cache
-  const withHashes = transactions.map((t) => ({
+): (RawTransaction & { aiCategory: AICategory })[] {
+  return transactions.map((t) => ({
     ...t,
-    hash: hashTransaction(t.name, t.amount, t.date),
-  }));
-
-  const hashes = withHashes.map((t) => t.hash);
-  const cached = await prisma.cachedCategory.findMany({
-    where: { transactionHash: { in: hashes } },
-  });
-  const cacheMap = new Map(cached.map((c) => [c.transactionHash, c.aiCategory as AICategory]));
-
-  // Split into cached and uncached
-  const uncached = withHashes.filter((t) => !cacheMap.has(t.hash));
-
-  // Batch uncached txns to Gemini (50 per call)
-  const BATCH_SIZE = 50;
-  for (let i = 0; i < uncached.length; i += BATCH_SIZE) {
-    const batch = uncached.slice(i, i + BATCH_SIZE);
-    const prompt = `You are a financial transaction categorizer. Categorize each transaction into exactly one of these categories:
-${AI_CATEGORIES.join(', ')}.
-
-Respond ONLY with a valid JSON array. Each element must have "index" (number) and "category" (string matching one of the categories above exactly).
-
-Transactions:
-${JSON.stringify(batch.map((t, idx) => ({ index: idx, name: t.merchantName || t.name, amount: t.amount, date: t.date })))}`;
-
-    try {
-      const result = await geminiModel.generateContent(prompt);
-      const text = result.response.text();
-      const parsed: { index: number; category: string }[] = JSON.parse(extractJSON(text));
-
-      const toCreate: { transactionHash: string; originalName: string; aiCategory: string }[] = [];
-      for (const item of parsed) {
-        const txn = batch[item.index];
-        if (!txn) continue;
-        const category = AI_CATEGORIES.includes(item.category as AICategory)
-          ? (item.category as AICategory)
-          : 'Other';
-        cacheMap.set(txn.hash, category);
-        toCreate.push({
-          transactionHash: txn.hash,
-          originalName: txn.name,
-          aiCategory: category,
-        });
-      }
-
-      if (toCreate.length) {
-        await prisma.cachedCategory.createMany({ data: toCreate, skipDuplicates: true });
-      }
-    } catch (err) {
-      console.error('Gemini categorization error:', err);
-      // Fallback: mark uncategorized as 'Other'
-      for (const txn of batch) {
-        if (!cacheMap.has(txn.hash)) cacheMap.set(txn.hash, 'Other');
-      }
-    }
-  }
-
-  return withHashes.map((t) => ({
-    ...t,
-    aiCategory: cacheMap.get(t.hash) || 'Other',
+    aiCategory: mapCategory(t.merchantName || t.name, t.category || ''),
   }));
 }
 
@@ -212,7 +159,7 @@ async function buildFinancialContext(userId: string): Promise<string> {
   const { data: accounts, totalBanks, totalCurrentBalance } = await getAccounts(userId);
 
   const accountDetails = await Promise.all(
-    accounts.slice(0, 3).map(async (account) => {
+    accounts.slice(0, 3).map(async (account: any) => {
       try {
         const { transactions } = await getAccount(account.bankRecordId);
         return {

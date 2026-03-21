@@ -57,9 +57,10 @@ model Bank {
   shareableId           String?
   createdAt             DateTime @default(now())
 
-  user                 User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sentTransactions     Transaction[] @relation("senderBank")
-  receivedTransactions Transaction[] @relation("receiverBank")
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sentTransactions     Transaction[]      @relation("senderBank")
+  receivedTransactions Transaction[]      @relation("receiverBank")
+  plaidTransactions    PlaidTransaction[]
 
   @@index([userId])
   @@index([accountId])
@@ -383,4 +384,26 @@ model NetWorthSnapshot {
   @@unique([userId, month])
   @@index([userId, month])
   @@map("net_worth_snapshots")
+}
+
+model PlaidTransaction {
+  id             String   @id                  // Plaid transaction_id (stable)
+  bankId         String
+  name           String
+  merchantName   String
+  paymentChannel String
+  type           String
+  accountId      String
+  amount         Decimal  @db.Decimal(12, 2)
+  pending        Boolean  @default(false)
+  category       String   @default("")
+  date           String                        // "YYYY-MM-DD"
+  image          String?
+  syncedAt       DateTime @default(now())
+
+  bank Bank @relation(fields: [bankId], references: [id], onDelete: Cascade)
+
+  @@index([bankId])
+  @@index([bankId, date])
+  @@map("plaid_transactions")
 }

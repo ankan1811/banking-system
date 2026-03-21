@@ -83,6 +83,16 @@ export const getAccounts = async (userId: string) => {
 
   const result = { data: accounts, totalBanks, totalCurrentBalance };
   setCache(accountsCache, userId, result, ACCOUNTS_TTL);
+
+  // Background: pre-warm full account cache for all banks so tab switches are instant
+  for (const bank of banks) {
+    if (!getCached(accountCache, bank.id)) {
+      getAccount(bank.id).catch((err) =>
+        console.error(`Background pre-warm failed for bank ${bank.id}:`, err)
+      );
+    }
+  }
+
   return result;
 };
 
@@ -132,15 +142,41 @@ export const getAccount = async (bankRecordId: string, userId?: string) => {
     accountsResponse.data.item.institution_id!
   );
 
-  const rawTransactions = await getTransactions(bank.accessToken);
+  // DB-first: serve persisted transactions, fall back to Plaid on first load
+  let rawTransactions: any[];
+  const dbRows = await prisma.plaidTransaction.findMany({
+    where: { bankId: bank.id },
+    orderBy: { date: 'desc' },
+  });
 
-  // Enrich with AI categories (uses DB cache, only calls Gemini for new txns)
-  let transactions = rawTransactions;
-  try {
-    transactions = await categorizeTransactions(rawTransactions);
-  } catch (err) {
-    console.error('AI categorization failed, using original categories:', err);
+  if (dbRows.length > 0) {
+    rawTransactions = dbRows.map((t) => ({
+      id: t.id,
+      name: t.name,
+      merchantName: t.merchantName,
+      paymentChannel: t.paymentChannel,
+      type: t.type,
+      accountId: t.accountId,
+      amount: parseFloat(t.amount.toString()),
+      pending: t.pending,
+      category: t.category,
+      date: t.date,
+      image: t.image,
+    }));
+    console.log(`[DB] Loaded ${rawTransactions.length} plaid txns for bank ${bank.id}`);
+    // Background re-sync from Plaid if data is stale (>1 hour)
+    const staleThreshold = 60 * 60 * 1000;
+    if (dbRows[0]?.syncedAt && Date.now() - dbRows[0].syncedAt.getTime() > staleThreshold) {
+      getTransactions(bank.accessToken, bank.id).catch((err) =>
+        console.error('Background Plaid re-sync failed:', err)
+      );
+    }
+  } else {
+    console.log(`[PLAID] No cached txns for bank ${bank.id}, fetching from Plaid`);
+    rawTransactions = await getTransactions(bank.accessToken, bank.id);
   }
+
+  const transactions = categorizeTransactions(rawTransactions);
 
   const account = {
     id: accountData.account_id,
@@ -211,7 +247,7 @@ export const getInstitution = async (institutionId: string) => {
 
 // ─── getTransactions (no separate cache — covered by getAccount cache) ─
 
-export const getTransactions = async (accessToken: string) => {
+export const getTransactions = async (accessToken: string, bankId: string) => {
   let hasMore = true;
   let transactions: any[] = [];
 
@@ -233,10 +269,41 @@ export const getTransactions = async (accessToken: string) => {
       pending: transaction.pending,
       category: transaction.category ? transaction.category[0] : '',
       date: transaction.date,
-      image: transaction.logo_url,
+      image: transaction.logo_url ?? null,
     }));
 
     hasMore = data.has_more;
+  }
+
+  // Persist to DB — insert new rows, skip duplicates
+  if (transactions.length > 0) {
+    await prisma.plaidTransaction.createMany({
+      data: transactions.map((t) => ({
+        id: t.id,
+        bankId,
+        name: t.name,
+        merchantName: t.merchantName,
+        paymentChannel: t.paymentChannel,
+        type: t.type,
+        accountId: t.accountId,
+        amount: t.amount,
+        pending: t.pending,
+        category: t.category,
+        date: t.date,
+        image: t.image,
+        syncedAt: new Date(),
+      })),
+      skipDuplicates: true,
+    });
+
+    // Update any pending transactions that have now settled
+    const settledIds = transactions.filter((t) => !t.pending).map((t) => t.id);
+    if (settledIds.length > 0) {
+      await prisma.plaidTransaction.updateMany({
+        where: { id: { in: settledIds }, pending: true },
+        data: { pending: false, syncedAt: new Date() },
+      });
+    }
   }
 
   return transactions;

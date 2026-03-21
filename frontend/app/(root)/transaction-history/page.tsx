@@ -3,6 +3,7 @@ import { Pagination } from '@/components/Pagination';
 import TransactionsTable from '@/components/TransactionsTable';
 import ExportModal from '@/components/ExportModal';
 import TransactionSearchView from '@/components/TransactionSearchView';
+import { BankTabItem } from '@/components/BankTabItem';
 import { serverApiRequest } from '@/lib/api/server-client';
 import { formatAmount } from '@/lib/utils';
 import React from 'react'
@@ -27,7 +28,7 @@ const TransactionHistory = async ({ searchParams: { id, page }}:SearchParamProps
   const indexOfLastTransaction = currentPage * rowsPerPage;
   const indexOfFirstTransaction = indexOfLastTransaction - rowsPerPage;
 
-  const currentTransactions = account?.transactions.slice(
+  const currentTransactions = account?.transactions?.slice(
     indexOfFirstTransaction, indexOfLastTransaction
   )
 
@@ -41,6 +42,18 @@ const TransactionHistory = async ({ searchParams: { id, page }}:SearchParamProps
       </div>
 
       <div className="space-y-6">
+        {accountsData.length > 1 && (
+          <div className="recent-transactions-tablist">
+            {accountsData.map((account: Account) => (
+              <BankTabItem
+                key={account.id}
+                account={account}
+                bankRecordId={bankRecordId}
+              />
+            ))}
+          </div>
+        )}
+
         <div className="transactions-account">
           <div className="flex flex-col gap-2">
             <h2 className="text-18 font-bold text-white">{account?.data.name}</h2>

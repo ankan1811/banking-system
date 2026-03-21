@@ -23,12 +23,12 @@ const TransactionsTable = ({ transactions }: TransactionTableProps) => {
   return (
     <div className="space-y-2">
       {/* Header */}
-      <div className="hidden sm:flex items-center px-4 py-2 text-xs font-medium text-slate-500 uppercase tracking-wider">
+      <div className="hidden sm:flex items-center px-4 py-2 text-xs font-medium text-slate-500 uppercase tracking-wider gap-4">
         <span className="flex-1">Transaction</span>
         <span className="w-28 text-right">Amount</span>
-        <span className="w-24 text-center">Status</span>
-        <span className="w-32 text-right hidden md:block">Date</span>
-        <span className="w-24 text-right hidden lg:block">Category</span>
+        <span className="w-28 text-center">Status</span>
+        <span className="w-36 text-right hidden md:block">Date</span>
+        <span className="w-36 text-right hidden lg:block">Category</span>
       </div>
 
       {/* Transaction Cards */}
@@ -48,7 +48,7 @@ const TransactionsTable = ({ transactions }: TransactionTableProps) => {
               </p>
             </div>
 
-            <div className="flex items-center gap-3 sm:gap-0">
+            <div className="flex items-center gap-4">
               <span className={cn(
                 'w-28 text-right text-sm font-semibold',
                 isDebit || amount[0] === '-' ? 'text-rose-400' : 'text-emerald-400'
@@ -56,15 +56,15 @@ const TransactionsTable = ({ transactions }: TransactionTableProps) => {
                 {isDebit ? `-${amount}` : amount}
               </span>
 
-              <span className="w-24 hidden sm:flex justify-center">
+              <span className="w-28 hidden sm:flex justify-center">
                 <CategoryBadge category={status} />
               </span>
 
-              <span className="w-32 text-right text-xs text-slate-400 hidden md:block">
+              <span className="w-36 text-right text-xs text-slate-400 hidden md:block">
                 {formatDateTime(new Date(t.date)).dateTime}
               </span>
 
-              <span className="w-24 hidden lg:flex justify-end">
+              <span className="w-36 hidden lg:flex justify-end">
                 <CategoryBadge category={t.aiCategory || t.category} />
               </span>
             </div>

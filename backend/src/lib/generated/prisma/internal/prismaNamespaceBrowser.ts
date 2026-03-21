@@ -69,7 +69,8 @@ export const ModelName = {
   Badge: 'Badge',
   ManualAsset: 'ManualAsset',
   ManualLiability: 'ManualLiability',
-  NetWorthSnapshot: 'NetWorthSnapshot'
+  NetWorthSnapshot: 'NetWorthSnapshot',
+  PlaidTransaction: 'PlaidTransaction'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -386,6 +387,25 @@ export const NetWorthSnapshotScalarFieldEnum = {
 } as const
 
 export type NetWorthSnapshotScalarFieldEnum = (typeof NetWorthSnapshotScalarFieldEnum)[keyof typeof NetWorthSnapshotScalarFieldEnum]
+
+
+export const PlaidTransactionScalarFieldEnum = {
+  id: 'id',
+  bankId: 'bankId',
+  name: 'name',
+  merchantName: 'merchantName',
+  paymentChannel: 'paymentChannel',
+  type: 'type',
+  accountId: 'accountId',
+  amount: 'amount',
+  pending: 'pending',
+  category: 'category',
+  date: 'date',
+  image: 'image',
+  syncedAt: 'syncedAt'
+} as const
+
+export type PlaidTransactionScalarFieldEnum = (typeof PlaidTransactionScalarFieldEnum)[keyof typeof PlaidTransactionScalarFieldEnum]
 
 
 export const SortOrder = {

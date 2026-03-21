@@ -122,3 +122,8 @@ export type ManualLiability = Prisma.ManualLiabilityModel
  * 
  */
 export type NetWorthSnapshot = Prisma.NetWorthSnapshotModel
+/**
+ * Model PlaidTransaction
+ * 
+ */
+export type PlaidTransaction = Prisma.PlaidTransactionModel
