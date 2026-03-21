@@ -36,6 +36,7 @@ export const createUser = async (userData: SignUpParams) => {
       lastName: userData.lastName,
       email: userData.email,
       address1: userData.address1,
+      country: userData.country,
       city: userData.city,
       state: userData.state,
       postalCode: userData.postalCode,
@@ -103,6 +104,7 @@ export const updateProfile = async (
     firstName?: string;
     lastName?: string;
     address1?: string;
+    country?: string;
     city?: string;
     state?: string;
     postalCode?: string;

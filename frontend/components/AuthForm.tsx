@@ -18,12 +18,20 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import CustomInput from './CustomInput';
 import { authFormSchema, otpSchema } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { requestSignInOTP, verifySignInOTP, requestSignUpOTP, verifySignUpOTP, googleSignIn } from '@/lib/api/auth.api';
 import PlaidLink from './PlaidLink';
+import { countries, getStatesForCountry } from '@/lib/countryStateData';
 
 const AuthForm = ({ type }: { type: string }) => {
   const router = useRouter();
@@ -43,8 +51,12 @@ const AuthForm = ({ type }: { type: string }) => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
+      country: "",
+      state: "",
     },
   })
+
+  const selectedCountry = form.watch('country');
 
   const otpForm = useForm<z.infer<typeof otpSchema>>({
     resolver: zodResolver(otpSchema),
@@ -88,6 +100,7 @@ const AuthForm = ({ type }: { type: string }) => {
           firstName: data.firstName!,
           lastName: data.lastName!,
           address1: data.address1!,
+          country: data.country!,
           city: data.city!,
           state: data.state!,
           postalCode: data.postalCode!,
@@ -306,13 +319,108 @@ const AuthForm = ({ type }: { type: string }) => {
                     <CustomInput control={form.control} name='lastName' label="Last Name" placeholder='Enter your last name' />
                   </div>
                   <CustomInput control={form.control} name='address1' label="Address" placeholder='Enter your specific address' />
+
+                  {/* Country dropdown */}
+                  <FormField
+                    control={form.control}
+                    name="country"
+                    render={({ field }) => (
+                      <div className="form-item">
+                        <FormLabel className="form-label">Country</FormLabel>
+                        <div className="flex w-full flex-col">
+                          <FormControl>
+                            <Select
+                              onValueChange={(value) => {
+                                field.onChange(value);
+                                form.setValue('state', '');
+                              }}
+                              value={field.value}
+                            >
+                              <SelectTrigger className="input-class">
+                                <SelectValue placeholder="Select your country" />
+                              </SelectTrigger>
+                              <SelectContent className="bg-slate-900 border-slate-700">
+                                {countries.map((country) => (
+                                  <SelectItem
+                                    key={country.code}
+                                    value={country.code}
+                                    className="text-white hover:bg-slate-800 focus:bg-slate-800 focus:text-white"
+                                  >
+                                    {country.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage className="form-message mt-2" />
+                        </div>
+                      </div>
+                    )}
+                  />
+
                   <CustomInput control={form.control} name='city' label="City" placeholder='Enter your city' />
+
                   <div className="flex gap-4">
-                    <CustomInput control={form.control} name='state' label="State" placeholder='Example: NY' />
+                    {/* State dropdown — dynamic based on country */}
+                    <FormField
+                      control={form.control}
+                      name="state"
+                      render={({ field }) => (
+                        <div className="form-item">
+                          <FormLabel className="form-label">State / Province</FormLabel>
+                          <div className="flex w-full flex-col">
+                            <FormControl>
+                              <Select
+                                onValueChange={field.onChange}
+                                value={field.value}
+                                disabled={!selectedCountry}
+                              >
+                                <SelectTrigger className="input-class">
+                                  <SelectValue placeholder={selectedCountry ? "Select state" : "Select country first"} />
+                                </SelectTrigger>
+                                <SelectContent className="bg-slate-900 border-slate-700 max-h-60">
+                                  {getStatesForCountry(selectedCountry || '').map((state) => (
+                                    <SelectItem
+                                      key={state.code}
+                                      value={state.code}
+                                      className="text-white hover:bg-slate-800 focus:bg-slate-800 focus:text-white"
+                                    >
+                                      {state.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage className="form-message mt-2" />
+                          </div>
+                        </div>
+                      )}
+                    />
                     <CustomInput control={form.control} name='postalCode' label="Postal Code" placeholder='Example: 11101' />
                   </div>
+
                   <div className="flex gap-4">
-                    <CustomInput control={form.control} name='dateOfBirth' label="Date of Birth" placeholder='YYYY-MM-DD' />
+                    {/* Date of Birth — native date picker */}
+                    <FormField
+                      control={form.control}
+                      name="dateOfBirth"
+                      render={({ field }) => (
+                        <div className="form-item">
+                          <FormLabel className="form-label">Date of Birth</FormLabel>
+                          <div className="flex w-full flex-col">
+                            <FormControl>
+                              <Input
+                                type="date"
+                                className="input-class"
+                                max={new Date().toISOString().split('T')[0]}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage className="form-message mt-2" />
+                          </div>
+                        </div>
+                      )}
+                    />
                     <CustomInput control={form.control} name='ssn' label="SSN" placeholder='Example: 1234' />
                   </div>
                 </>
