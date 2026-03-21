@@ -1,6 +1,41 @@
 import { SignJWT, jwtVerify } from 'jose';
 import type { Request, Response } from 'express';
 
+// ─── User-info cookie helpers ─────────────────────────────────
+
+const USER_INFO_COOKIE = 'user-info';
+
+const COOKIE_OPTS = (res_is_production: boolean) => ({
+  httpOnly: true,
+  secure: res_is_production,
+  sameSite: (res_is_production ? 'none' : 'lax') as 'none' | 'lax',
+  path: '/',
+  domain: process.env.COOKIE_DOMAIN || undefined,
+});
+
+export function setUserInfoCookie(
+  res: Response,
+  user: { id: string; firstName: string; lastName: string; email: string }
+): void {
+  const isProd = process.env.NODE_ENV === 'production';
+  const payload = {
+    id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    name: `${user.firstName} ${user.lastName}`,
+    email: user.email,
+  };
+  res.cookie(USER_INFO_COOKIE, JSON.stringify(payload), {
+    ...COOKIE_OPTS(isProd),
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+}
+
+export function clearUserInfoCookie(res: Response): void {
+  const isProd = process.env.NODE_ENV === 'production';
+  res.clearCookie(USER_INFO_COOKIE, COOKIE_OPTS(isProd));
+}
+
 const COOKIE_NAME = 'session-token';
 const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
 

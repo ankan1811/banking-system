@@ -2,7 +2,7 @@ import { Router, type Request, type Response } from 'express';
 import { z } from 'zod';
 import { prisma } from '../lib/db.js';
 import { sendOtp, verifyOtp } from '../services/otp.service.js';
-import { createSession, destroySession } from '../services/auth.service.js';
+import { createSession, destroySession, setUserInfoCookie, clearUserInfoCookie } from '../services/auth.service.js';
 import { getUserInfo, createUser, updateProfile, deleteUser } from '../services/user.service.js';
 import { verifyGoogleToken, findOrCreateGoogleUser } from '../services/google.service.js';
 import { requireAuth } from '../middleware/auth.js';
@@ -79,6 +79,7 @@ router.post('/verify-signin-otp', async (req: Request, res: Response) => {
     }
 
     await createSession(res, user.id, user.tokenVersion);
+    setUserInfoCookie(res, user);
 
     res.json({
       ...user,
@@ -137,6 +138,7 @@ router.post('/verify-signup-otp', async (req: Request, res: Response) => {
     });
 
     await createSession(res, newUser.id, newUser.tokenVersion);
+    setUserInfoCookie(res, newUser);
 
     res.status(201).json(newUser);
   } catch (error) {
@@ -159,6 +161,7 @@ router.post('/google', async (req: Request, res: Response) => {
     const user = await findOrCreateGoogleUser(googlePayload);
 
     await createSession(res, user.id, user.tokenVersion);
+    setUserInfoCookie(res, user);
 
     res.json({
       ...user,
@@ -198,6 +201,7 @@ router.post('/logout', requireAuth, async (req: Request, res: Response) => {
     });
 
     await destroySession(res);
+    clearUserInfoCookie(res);
     res.json({ success: true });
   } catch (error) {
     console.error('Error logging out:', error);
@@ -220,6 +224,7 @@ router.patch('/profile', requireAuth, async (req: Request, res: Response) => {
   try {
     const data = profileSchema.parse(req.body);
     const user = await updateProfile(req.userId!, data);
+    setUserInfoCookie(res, user);
     res.json(user);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -236,6 +241,7 @@ router.delete('/account', requireAuth, async (req: Request, res: Response) => {
   try {
     await deleteUser(req.userId!);
     await destroySession(res);
+    clearUserInfoCookie(res);
     res.json({ success: true });
   } catch (error) {
     console.error('Error deleting account:', error);

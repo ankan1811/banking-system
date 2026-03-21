@@ -4,9 +4,9 @@ import { getAccount } from './bank.service.js';
 import { AI_CATEGORIES } from '@shared/types';
 import type { AiChallengeSuggestion, ChallengeProgress, ChallengeStreak, Badge } from '@shared/types';
 
-// ─── Cache for AI suggestions (10-min TTL) ──────────────────
+// ─── Cache for AI suggestions (24-hour TTL) ──────────────────
 const suggestionsCache = new Map<string, { data: AiChallengeSuggestion[]; expiresAt: number }>();
-const SUGGESTIONS_TTL = 10 * 60 * 1000;
+const SUGGESTIONS_TTL = 24 * 60 * 60 * 1000;
 
 function extractJSON(text: string): string {
   const match = text.match(/```(?:json)?\s*([\s\S]*?)```/);

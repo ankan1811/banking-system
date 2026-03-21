@@ -4,9 +4,9 @@ import { getAccount } from './bank.service.js';
 import { getBudgetStatus } from './budget.service.js';
 import type { HealthScore } from '@shared/types';
 
-// ─── Cache: 1-hour in-memory TTL ─────────────────────────────
+// ─── Cache: 24-hour in-memory TTL ─────────────────────────────
 const scoreCache = new Map<string, { data: HealthScore; expiresAt: number }>();
-const SCORE_TTL = 60 * 60 * 1000; // 1 hour
+const SCORE_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
 function extractJSON(text: string): string {
   const match = text.match(/```(?:json)?\s*([\s\S]*?)```/);

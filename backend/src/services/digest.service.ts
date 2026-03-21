@@ -7,9 +7,9 @@ import { getMerchantInsights, getIncomeVsExpense } from './analytics.service.js'
 import type { DigestSection, MonthlyDigest } from '@shared/types';
 import PDFDocument from 'pdfkit';
 
-// ─── Cache: 1-hour in-memory TTL ─────────────────────────────
+// ─── Cache: 24-hour in-memory TTL ─────────────────────────────
 const digestCache = new Map<string, { data: MonthlyDigest; expiresAt: number }>();
-const DIGEST_TTL = 60 * 60 * 1000; // 1 hour
+const DIGEST_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
 function extractJSON(text: string): string {
   const match = text.match(/```(?:json)?\s*([\s\S]*?)```/);

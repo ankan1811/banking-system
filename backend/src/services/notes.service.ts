@@ -2,9 +2,9 @@ import { prisma } from '../lib/db.js';
 
 // ─── In-memory caches ────────────────────────────────────────
 const notesCache = new Map<string, { data: Map<string, any>; expiresAt: number }>();
-const NOTES_TTL = 2 * 60 * 1000;
+const NOTES_TTL = 24 * 60 * 60 * 1000;
 const userTagsCache = new Map<string, { data: string[]; expiresAt: number }>();
-const TAGS_TTL = 5 * 60 * 1000;
+const TAGS_TTL = 24 * 60 * 60 * 1000;
 
 function invalidateNotesCache(userId: string) {
   for (const [key] of notesCache) {

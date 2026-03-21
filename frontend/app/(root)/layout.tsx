@@ -3,6 +3,7 @@ import LandingPreview from "@/components/LandingPreview";
 import MobileNav from "@/components/MobileNav";
 import Sidebar from "@/components/Sidebar";
 import { serverApiRequest } from "@/lib/api/server-client";
+import { cookies } from "next/headers";
 import Image from "next/image";
 
 export default async function RootLayout({
@@ -10,7 +11,14 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const loggedIn = await serverApiRequest('/api/auth/me');
+  let loggedIn: any = null;
+  const raw = cookies().get('user-info')?.value;
+  if (raw) {
+    try { loggedIn = JSON.parse(raw); } catch {}
+  }
+  if (!loggedIn) {
+    loggedIn = await serverApiRequest('/api/auth/me').catch(() => null);
+  }
 
   if (!loggedIn) return <LandingPreview />;
 

@@ -2,9 +2,9 @@ import { prisma } from '../lib/db.js';
 import { geminiModel } from '../lib/gemini.js';
 import { getAccounts } from './bank.service.js';
 
-// ─── Cache for AI insight (1-hour TTL) ──────────────────────
+// ─── Cache for AI insight (24-hour TTL) ──────────────────────
 const insightCache = new Map<string, { data: string; expiresAt: number }>();
-const INSIGHT_TTL = 60 * 60 * 1000;
+const INSIGHT_TTL = 24 * 60 * 60 * 1000;
 
 function extractJSON(text: string): string {
   const match = text.match(/```(?:json)?\s*([\s\S]*?)```/);

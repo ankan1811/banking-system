@@ -13,18 +13,26 @@ const Insights = async ({ searchParams: { id } }: SearchParamProps) => {
 
   return (
     <section className="home">
-      <div className="home-content max-w-3xl">
+      <div className="home-content">
         <HeaderBox
           type="title"
           title="AI Insights"
           subtext="AI-powered analysis of your spending patterns and financial health."
         />
 
-        {account?.transactions?.length > 0 && (
-          <CategoryBreakdownChart transactions={account.transactions} />
-        )}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+          {account?.transactions?.length > 0 && (
+            <div className="lg:col-span-1">
+              <CategoryBreakdownChart transactions={account.transactions} />
+            </div>
+          )}
 
-        {bankRecordId && <SpendingInsightsCard bankRecordId={bankRecordId} />}
+          {bankRecordId && (
+            <div className="lg:col-span-1">
+              <SpendingInsightsCard bankRecordId={bankRecordId} />
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );

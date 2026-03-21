@@ -22,7 +22,24 @@ router.get('/:bankRecordId', async (req: Request, res: Response) => {
       res.status(404).json({ error: 'No bank specified' });
       return;
     }
+
+    const page  = parseInt(req.query.page  as string) || 0;
+    const limit = parseInt(req.query.limit as string) || 0;
+
     const result = await getAccount(bankRecordId, req.userId);
+
+    if (page > 0 && limit > 0) {
+      const start      = (page - 1) * limit;
+      const totalCount = result.transactions.length;
+      return res.json({
+        data: result.data,
+        transactions: result.transactions.slice(start, start + limit),
+        totalCount,
+        page,
+        totalPages: Math.ceil(totalCount / limit),
+      });
+    }
+
     res.json(result);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to get account';

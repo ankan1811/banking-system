@@ -19,18 +19,11 @@ const TransactionHistory = async ({ searchParams: { id, page }}:SearchParamProps
   const bankRecordId = (id as string) || accountsData[0]?.bankRecordId;
 
   const account = bankRecordId
-    ? await serverApiRequest('/api/accounts/' + bankRecordId).catch(() => null)
+    ? await serverApiRequest<any>(`/api/accounts/${bankRecordId}?page=${currentPage}&limit=10`).catch(() => null)
     : null;
 
-  const rowsPerPage = 10;
-  const totalPages = Math.ceil((account?.transactions?.length ?? 0) / rowsPerPage);
-
-  const indexOfLastTransaction = currentPage * rowsPerPage;
-  const indexOfFirstTransaction = indexOfLastTransaction - rowsPerPage;
-
-  const currentTransactions = account?.transactions?.slice(
-    indexOfFirstTransaction, indexOfLastTransaction
-  )
+  const currentTransactions = account?.transactions ?? [];
+  const totalPages = account?.totalPages ?? 0;
 
   return (
     <div className="transactions">

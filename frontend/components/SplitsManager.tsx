@@ -1,14 +1,19 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getSplits, getSplitSummary, createSplit } from '@/lib/api/splits.api';
 import type { SplitGroup, SplitSummary } from '@shared/types';
 import SplitCard from './SplitCard';
 
-export default function SplitsManager() {
-  const [splits, setSplits] = useState<SplitGroup[]>([]);
-  const [summary, setSummary] = useState<SplitSummary | null>(null);
-  const [loading, setLoading] = useState(true);
+interface SplitsManagerProps {
+  initialSplits?: SplitGroup[];
+  initialSummary?: SplitSummary | null;
+}
+
+export default function SplitsManager({ initialSplits = [], initialSummary = null }: SplitsManagerProps) {
+  const [splits, setSplits] = useState<SplitGroup[]>(initialSplits);
+  const [summary, setSummary] = useState<SplitSummary | null>(initialSummary);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [creating, setCreating] = useState(false);
   const [filter, setFilter] = useState<'all' | 'pending' | 'settled'>('all');
@@ -33,7 +38,11 @@ export default function SplitsManager() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { load(); }, [filter]);
+  const isFirstRender = useRef(true);
+  useEffect(() => {
+    if (isFirstRender.current) { isFirstRender.current = false; return; }
+    load();
+  }, [filter]);
 
   const addParticipant = () => {
     setForm({ ...form, participants: [...form.participants, { name: '', email: '', amount: '' }] });

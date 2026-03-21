@@ -51,7 +51,7 @@ type CategorizedTransaction = RawTransaction & { aiCategory: AICategory };
 
 // Simple in-memory cache: key = `${userId}:${month}` → { data, expiresAt }
 const insightsCache = new Map<string, { data: SpendingInsight; expiresAt: number }>();
-const INSIGHTS_TTL = 5 * 60 * 1000; // 5 minutes
+const INSIGHTS_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
 export async function generateSpendingInsights(
   transactions: CategorizedTransaction[],
@@ -145,9 +145,9 @@ Total transactions this month: ${currentTxns.length}`;
 
 // ─── 3. AI Chatbot ──────────────────────────────────────────
 
-// Cache built financial context per user (5-min TTL) to avoid redundant Plaid calls per chat message
+// Cache built financial context per user (24-hour TTL) to avoid redundant Plaid calls per chat message
 const chatContextCache = new Map<string, { data: string; expiresAt: number }>();
-const CHAT_CONTEXT_TTL = 5 * 60 * 1000;
+const CHAT_CONTEXT_TTL = 24 * 60 * 60 * 1000;
 
 async function buildFinancialContext(userId: string): Promise<string> {
   const cached = chatContextCache.get(userId);

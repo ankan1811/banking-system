@@ -8,10 +8,10 @@ const trendsCache = new Map<string, CacheEntry<TrendsData>>();
 const recurringCache = new Map<string, CacheEntry<RecurringPattern[]>>();
 const incomeExpenseCache = new Map<string, CacheEntry<IncomeExpenseData>>();
 const merchantCache = new Map<string, CacheEntry<MerchantInsight[]>>();
-const TRENDS_TTL = 5 * 60 * 1000;
-const RECURRING_TTL = 60 * 60 * 1000;
-const IE_TTL = 5 * 60 * 1000;
-const MERCHANT_TTL = 5 * 60 * 1000;
+const TRENDS_TTL = 24 * 60 * 60 * 1000;
+const RECURRING_TTL = 24 * 60 * 60 * 1000;
+const IE_TTL = 24 * 60 * 60 * 1000;
+const MERCHANT_TTL = 24 * 60 * 60 * 1000;
 
 // ─── Spending Trends ─────────────────────────────────────────
 

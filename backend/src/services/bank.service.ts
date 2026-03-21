@@ -12,10 +12,10 @@ import { prisma } from '../lib/db.js';
 type CacheEntry<T> = { data: T; expiresAt: number };
 
 const accountCache = new Map<string, CacheEntry<any>>();
-const ACCOUNT_TTL = 5 * 60 * 1000; // 5 minutes
+const ACCOUNT_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
 const accountsCache = new Map<string, CacheEntry<any>>();
-const ACCOUNTS_TTL = 5 * 60 * 1000; // 5 minutes
+const ACCOUNTS_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
 const institutionCache = new Map<string, CacheEntry<any>>();
 const INSTITUTION_TTL = 24 * 60 * 60 * 1000; // 24 hours
@@ -87,7 +87,7 @@ export const getAccounts = async (userId: string) => {
   // Background: pre-warm full account cache for all banks so tab switches are instant
   for (const bank of banks) {
     if (!getCached(accountCache, bank.id)) {
-      getAccount(bank.id).catch((err) =>
+      getAccount(bank.id, userId).catch((err) =>
         console.error(`Background pre-warm failed for bank ${bank.id}:`, err)
       );
     }
@@ -110,10 +110,32 @@ export const getAccount = async (bankRecordId: string, userId?: string) => {
 
   if (!bank) throw new Error('Bank not found');
 
-  const accountsResponse = await plaidClient.accountsGet({
-    access_token: bank.accessToken,
-  });
-  const accountData = accountsResponse.data.accounts[0];
+  // Reuse accountsCache to skip a redundant Plaid call (it was just fetched by getAccounts())
+  let accountData: any = null;
+  if (userId) {
+    const cachedAccounts = getCached(accountsCache, userId);
+    if (cachedAccounts) {
+      accountData = cachedAccounts.data.find((a: any) => a.bankRecordId === bankRecordId) ?? null;
+    }
+  }
+
+  if (!accountData) {
+    const accountsResponse = await plaidClient.accountsGet({ access_token: bank.accessToken });
+    const raw = accountsResponse.data.accounts[0];
+    const institution = await getInstitution(accountsResponse.data.item.institution_id!);
+    accountData = {
+      id: raw.account_id,
+      availableBalance: raw.balances.available!,
+      currentBalance: raw.balances.current!,
+      institutionId: institution.institution_id,
+      name: raw.name,
+      officialName: raw.official_name,
+      mask: raw.mask!,
+      type: raw.type as string,
+      subtype: raw.subtype! as string,
+      bankRecordId: bank.id,
+    };
+  }
 
   const transferTransactionsData = await getTransactionsByBankId(bank.id);
 
@@ -136,10 +158,6 @@ export const getAccount = async (bankRecordId: string, userId?: string) => {
       pending: false,
       image: null,
     })
-  );
-
-  const institution = await getInstitution(
-    accountsResponse.data.item.institution_id!
   );
 
   // DB-first: serve persisted transactions, fall back to Plaid on first load
@@ -179,15 +197,15 @@ export const getAccount = async (bankRecordId: string, userId?: string) => {
   const transactions = categorizeTransactions(rawTransactions);
 
   const account = {
-    id: accountData.account_id,
-    availableBalance: accountData.balances.available!,
-    currentBalance: accountData.balances.current!,
-    institutionId: institution.institution_id,
+    id: accountData.id,
+    availableBalance: accountData.availableBalance,
+    currentBalance: accountData.currentBalance,
+    institutionId: accountData.institutionId,
     name: accountData.name,
-    officialName: accountData.official_name,
-    mask: accountData.mask!,
-    type: accountData.type as string,
-    subtype: accountData.subtype! as string,
+    officialName: accountData.officialName,
+    mask: accountData.mask,
+    type: accountData.type,
+    subtype: accountData.subtype,
     bankRecordId: bank.id,
   };
 
