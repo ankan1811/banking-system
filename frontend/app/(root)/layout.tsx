@@ -1,6 +1,7 @@
 import AIChatbot from "@/components/AIChatbot";
 import LandingPreview from "@/components/LandingPreview";
 import MobileNav from "@/components/MobileNav";
+import NavigationProgress from "@/components/NavigationProgress";
 import Sidebar from "@/components/Sidebar";
 import { serverApiRequest } from "@/lib/api/server-client";
 import { cookies } from "next/headers";
@@ -24,6 +25,7 @@ export default async function RootLayout({
 
   return (
     <main className="flex h-screen w-full bg-[#0a0e1a]">
+      <NavigationProgress />
       <Sidebar user={loggedIn} />
       <div className="flex flex-1 flex-col overflow-hidden">
         <div className="root-layout">

@@ -49,8 +49,19 @@ export default function AlertsManager() {
   };
 
   const handleToggle = async (id: string, enabled: boolean) => {
-    await updateAlert(id, { enabled: !enabled });
-    load();
+    // Optimistically flip the toggle immediately
+    setAlerts((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, enabled: !enabled } : a))
+    );
+
+    try {
+      await updateAlert(id, { enabled: !enabled });
+    } catch {
+      // Revert on failure
+      setAlerts((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, enabled } : a))
+      );
+    }
   };
 
   const handleDelete = async (id: string) => {
