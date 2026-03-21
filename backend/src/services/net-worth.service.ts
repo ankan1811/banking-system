@@ -216,9 +216,17 @@ async function getNetWorthInsight(userId: string, history: any[]): Promise<strin
 
 Snapshots: ${JSON.stringify(last6.map((s: any) => ({ month: s.month, netWorth: s.netWorth, assets: s.totalAssets, liabilities: s.totalLiabilities })))}`;
 
-  const result = await geminiModel.generateContent(prompt);
-  const text = result.response.text().trim();
+  try {
+    const result = await geminiModel.generateContent(prompt);
+    const text = result.response.text().trim();
 
-  insightCache.set(userId, { data: text, expiresAt: Date.now() + INSIGHT_TTL });
-  return text;
+    insightCache.set(userId, { data: text, expiresAt: Date.now() + INSIGHT_TTL });
+    return text;
+  } catch (err) {
+    console.error('Gemini net worth insight error:', err);
+    // Cache a fallback so we stop retrying while rate-limited (5 min cooldown)
+    const fallback = 'Net worth insight is temporarily unavailable. Please check back later.';
+    insightCache.set(userId, { data: fallback, expiresAt: Date.now() + 5 * 60 * 1000 });
+    return fallback;
+  }
 }

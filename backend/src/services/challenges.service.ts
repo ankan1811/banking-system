@@ -277,7 +277,10 @@ Respond ONLY with a valid JSON array:
     return suggestions;
   } catch (err) {
     console.error('AI suggestions error:', err);
-    return getDefaultSuggestions();
+    // Cache defaults so we stop hammering Gemini while rate-limited (5 min cooldown)
+    const defaults = getDefaultSuggestions();
+    suggestionsCache.set(cacheKey, { data: defaults, expiresAt: Date.now() + 5 * 60 * 1000 });
+    return defaults;
   }
 }
 
