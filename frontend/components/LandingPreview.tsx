@@ -5,7 +5,7 @@ const LandingPreview = () => {
   return (
     <div className="relative min-h-screen w-full bg-[#0a0e1a] overflow-hidden">
       {/* Blurred mock dashboard background */}
-      <div className="absolute inset-0 blur-[6px] opacity-60 pointer-events-none select-none" aria-hidden>
+      <div className="absolute inset-0 blur-[5px] opacity-80 pointer-events-none select-none" aria-hidden>
         <div className="flex h-screen w-full">
           {/* Mock sidebar */}
           <aside className="hidden lg:flex flex-col w-[280px] bg-slate-900/80 border-r border-slate-800 p-6 gap-6">

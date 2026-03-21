@@ -1,13 +1,21 @@
 export type CountryData = {
   code: string;
   name: string;
+  flag: string;
   states: { code: string; name: string }[];
 };
+
+/** Converts an ISO 3166-1 alpha-2 country code to its flag emoji */
+export const getFlagEmoji = (code: string) =>
+  code.toUpperCase().replace(/./g, (c) =>
+    String.fromCodePoint(127397 + c.charCodeAt(0))
+  );
 
 export const countries: CountryData[] = [
   {
     code: 'US',
     name: 'United States',
+    flag: '🇺🇸',
     states: [
       { code: 'AL', name: 'Alabama' }, { code: 'AK', name: 'Alaska' },
       { code: 'AZ', name: 'Arizona' }, { code: 'AR', name: 'Arkansas' },
@@ -40,6 +48,7 @@ export const countries: CountryData[] = [
   {
     code: 'IN',
     name: 'India',
+    flag: '🇮🇳',
     states: [
       { code: 'AP', name: 'Andhra Pradesh' }, { code: 'AR', name: 'Arunachal Pradesh' },
       { code: 'AS', name: 'Assam' }, { code: 'BR', name: 'Bihar' },
@@ -61,6 +70,7 @@ export const countries: CountryData[] = [
   {
     code: 'CA',
     name: 'Canada',
+    flag: '🇨🇦',
     states: [
       { code: 'AB', name: 'Alberta' }, { code: 'BC', name: 'British Columbia' },
       { code: 'MB', name: 'Manitoba' }, { code: 'NB', name: 'New Brunswick' },

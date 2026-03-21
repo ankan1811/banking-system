@@ -134,9 +134,8 @@ const AuthForm = ({ type }: { type: string }) => {
 
       setStep('otp');
       setOtpValues(['', '', '', '', '', '']);
-    } catch (error: any) {
-      setError(error?.message || 'Something went wrong');
-      console.log(error);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
       setIsLoading(false);
     }
@@ -148,17 +147,35 @@ const AuthForm = ({ type }: { type: string }) => {
     setError(null);
     try {
       const result: any = await googleSignIn(response.credential);
-      if (type === 'sign-in') {
+      // Profile incomplete (new Google user) — collect missing fields regardless of sign-in/sign-up
+      if (!result.address1) {
+        setSavedFormData(result);
+        setStep('complete-profile');
+      } else if (type === 'sign-in') {
         router.push('/');
       } else {
         setUser(result);
       }
-    } catch (error: any) {
-      setError(error?.message || 'Google sign-in failed');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Google sign-in failed';
+      setError(message);
     } finally {
       setIsLoading(false);
     }
   }, [type, router]);
+
+  const onSubmitCompleteProfile = async (data: z.infer<typeof completeProfileSchema>) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await updateProfile(data);
+      setUser(savedFormData);
+    } catch (error: any) {
+      setError(error?.message || 'Failed to save profile');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const renderGoogleButton = useCallback(() => {
     if (typeof window === 'undefined' || !(window as any).google) return;
@@ -236,9 +253,11 @@ const AuthForm = ({ type }: { type: string }) => {
                 ? 'Link Account'
                 : step === 'otp'
                   ? 'Enter Verification Code'
-                  : type === 'sign-in'
-                    ? 'Sign In'
-                    : 'Sign Up'
+                  : step === 'complete-profile'
+                    ? 'Complete Your Profile'
+                    : type === 'sign-in'
+                      ? 'Sign In'
+                      : 'Sign Up'
               }
             </h1>
             <p className="text-16 font-normal text-slate-400">
@@ -246,7 +265,9 @@ const AuthForm = ({ type }: { type: string }) => {
                 ? 'Link your account to get started'
                 : step === 'otp'
                   ? 'We sent a 6-digit code to your email'
-                  : 'Please enter your details'
+                  : step === 'complete-profile'
+                    ? 'A few more details to set up your account'
+                    : 'Please enter your details'
               }
             </p>
           </div>
@@ -262,6 +283,76 @@ const AuthForm = ({ type }: { type: string }) => {
         <div className="flex flex-col gap-4">
           <PlaidLink user={user} variant="primary" />
         </div>
+      ) : step === 'complete-profile' ? (
+        <Form {...profileForm}>
+          <form onSubmit={profileForm.handleSubmit(onSubmitCompleteProfile)} className="space-y-8">
+            <CustomInput control={profileForm.control} name='address1' label="Address" placeholder='Enter your address' />
+
+            <FormField control={profileForm.control} name="country" render={({ field }) => (
+              <div className="form-item">
+                <FormLabel className="form-label">Country</FormLabel>
+                <div className="flex w-full flex-col">
+                  <FormControl>
+                    <Select onValueChange={(v) => { field.onChange(v); profileForm.setValue('state', ''); }} value={field.value}>
+                      <SelectTrigger className="input-class"><SelectValue placeholder="Select your country" /></SelectTrigger>
+                      <SelectContent className="bg-slate-900 border-slate-700">
+                        {countries.map((c) => (
+                          <SelectItem key={c.code} value={c.code} className="text-white focus:bg-slate-800 focus:text-white">{c.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage className="form-message mt-2" />
+                </div>
+              </div>
+            )} />
+
+            <CustomInput control={profileForm.control} name='city' label="City" placeholder='Enter your city' />
+
+            <div className="flex gap-4">
+              <FormField control={profileForm.control} name="state" render={({ field }) => (
+                <div className="form-item">
+                  <FormLabel className="form-label">State / Province</FormLabel>
+                  <div className="flex w-full flex-col">
+                    <FormControl>
+                      <Select onValueChange={field.onChange} value={field.value} disabled={!selectedProfileCountry}>
+                        <SelectTrigger className="input-class">
+                          <SelectValue placeholder={selectedProfileCountry ? "Select state" : "Select country first"} />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-900 border-slate-700 max-h-60">
+                          {getStatesForCountry(selectedProfileCountry || '').map((s) => (
+                            <SelectItem key={s.code} value={s.code} className="text-white focus:bg-slate-800 focus:text-white">{s.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage className="form-message mt-2" />
+                  </div>
+                </div>
+              )} />
+              <CustomInput control={profileForm.control} name='postalCode' label="Postal Code" placeholder='Example: 11101' />
+            </div>
+
+            <div className="flex gap-4">
+              <FormField control={profileForm.control} name="dateOfBirth" render={({ field }) => (
+                <div className="form-item">
+                  <FormLabel className="form-label">Date of Birth</FormLabel>
+                  <div className="flex w-full flex-col">
+                    <FormControl>
+                      <Input type="date" className="input-class" max={new Date().toISOString().split('T')[0]} {...field} />
+                    </FormControl>
+                    <FormMessage className="form-message mt-2" />
+                  </div>
+                </div>
+              )} />
+              <CustomInput control={profileForm.control} name='ssn' label="SSN" placeholder='Example: 1234' />
+            </div>
+
+            <Button type="submit" disabled={isLoading} className="form-btn">
+              {isLoading ? <><Loader2 size={20} className="animate-spin" /> &nbsp;Saving...</> : 'Continue'}
+            </Button>
+          </form>
+        </Form>
       ) : step === 'otp' ? (
         <>
           <Form {...otpForm}>
