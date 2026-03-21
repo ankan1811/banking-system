@@ -30,8 +30,8 @@
     2. Create a project  →  copy the connection string
     3. Paste it into BOTH fields in backend/.env:
 
-         DATABASE_URL="postgresql://user:pass@ep-xxx.neon.tech/neondb?sslmode=require"
-         DIRECT_URL="postgresql://user:pass@ep-xxx.neon.tech/neondb?sslmode=require"
+         DATABASE_URL=postgresql://user:pass@ep-xxx.neon.tech/neondb?sslmode=require
+         DIRECT_URL=postgresql://user:pass@ep-xxx.neon.tech/neondb?sslmode=require
 
   OPTION C  Supabase
   ──────────────────
@@ -127,14 +127,86 @@
   ──────────────────────────────────────────────────────────────────────
 
 ================================================================================
-                          QUICK START (TL;DR)
+                    FIRST-TIME SETUP COMMANDS
 ================================================================================
 
-  1.  Set DATABASE_URL  →  run: npx prisma migrate dev
-  2.  Set PLAID keys    →  link a sandbox bank
-  3.  npm run dev:backend   (port 8787)
-  4.  npm run dev:frontend  (port 3003)
-  5.  Log in with any email + OTP 123456
+  Run these once, in order, before starting the app for the first time.
+
+  STEP 1 — Install all dependencies
+  ───────────────────────────────────
+    From the root /bank directory:
+
+      npm run install:all
+
+    This installs both frontend and backend node_modules.
+
+  STEP 2 — Generate Prisma client
+  ────────────────────────────────
+    From /bank/backend:
+
+      npx prisma generate
+
+    Generates the typed database client from your schema.
+
+  STEP 3 — Run database migrations
+  ──────────────────────────────────
+    From /bank/backend:
+
+      npx prisma migrate dev --name init
+
+    Creates all 20 tables in your database (Neon/Supabase/local).
+    Only needed once — or again if you change prisma/schema.prisma.
+
+  STEP 4 — (Optional) Inspect your database
+  ───────────────────────────────────────────
+    From /bank/backend:
+
+      npx prisma studio
+
+    Opens a browser UI at http://localhost:5555 to browse your tables.
+
+================================================================================
+                    RUNNING THE APP
+================================================================================
+
+  Run each in a separate terminal tab from the root /bank directory:
+
+  BACKEND   (Express API — port 8787)
+  ────────────────────────────────────
+    npm run dev:backend
+
+  FRONTEND  (Next.js — port 3003)
+  ────────────────────────────────
+    npm run dev:frontend
+
+  Then open  http://localhost:3003  in your browser.
+
+  Log in with any email  +  OTP: 123456  (MASTER_OTP, no email needed in dev)
+
+================================================================================
+                    USEFUL PRISMA COMMANDS
+================================================================================
+
+  All run from /bank/backend:
+
+  npx prisma generate              Regenerate client after schema changes
+  npx prisma migrate dev           Apply schema changes to DB + generate client
+  npx prisma migrate reset         Wipe DB and reapply all migrations (destructive!)
+  npx prisma studio                Visual DB browser at localhost:5555
+  npx prisma db push               Push schema to DB without creating a migration
+  npx prisma migrate status        Show which migrations have been applied
+
+================================================================================
+                    QUICK START (TL;DR)
+================================================================================
+
+  1.  Fill in backend/.env with your keys (DATABASE_URL + PLAID_* minimum)
+  2.  cd backend  &&  npx prisma migrate dev --name init
+  3.  cd ..  (back to root)
+  4.  npm run dev:backend       (terminal 1)
+  5.  npm run dev:frontend      (terminal 2)
+  6.  Open http://localhost:3003
+  7.  Log in with any email  +  OTP: 123456
 
   You're up.
 

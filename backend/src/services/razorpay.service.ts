@@ -1,9 +1,16 @@
 import Razorpay from 'razorpay';
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID || '',
-  key_secret: process.env.RAZORPAY_KEY_SECRET || '',
-});
+let _razorpay: Razorpay | null = null;
+
+function getRazorpay(): Razorpay {
+  if (!_razorpay) {
+    _razorpay = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID!,
+      key_secret: process.env.RAZORPAY_KEY_SECRET!,
+    });
+  }
+  return _razorpay;
+}
 
 export async function createContact(userData: {
   name: string;
@@ -12,7 +19,7 @@ export async function createContact(userData: {
 }): Promise<string | undefined> {
   try {
     // RazorpayX Contacts API — not typed in standard SDK, use direct call
-    const contact = await (razorpay as any).contacts?.create({
+    const contact = await (getRazorpay() as any).contacts?.create({
       name: userData.name,
       email: userData.email,
       type: userData.type || 'customer',

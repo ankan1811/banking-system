@@ -52,7 +52,7 @@ router.patch('/:id', async (req: Request, res: Response) => {
   try {
     const data = updateSchema.parse(req.body);
     const userId = (req as any).userId as string;
-    const alert = await updateAlert(userId, req.params.id, data);
+    const alert = await updateAlert(userId, req.params.id as string, data);
     res.json({ alert });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -71,7 +71,7 @@ router.patch('/:id', async (req: Request, res: Response) => {
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId as string;
-    await deleteAlert(userId, req.params.id);
+    await deleteAlert(userId, req.params.id as string);
     res.json({ success: true });
   } catch (error) {
     if ((error as Error).message === 'Alert not found') {

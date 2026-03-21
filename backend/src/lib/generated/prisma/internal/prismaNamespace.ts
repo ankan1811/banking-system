@@ -393,6 +393,7 @@ export const ModelName = {
   User: 'User',
   Bank: 'Bank',
   Transaction: 'Transaction',
+  CachedCategory: 'CachedCategory',
   OtpCode: 'OtpCode'
 } as const
 
@@ -409,7 +410,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "bank" | "transaction" | "otpCode"
+    modelProps: "user" | "bank" | "transaction" | "cachedCategory" | "otpCode"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -635,6 +636,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    CachedCategory: {
+      payload: Prisma.$CachedCategoryPayload<ExtArgs>
+      fields: Prisma.CachedCategoryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CachedCategoryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CachedCategoryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CachedCategoryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CachedCategoryPayload>
+        }
+        findFirst: {
+          args: Prisma.CachedCategoryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CachedCategoryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CachedCategoryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CachedCategoryPayload>
+        }
+        findMany: {
+          args: Prisma.CachedCategoryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CachedCategoryPayload>[]
+        }
+        create: {
+          args: Prisma.CachedCategoryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CachedCategoryPayload>
+        }
+        createMany: {
+          args: Prisma.CachedCategoryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CachedCategoryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CachedCategoryPayload>[]
+        }
+        delete: {
+          args: Prisma.CachedCategoryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CachedCategoryPayload>
+        }
+        update: {
+          args: Prisma.CachedCategoryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CachedCategoryPayload>
+        }
+        deleteMany: {
+          args: Prisma.CachedCategoryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CachedCategoryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CachedCategoryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CachedCategoryPayload>[]
+        }
+        upsert: {
+          args: Prisma.CachedCategoryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CachedCategoryPayload>
+        }
+        aggregate: {
+          args: Prisma.CachedCategoryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCachedCategory>
+        }
+        groupBy: {
+          args: Prisma.CachedCategoryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CachedCategoryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CachedCategoryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CachedCategoryCountAggregateOutputType> | number
+        }
+      }
+    }
     OtpCode: {
       payload: Prisma.$OtpCodePayload<ExtArgs>
       fields: Prisma.OtpCodeFieldRefs
@@ -798,6 +873,17 @@ export const TransactionScalarFieldEnum = {
 } as const
 
 export type TransactionScalarFieldEnum = (typeof TransactionScalarFieldEnum)[keyof typeof TransactionScalarFieldEnum]
+
+
+export const CachedCategoryScalarFieldEnum = {
+  id: 'id',
+  transactionHash: 'transactionHash',
+  originalName: 'originalName',
+  aiCategory: 'aiCategory',
+  createdAt: 'createdAt'
+} as const
+
+export type CachedCategoryScalarFieldEnum = (typeof CachedCategoryScalarFieldEnum)[keyof typeof CachedCategoryScalarFieldEnum]
 
 
 export const OtpCodeScalarFieldEnum = {
@@ -1008,6 +1094,7 @@ export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   bank?: Prisma.BankOmit
   transaction?: Prisma.TransactionOmit
+  cachedCategory?: Prisma.CachedCategoryOmit
   otpCode?: Prisma.OtpCodeOmit
 }
 

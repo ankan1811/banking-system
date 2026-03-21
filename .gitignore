@@ -40,6 +40,7 @@ next-env.d.ts
 
 /lib/generated/prisma
 
+/frontend/.env
 /backend/.env
 
 # claude

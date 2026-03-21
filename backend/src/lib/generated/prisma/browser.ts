@@ -33,6 +33,11 @@ export type Bank = Prisma.BankModel
  */
 export type Transaction = Prisma.TransactionModel
 /**
+ * Model CachedCategory
+ * 
+ */
+export type CachedCategory = Prisma.CachedCategoryModel
+/**
  * Model OtpCode
  * 
  */

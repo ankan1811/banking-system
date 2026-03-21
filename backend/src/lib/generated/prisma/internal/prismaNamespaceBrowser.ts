@@ -52,6 +52,7 @@ export const ModelName = {
   User: 'User',
   Bank: 'Bank',
   Transaction: 'Transaction',
+  CachedCategory: 'CachedCategory',
   OtpCode: 'OtpCode'
 } as const
 
@@ -121,6 +122,17 @@ export const TransactionScalarFieldEnum = {
 } as const
 
 export type TransactionScalarFieldEnum = (typeof TransactionScalarFieldEnum)[keyof typeof TransactionScalarFieldEnum]
+
+
+export const CachedCategoryScalarFieldEnum = {
+  id: 'id',
+  transactionHash: 'transactionHash',
+  originalName: 'originalName',
+  aiCategory: 'aiCategory',
+  createdAt: 'createdAt'
+} as const
+
+export type CachedCategoryScalarFieldEnum = (typeof CachedCategoryScalarFieldEnum)[keyof typeof CachedCategoryScalarFieldEnum]
 
 
 export const OtpCodeScalarFieldEnum = {

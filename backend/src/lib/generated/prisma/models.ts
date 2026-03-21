@@ -11,5 +11,6 @@
 export type * from './models/User'
 export type * from './models/Bank'
 export type * from './models/Transaction'
+export type * from './models/CachedCategory'
 export type * from './models/OtpCode'
 export type * from './commonInputTypes'
