@@ -84,6 +84,7 @@ export const countries: CountryData[] = [
   {
     code: 'GB',
     name: 'United Kingdom',
+    flag: '🇬🇧',
     states: [
       { code: 'ENG', name: 'England' }, { code: 'SCT', name: 'Scotland' },
       { code: 'WLS', name: 'Wales' }, { code: 'NIR', name: 'Northern Ireland' },
@@ -92,6 +93,7 @@ export const countries: CountryData[] = [
   {
     code: 'AU',
     name: 'Australia',
+    flag: '🇦🇺',
     states: [
       { code: 'NSW', name: 'New South Wales' }, { code: 'VIC', name: 'Victoria' },
       { code: 'QLD', name: 'Queensland' }, { code: 'WA', name: 'Western Australia' },
@@ -102,6 +104,7 @@ export const countries: CountryData[] = [
   {
     code: 'DE',
     name: 'Germany',
+    flag: '🇩🇪',
     states: [
       { code: 'BW', name: 'Baden-Württemberg' }, { code: 'BY', name: 'Bavaria' },
       { code: 'BE', name: 'Berlin' }, { code: 'BB', name: 'Brandenburg' },
@@ -116,6 +119,7 @@ export const countries: CountryData[] = [
   {
     code: 'FR',
     name: 'France',
+    flag: '🇫🇷',
     states: [
       { code: 'ARA', name: 'Auvergne-Rhône-Alpes' }, { code: 'BFC', name: 'Bourgogne-Franche-Comté' },
       { code: 'BRE', name: 'Brittany' }, { code: 'CVL', name: 'Centre-Val de Loire' },
@@ -128,6 +132,7 @@ export const countries: CountryData[] = [
   {
     code: 'JP',
     name: 'Japan',
+    flag: '🇯🇵',
     states: [
       { code: 'TK', name: 'Tokyo' }, { code: 'OS', name: 'Osaka' },
       { code: 'KY', name: 'Kyoto' }, { code: 'HK', name: 'Hokkaido' },
@@ -139,6 +144,7 @@ export const countries: CountryData[] = [
   {
     code: 'BR',
     name: 'Brazil',
+    flag: '🇧🇷',
     states: [
       { code: 'SP', name: 'São Paulo' }, { code: 'RJ', name: 'Rio de Janeiro' },
       { code: 'MG', name: 'Minas Gerais' }, { code: 'BA', name: 'Bahia' },
@@ -151,6 +157,7 @@ export const countries: CountryData[] = [
   {
     code: 'MX',
     name: 'Mexico',
+    flag: '🇲🇽',
     states: [
       { code: 'CMX', name: 'Mexico City' }, { code: 'JAL', name: 'Jalisco' },
       { code: 'NLE', name: 'Nuevo León' }, { code: 'MEX', name: 'State of Mexico' },

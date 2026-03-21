@@ -33,6 +33,7 @@ import { requestSignInOTP, verifySignInOTP, requestSignUpOTP, verifySignUpOTP, g
 import PlaidLink from './PlaidLink';
 import { countries, getStatesForCountry } from '@/lib/countryStateData';
 import { completeProfileSchema } from '@/lib/utils';
+import DatePicker from './DatePicker';
 
 const AuthForm = ({ type }: { type: string }) => {
   const router = useRouter();
@@ -339,7 +340,7 @@ const AuthForm = ({ type }: { type: string }) => {
                   <FormLabel className="form-label">Date of Birth</FormLabel>
                   <div className="flex w-full flex-col">
                     <FormControl>
-                      <Input type="date" className="input-class" max={new Date().toISOString().split('T')[0]} {...field} />
+                      <DatePicker value={field.value ?? ''} onChange={field.onChange} />
                     </FormControl>
                     <FormMessage className="form-message mt-2" />
                   </div>
@@ -452,7 +453,10 @@ const AuthForm = ({ type }: { type: string }) => {
                                     value={country.code}
                                     className="text-white hover:bg-slate-800 focus:bg-slate-800 focus:text-white"
                                   >
-                                    {country.name}
+                                    <span className="flex items-center gap-2">
+                                      <span>{country.flag}</span>
+                                      <span>{country.name}</span>
+                                    </span>
                                   </SelectItem>
                                 ))}
                               </SelectContent>
@@ -515,12 +519,7 @@ const AuthForm = ({ type }: { type: string }) => {
                           <FormLabel className="form-label">Date of Birth</FormLabel>
                           <div className="flex w-full flex-col">
                             <FormControl>
-                              <Input
-                                type="date"
-                                className="input-class"
-                                max={new Date().toISOString().split('T')[0]}
-                                {...field}
-                              />
+                              <DatePicker value={field.value ?? ''} onChange={field.onChange} />
                             </FormControl>
                             <FormMessage className="form-message mt-2" />
                           </div>
