@@ -81,9 +81,9 @@ model Transaction {
   createdAt      DateTime @default(now())
 
   sender       User @relation("sender", fields: [senderId], references: [id])
-  senderBank   Bank @relation("senderBank", fields: [senderBankId], references: [id])
+  senderBank   Bank @relation("senderBank", fields: [senderBankId], references: [id], onDelete: Cascade)
   receiver     User @relation("receiver", fields: [receiverId], references: [id])
-  receiverBank Bank @relation("receiverBank", fields: [receiverBankId], references: [id])
+  receiverBank Bank @relation("receiverBank", fields: [receiverBankId], references: [id], onDelete: Cascade)
 
   @@index([senderBankId])
   @@index([receiverBankId])

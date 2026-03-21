@@ -2,6 +2,7 @@ import { prisma } from '../lib/db.js';
 import { createContact } from './razorpay.service.js';
 import { plaidClient } from '../lib/plaid.js';
 import { clearAccountCache } from './bank.service.js';
+import { clearSuggestionsCache } from './challenges.service.js';
 import type { SignUpParams } from '@shared/types';
 
 export const getUserInfo = async (userId: string) => {
@@ -129,7 +130,8 @@ export const disconnectBank = async (userId: string, bankId: string) => {
   }
 
   await prisma.bank.delete({ where: { id: bankId } });
-  clearAccountCache(bankId);
+  clearAccountCache(bankId, userId);
+  clearSuggestionsCache(bankId);
 };
 
 export const deleteUser = async (userId: string) => {

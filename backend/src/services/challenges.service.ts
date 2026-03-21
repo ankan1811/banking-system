@@ -8,6 +8,12 @@ import type { AiChallengeSuggestion, ChallengeProgress, ChallengeStreak, Badge }
 const suggestionsCache = new Map<string, { data: AiChallengeSuggestion[]; expiresAt: number }>();
 const SUGGESTIONS_TTL = 24 * 60 * 60 * 1000;
 
+export function clearSuggestionsCache(bankRecordId: string) {
+  for (const key of suggestionsCache.keys()) {
+    if (key.endsWith(`:${bankRecordId}`)) suggestionsCache.delete(key);
+  }
+}
+
 function extractJSON(text: string): string {
   const match = text.match(/```(?:json)?\s*([\s\S]*?)```/);
   return match ? match[1].trim() : text.trim();

@@ -1,14 +1,19 @@
 'use client'
 
 import Link from 'next/link'
-import React from 'react'
+import React, { useState } from 'react'
 import BankCard from './BankCard'
 import { countTransactionCategories } from '@/lib/utils'
 import Category from './Category'
 import PlaidLink from './PlaidLink'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 const RightSidebar = ({ user, transactions, banks }: RightSidebarProps) => {
   const categories: CategoryCount[] = countTransactionCategories(transactions);
+  const [activeCardIndex, setActiveCardIndex] = useState(0);
+
+  const handlePrev = () => setActiveCardIndex(i => Math.max(0, i - 1));
+  const handleNext = () => setActiveCardIndex(i => Math.min(banks.length - 1, i + 1));
 
   return (
     <aside className="right-sidebar">
@@ -39,15 +44,44 @@ const RightSidebar = ({ user, transactions, banks }: RightSidebarProps) => {
         </div>
 
         {banks?.length > 0 && (
-          <div className="flex flex-col gap-4">
-            {banks.map((bank: any) => (
-              <BankCard
-                key={bank.id}
-                account={bank}
-                userName={`${user.firstName} ${user.lastName}`}
-                showBalance={false}
-              />
-            ))}
+          <div className="flex flex-col items-center gap-3">
+            <BankCard
+              account={banks[activeCardIndex]}
+              userName={`${user.firstName} ${user.lastName}`}
+              showBalance={false}
+            />
+
+            {banks.length > 1 && (
+              <div className="flex items-center gap-3 w-full justify-between px-1">
+                <button
+                  onClick={handlePrev}
+                  disabled={activeCardIndex === 0}
+                  className="p-1 rounded-full text-gray-400 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+
+                <div className="flex gap-1.5">
+                  {banks.map((_: any, i: number) => (
+                    <button
+                      key={i}
+                      onClick={() => setActiveCardIndex(i)}
+                      className={`h-1.5 rounded-full transition-all ${
+                        i === activeCardIndex ? 'w-4 bg-blue-400' : 'w-1.5 bg-gray-500'
+                      }`}
+                    />
+                  ))}
+                </div>
+
+                <button
+                  onClick={handleNext}
+                  disabled={activeCardIndex === banks.length - 1}
+                  className="p-1 rounded-full text-gray-400 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                >
+                  <ChevronRight size={18} />
+                </button>
+              </div>
+            )}
           </div>
         )}
 

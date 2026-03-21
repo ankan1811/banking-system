@@ -243,8 +243,9 @@ function fireAlerts(userId: string, allTransactions: any[]) {
 
 // ─── Cache invalidation (called after transfers) ────────────
 
-export function clearAccountCache(bankRecordId: string) {
+export function clearAccountCache(bankRecordId: string, userId?: string) {
   accountCache.delete(bankRecordId);
+  if (userId) accountsCache.delete(userId);
 }
 
 // ─── getInstitution (cached 24 hours) ────────────────────────

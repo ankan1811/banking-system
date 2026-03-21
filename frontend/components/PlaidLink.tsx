@@ -6,7 +6,10 @@ import Image from 'next/image';
 import { Loader2 } from 'lucide-react';
 
 const PlaidLinkButton = ({ token, variant }: { token: string; variant: string }) => {
+  const [syncing, setSyncing] = useState(false);
+
   const onSuccess = useCallback<PlaidLinkOnSuccess>(async (public_token: string) => {
+    setSyncing(true);
     await exchangePublicToken(public_token);
     window.location.href = '/';
   }, []);
@@ -15,6 +18,14 @@ const PlaidLinkButton = ({ token, variant }: { token: string; variant: string })
 
   return (
     <>
+      {syncing && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 backdrop-blur-sm bg-black/60">
+          <Loader2 size={48} className="animate-spin text-blue-400" />
+          <p className="text-white text-lg font-semibold">Syncing your bank account…</p>
+          <p className="text-white/50 text-sm">This may take a few seconds</p>
+        </div>
+      )}
+
       {variant === 'primary' ? (
         <Button
           onClick={() => open()}
