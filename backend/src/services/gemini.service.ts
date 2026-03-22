@@ -128,18 +128,66 @@ Total transactions this month: ${currentTxns.length}`;
   } catch (err) {
     console.error('Gemini insights error:', err);
 
-    // Cache the fallback so we stop hammering Gemini while rate-limited.
-    // Use a shorter TTL (5 minutes) so it auto-retries after cooldown.
+    // ── Formula-based fallback ──────────────────────────────────
+    const totalCurrent = Object.values(currentAgg).reduce((s, v) => s + v.amount, 0);
+    const totalPrev = Object.values(prevAgg).reduce((s, v) => s + v.amount, 0);
+
+    // Month-over-month comparison per category
+    const allCategories = new Set([...Object.keys(currentAgg), ...Object.keys(prevAgg)]);
+    const monthComparison = [...allCategories].map((category) => {
+      const cur = currentAgg[category]?.amount ?? 0;
+      const prev = prevAgg[category]?.amount ?? 0;
+      const changePercent = prev > 0 ? Math.round(((cur - prev) / prev) * 100) : cur > 0 ? 100 : 0;
+      return { category, currentAmount: Math.round(cur * 100) / 100, previousAmount: Math.round(prev * 100) / 100, changePercent };
+    }).sort((a, b) => Math.abs(b.changePercent) - Math.abs(a.changePercent));
+
+    // Top categories sorted by amount
+    const topCategories = Object.entries(currentAgg)
+      .map(([category, { amount, count }]) => ({ category, amount: Math.round(amount * 100) / 100, transactionCount: count }))
+      .sort((a, b) => b.amount - a.amount);
+
+    // Anomaly detection: categories with >50% increase or single large transactions
+    const anomalies: string[] = [];
+    for (const mc of monthComparison) {
+      if (mc.previousAmount > 0 && mc.changePercent > 50) {
+        anomalies.push(`${mc.category} spending jumped ${mc.changePercent}% vs last month ($${mc.previousAmount} → $${mc.currentAmount}).`);
+      }
+    }
+    const avgTxnAmount = totalCurrent / Math.max(currentTxns.length, 1);
+    for (const t of topTxns) {
+      if (Math.abs(t.amount) > avgTxnAmount * 3) {
+        anomalies.push(`Unusually large transaction: ${t.name} ($${Math.abs(t.amount).toFixed(2)}) on ${t.date}.`);
+      }
+    }
+
+    // Savings tips based on data
+    const savingsTips: string[] = [];
+    if (topCategories.length > 0) {
+      savingsTips.push(`Your top spending category is ${topCategories[0].category} at $${topCategories[0].amount}. Look for ways to reduce discretionary spending here.`);
+    }
+    const biggestIncrease = monthComparison.find((mc) => mc.changePercent > 0 && mc.previousAmount > 0);
+    if (biggestIncrease) {
+      savingsTips.push(`${biggestIncrease.category} increased ${biggestIncrease.changePercent}% this month — consider setting a budget cap for this category.`);
+    }
+    if (totalCurrent > totalPrev && totalPrev > 0) {
+      const overallIncrease = Math.round(((totalCurrent - totalPrev) / totalPrev) * 100);
+      savingsTips.push(`Overall spending is up ${overallIncrease}% from last month ($${totalPrev.toFixed(2)} → $${totalCurrent.toFixed(2)}). Review recurring subscriptions and discretionary purchases.`);
+    } else if (totalPrev > 0) {
+      savingsTips.push(`Great job — your spending decreased from $${totalPrev.toFixed(2)} to $${totalCurrent.toFixed(2)} this month. Keep it up!`);
+    }
+
+    // Summary
+    const changeDir = totalPrev > 0
+      ? totalCurrent > totalPrev ? `up ${Math.round(((totalCurrent - totalPrev) / totalPrev) * 100)}%` : `down ${Math.round(((totalPrev - totalCurrent) / totalPrev) * 100)}%`
+      : '';
+    const summary = `You spent $${totalCurrent.toFixed(2)} across ${currentTxns.length} transactions in ${currentMonth}${totalPrev > 0 ? `, ${changeDir} from $${totalPrev.toFixed(2)} last month` : ''}. ${topCategories.length > 0 ? `Your biggest category was ${topCategories[0].category} ($${topCategories[0].amount}).` : ''}`;
+
     const fallback: SpendingInsight = {
-      summary: 'Unable to generate insights at this time. Please try again later.',
-      monthComparison: [],
-      topCategories: Object.entries(currentAgg).map(([category, { amount, count }]) => ({
-        category,
-        amount,
-        transactionCount: count,
-      })),
-      anomalies: [],
-      savingsTips: [],
+      summary,
+      monthComparison,
+      topCategories,
+      anomalies: anomalies.slice(0, 3),
+      savingsTips: savingsTips.slice(0, 3),
       generatedAt: new Date().toISOString(),
     };
     await redisSet(cacheKey, JSON.stringify(fallback), 5 * 60);

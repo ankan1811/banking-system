@@ -1,4 +1,5 @@
 import { prisma } from '../lib/db.js';
+import { geminiModel } from '../lib/gemini.js';
 import { getAccounts } from './bank.service.js';
 import { redisGet, redisSet } from '../lib/redis.js';
 
@@ -211,23 +212,52 @@ async function getNetWorthInsight(userId: string, history: any[]): Promise<strin
   if (raw) return raw;
 
   const last6 = history.slice(-6);
-  const earliest = last6[0];
-  const latest = last6[last6.length - 1];
-  const change = latest.netWorth - earliest.netWorth;
-  const pctChange = earliest.netWorth !== 0
-    ? Math.round(Math.abs(change / earliest.netWorth) * 1000) / 10
-    : 0;
-  const months = last6.length;
+  const prompt = `Given these monthly net worth snapshots for a user, provide a 2-sentence insight about the trend and one actionable tip. Return plain text only, no JSON.
 
-  let insight: string;
-  if (pctChange < 2) {
-    insight = `Your net worth has been stable over the last ${months} months. Look for opportunities to grow through additional savings or investments.`;
-  } else if (change > 0) {
-    insight = `Your net worth grew ${pctChange}% over the last ${months} months. Keep building momentum by maintaining your savings rate.`;
-  } else {
-    insight = `Your net worth decreased ${pctChange}% over the last ${months} months. Consider reviewing recurring expenses and increasing savings contributions.`;
+Snapshots: ${JSON.stringify(last6.map((s: any) => ({ month: s.month, netWorth: s.netWorth, assets: s.totalAssets, liabilities: s.totalLiabilities })))}`;
+
+  try {
+    const result = await geminiModel.generateContent(prompt);
+    const text = result.response.text().trim();
+
+    await redisSet(cacheKey, text, INSIGHT_TTL_S);
+    return text;
+  } catch (err) {
+    console.error('Gemini net worth insight error:', err);
+
+    // ── Formula-based fallback ──────────────────────────────────
+    const newest = last6[last6.length - 1];
+    const oldest = last6[0];
+    const totalChange = newest.netWorth - oldest.netWorth;
+    const monthsSpan = last6.length - 1;
+    const avgMonthlyChange = monthsSpan > 0 ? totalChange / monthsSpan : 0;
+    const pctChange = oldest.netWorth !== 0 ? (totalChange / Math.abs(oldest.netWorth)) * 100 : 0;
+
+    // Trend direction
+    const trend = totalChange > 0 ? 'growing' : totalChange < 0 ? 'declining' : 'stable';
+
+    // Build insight sentence
+    let insight: string;
+    if (trend === 'stable') {
+      insight = `Your net worth has remained stable at $${newest.netWorth.toLocaleString()} over the past ${last6.length} months.`;
+    } else {
+      insight = `Your net worth has been ${trend} over the past ${last6.length} months, moving from $${oldest.netWorth.toLocaleString()} to $${newest.netWorth.toLocaleString()} (${pctChange > 0 ? '+' : ''}${pctChange.toFixed(1)}%).`;
+    }
+
+    // Build actionable tip
+    let tip: string;
+    if (newest.totalLiabilities > newest.totalAssets * 0.5) {
+      tip = 'Your liabilities are more than half your assets — focus on paying down high-interest debt to accelerate net worth growth.';
+    } else if (trend === 'declining') {
+      tip = `You're averaging -$${Math.abs(avgMonthlyChange).toFixed(0)}/month in net worth change. Review recent expenses and look for areas to cut back.`;
+    } else if (trend === 'growing') {
+      tip = `At your current pace of +$${avgMonthlyChange.toFixed(0)}/month, keep it up and consider increasing contributions to savings or investments.`;
+    } else {
+      tip = 'Consider setting a savings goal to start growing your net worth consistently.';
+    }
+
+    const fallback = `${insight} ${tip}`;
+    await redisSet(cacheKey, fallback, 5 * 60);
+    return fallback;
   }
-
-  await redisSet(cacheKey, insight, INSIGHT_TTL_S);
-  return insight;
 }

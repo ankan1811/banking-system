@@ -1,10 +1,16 @@
 import { prisma } from '../lib/db.js';
+import { geminiModel } from '../lib/gemini.js';
 import { getAccount } from './bank.service.js';
 import { getBudgetStatus } from './budget.service.js';
 import { redisGet, redisSet } from '../lib/redis.js';
 import type { HealthScore } from '@shared/types';
 
 const SCORE_TTL_S = 100 * 60 * 60; // 100 hours in seconds
+
+function extractJSON(text: string): string {
+  const match = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  return match ? match[1].trim() : text.trim();
+}
 
 export async function getHealthScore(
   userId: string,
@@ -40,9 +46,16 @@ export async function getHealthScore(
     }
   }
 
-  // Layer 3: Compute metrics locally, then use formula-based scoring
+  // Layer 3: Compute metrics locally, then single Gemini call
   const metrics = await computeMetrics(userId, bankRecordId, month);
-  const result = computeLocalFallback(metrics);
+
+  let result: HealthScore;
+  try {
+    result = await callGeminiForScore(metrics);
+  } catch (err) {
+    console.error('Gemini health score error, using local fallback:', err);
+    result = computeLocalFallback(metrics);
+  }
 
   // Persist to DB
   await prisma.financialHealthScore.upsert({
@@ -132,7 +145,41 @@ async function computeMetrics(userId: string, bankRecordId: string, month: strin
   };
 }
 
-// ─── Formula-based scoring (no AI needed) ───────────────────
+// ─── Single Gemini call with pre-aggregated data (~200 bytes) ─
+
+async function callGeminiForScore(metrics: Metrics): Promise<HealthScore> {
+  const prompt = `You are a financial health scoring engine. Given these pre-computed metrics for a user's finances this month, generate:
+1. An overall financial health score (0-100, integer)
+2. A breakdown with sub-scores (0-100 each): budgetAdherence, savingsRate, spendingTrend, goalProgress
+3. 3-5 personalized, actionable tips based on the data
+
+Respond ONLY with valid JSON:
+{"score":number,"breakdown":{"budgetAdherence":number,"savingsRate":number,"spendingTrend":number,"goalProgress":number},"tips":["string"]}
+
+User metrics:
+- Budget adherence: ${metrics.budgetAdherence}% (${metrics.budgetCount} budgets set)
+- Savings rate: ${metrics.savingsRate}% (income $${metrics.totalIncome}, expenses $${metrics.totalExpenses})
+- Spending diversity: ${metrics.categoryCount} categories
+- Goal progress: ${metrics.goalProgress}% across ${metrics.goalCount} active goals`;
+
+  const result = await geminiModel.generateContent(prompt);
+  const text = result.response.text();
+  const parsed = JSON.parse(extractJSON(text));
+
+  return {
+    score: Math.max(0, Math.min(100, Math.round(parsed.score || 50))),
+    breakdown: {
+      budgetAdherence: Math.round(parsed.breakdown?.budgetAdherence || metrics.budgetAdherence),
+      savingsRate: Math.round(Math.max(0, Math.min(100, parsed.breakdown?.savingsRate || metrics.savingsRate))),
+      spendingTrend: Math.round(parsed.breakdown?.spendingTrend || 50),
+      goalProgress: Math.round(parsed.breakdown?.goalProgress || metrics.goalProgress),
+    },
+    tips: Array.isArray(parsed.tips) ? parsed.tips.slice(0, 5) : [],
+    generatedAt: new Date().toISOString(),
+  };
+}
+
+// ─── Local fallback (no Gemini needed) ───────────────────────
 
 function computeLocalFallback(metrics: Metrics): HealthScore {
   const savingsScore = Math.max(0, Math.min(100, metrics.savingsRate * 2));
