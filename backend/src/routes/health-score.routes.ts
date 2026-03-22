@@ -14,7 +14,8 @@ router.get('/', async (req: Request, res: Response) => {
   try {
     const { bankRecordId, month } = querySchema.parse(req.query);
     const userId = (req as any).userId as string;
-    const score = await getHealthScore(userId, bankRecordId, month);
+    const useAi = req.query.ai === 'true';
+    const score = await getHealthScore(userId, bankRecordId, month, useAi);
     res.json({ score });
   } catch (error) {
     if (error instanceof z.ZodError) {

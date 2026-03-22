@@ -41,7 +41,8 @@ router.get('/', async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId as string;
     const months = Math.max(3, Math.min(24, parseInt(req.query.months as string) || 12));
-    const data = await getNetWorth(userId, months);
+    const useAi = req.query.ai === 'true';
+    const data = await getNetWorth(userId, months, useAi);
     res.json({ data });
   } catch {
     res.status(500).json({ error: 'Failed to fetch net worth' });

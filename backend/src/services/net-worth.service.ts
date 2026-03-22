@@ -1,7 +1,7 @@
 import { prisma } from '../lib/db.js';
 import { geminiModel } from '../lib/gemini.js';
 import { getAccounts } from './bank.service.js';
-import { redisGet, redisSet } from '../lib/redis.js';
+import { redisGet, redisSet, redisDel } from '../lib/redis.js';
 
 const INSIGHT_TTL_S = 100 * 60 * 60; // 100 hours in seconds
 
@@ -96,7 +96,7 @@ export async function deleteManualLiability(userId: string, liabilityId: string)
 
 // ─── Net Worth Calculation ──────────────────────────────────
 
-export async function getNetWorth(userId: string, months: number = 12) {
+export async function getNetWorth(userId: string, months: number = 12, useAi: boolean = false) {
   // Step 1: Get linked account balances
   let linkedAssets = 0;
   const linkedBreakdown: { name: string; balance: number }[] = [];
@@ -182,9 +182,12 @@ export async function getNetWorth(userId: string, months: number = 12) {
 
   // Step 7: Optional AI insight
   let aiInsight: string | null = null;
+  let aiInsightSource: 'ai' | 'formula' | null = null;
   if (history.length >= 3) {
     try {
-      aiInsight = await getNetWorthInsight(userId, history);
+      const result = await getNetWorthInsight(userId, history, useAi);
+      aiInsight = result.text;
+      aiInsightSource = result.source;
     } catch {
       // Silently skip AI insight
     }
@@ -203,15 +206,32 @@ export async function getNetWorth(userId: string, months: number = 12) {
     breakdown,
     history,
     aiInsight,
+    aiInsightSource,
   };
 }
 
-async function getNetWorthInsight(userId: string, history: any[]): Promise<string> {
+async function getNetWorthInsight(
+  userId: string,
+  history: any[],
+  useAi: boolean = false
+): Promise<{ text: string; source: 'ai' | 'formula' }> {
   const cacheKey = `net-worth-insight:${userId}`;
+
+  if (useAi) await redisDel(cacheKey);
+
   const raw = await redisGet(cacheKey);
-  if (raw) return raw;
+  if (raw) return { text: raw, source: 'formula' };
 
   const last6 = history.slice(-6);
+
+  // useAi=false: skip Gemini, use formula fallback
+  if (!useAi) {
+    const fallback = computeNetWorthFallback(last6);
+    await redisSet(cacheKey, fallback, 5 * 60);
+    return { text: fallback, source: 'formula' };
+  }
+
+  // useAi=true: call Gemini
   const prompt = `Given these monthly net worth snapshots for a user, provide a 2-sentence insight about the trend and one actionable tip. Return plain text only, no JSON.
 
 Snapshots: ${JSON.stringify(last6.map((s: any) => ({ month: s.month, netWorth: s.netWorth, assets: s.totalAssets, liabilities: s.totalLiabilities })))}`;
@@ -221,43 +241,42 @@ Snapshots: ${JSON.stringify(last6.map((s: any) => ({ month: s.month, netWorth: s
     const text = result.response.text().trim();
 
     await redisSet(cacheKey, text, INSIGHT_TTL_S);
-    return text;
+    return { text, source: 'ai' };
   } catch (err) {
     console.error('Gemini net worth insight error:', err);
-
-    // ── Formula-based fallback ──────────────────────────────────
-    const newest = last6[last6.length - 1];
-    const oldest = last6[0];
-    const totalChange = newest.netWorth - oldest.netWorth;
-    const monthsSpan = last6.length - 1;
-    const avgMonthlyChange = monthsSpan > 0 ? totalChange / monthsSpan : 0;
-    const pctChange = oldest.netWorth !== 0 ? (totalChange / Math.abs(oldest.netWorth)) * 100 : 0;
-
-    // Trend direction
-    const trend = totalChange > 0 ? 'growing' : totalChange < 0 ? 'declining' : 'stable';
-
-    // Build insight sentence
-    let insight: string;
-    if (trend === 'stable') {
-      insight = `Your net worth has remained stable at $${newest.netWorth.toLocaleString()} over the past ${last6.length} months.`;
-    } else {
-      insight = `Your net worth has been ${trend} over the past ${last6.length} months, moving from $${oldest.netWorth.toLocaleString()} to $${newest.netWorth.toLocaleString()} (${pctChange > 0 ? '+' : ''}${pctChange.toFixed(1)}%).`;
-    }
-
-    // Build actionable tip
-    let tip: string;
-    if (newest.totalLiabilities > newest.totalAssets * 0.5) {
-      tip = 'Your liabilities are more than half your assets — focus on paying down high-interest debt to accelerate net worth growth.';
-    } else if (trend === 'declining') {
-      tip = `You're averaging -$${Math.abs(avgMonthlyChange).toFixed(0)}/month in net worth change. Review recent expenses and look for areas to cut back.`;
-    } else if (trend === 'growing') {
-      tip = `At your current pace of +$${avgMonthlyChange.toFixed(0)}/month, keep it up and consider increasing contributions to savings or investments.`;
-    } else {
-      tip = 'Consider setting a savings goal to start growing your net worth consistently.';
-    }
-
-    const fallback = `${insight} ${tip}`;
+    const fallback = computeNetWorthFallback(last6);
     await redisSet(cacheKey, fallback, 5 * 60);
-    return fallback;
+    return { text: fallback, source: 'formula' };
   }
+}
+
+function computeNetWorthFallback(last6: any[]): string {
+  const newest = last6[last6.length - 1];
+  const oldest = last6[0];
+  const totalChange = newest.netWorth - oldest.netWorth;
+  const monthsSpan = last6.length - 1;
+  const avgMonthlyChange = monthsSpan > 0 ? totalChange / monthsSpan : 0;
+  const pctChange = oldest.netWorth !== 0 ? (totalChange / Math.abs(oldest.netWorth)) * 100 : 0;
+
+  const trend = totalChange > 0 ? 'growing' : totalChange < 0 ? 'declining' : 'stable';
+
+  let insight: string;
+  if (trend === 'stable') {
+    insight = `Your net worth has remained stable at $${newest.netWorth.toLocaleString()} over the past ${last6.length} months.`;
+  } else {
+    insight = `Your net worth has been ${trend} over the past ${last6.length} months, moving from $${oldest.netWorth.toLocaleString()} to $${newest.netWorth.toLocaleString()} (${pctChange > 0 ? '+' : ''}${pctChange.toFixed(1)}%).`;
+  }
+
+  let tip: string;
+  if (newest.totalLiabilities > newest.totalAssets * 0.5) {
+    tip = 'Your liabilities are more than half your assets — focus on paying down high-interest debt to accelerate net worth growth.';
+  } else if (trend === 'declining') {
+    tip = `You're averaging -$${Math.abs(avgMonthlyChange).toFixed(0)}/month in net worth change. Review recent expenses and look for areas to cut back.`;
+  } else if (trend === 'growing') {
+    tip = `At your current pace of +$${avgMonthlyChange.toFixed(0)}/month, keep it up and consider increasing contributions to savings or investments.`;
+  } else {
+    tip = 'Consider setting a savings goal to start growing your net worth consistently.';
+  }
+
+  return `${insight} ${tip}`;
 }

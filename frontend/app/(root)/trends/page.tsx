@@ -15,7 +15,7 @@ const TrendsPage = async ({ searchParams: { id } }: SearchParamProps) => {
         <HeaderBox
           type="title"
           title="Spending Trends"
-          subtext="See how your spending has changed across categories over the past months."
+          subtext="Visualize how your spending changes over time across categories."
         />
         {bankRecordId && <SpendingTrendsChart bankRecordId={bankRecordId} />}
       </div>

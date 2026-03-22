@@ -107,6 +107,7 @@ export type SpendingInsight = {
   anomalies: string[];
   savingsTips: string[];
   generatedAt: string;
+  source?: 'ai' | 'formula';
 };
 
 export type ChatMessage = {
@@ -234,6 +235,7 @@ export type HealthScore = {
   };
   tips: string[];
   generatedAt: string;
+  source?: 'ai' | 'formula';
 };
 
 // ─── Monthly Digest ─────────────────────────────────────────
@@ -262,6 +264,7 @@ export type MonthlyDigest = {
   sections: DigestSection;
   narrative: string;
   generatedAt: string;
+  narrativeSource?: 'ai' | 'formula';
 };
 
 // ─── Transaction Notes ──────────────────────────────────────
@@ -429,6 +432,7 @@ export type NetWorthData = {
   breakdown: NetWorthBreakdown;
   history: NetWorthSnapshot[];
   aiInsight: string | null;
+  aiInsightSource?: 'ai' | 'formula' | null;
 };
 
 // ─── Financial Plan Generator ───────────────────────────────

@@ -15,7 +15,7 @@ const CalendarPage = async ({ searchParams: { id } }: SearchParamProps) => {
         <HeaderBox
           type="title"
           title="Bill Calendar"
-          subtext="See when your recurring charges and subscriptions are due each month."
+          subtext="Track upcoming bills and recurring payments on a monthly calendar."
         />
         {bankRecordId && <BillCalendar bankRecordId={bankRecordId} />}
       </div>

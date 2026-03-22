@@ -2,7 +2,7 @@ import { prisma } from '../lib/db.js';
 import { geminiModel } from '../lib/gemini.js';
 import { getAccount } from './bank.service.js';
 import { getBudgetStatus } from './budget.service.js';
-import { redisGet, redisSet } from '../lib/redis.js';
+import { redisGet, redisSet, redisDel } from '../lib/redis.js';
 import type { HealthScore } from '@shared/types';
 
 const SCORE_TTL_S = 100 * 60 * 60; // 100 hours in seconds
@@ -15,7 +15,8 @@ function extractJSON(text: string): string {
 export async function getHealthScore(
   userId: string,
   bankRecordId: string,
-  month: string
+  month: string,
+  useAi: boolean = false
 ): Promise<HealthScore> {
   const cacheKey = `health:${userId}:${month}`;
 
@@ -39,6 +40,7 @@ export async function getHealthScore(
         breakdown: dbScore.breakdown as HealthScore['breakdown'],
         tips: dbScore.tips as string[],
         generatedAt: dbScore.generatedAt.toISOString(),
+        source: 'formula',
       };
       const remainingTtlS = Math.floor((SCORE_TTL_S * 1000 - ageMs) / 1000);
       await redisSet(cacheKey, JSON.stringify(result), remainingTtlS);
@@ -46,15 +48,25 @@ export async function getHealthScore(
     }
   }
 
-  // Layer 3: Compute metrics locally, then single Gemini call
+  // Layer 3: Compute score (AI or formula)
   const metrics = await computeMetrics(userId, bankRecordId, month);
 
   let result: HealthScore;
-  try {
-    result = await callGeminiForScore(metrics);
-  } catch (err) {
-    console.error('Gemini health score error, using local fallback:', err);
-    result = computeLocalFallback(metrics);
+  if (useAi) {
+    // Clear caches before AI generation
+    await redisDel(cacheKey);
+    await prisma.financialHealthScore.deleteMany({
+      where: { userId, month },
+    });
+
+    try {
+      result = { ...await callGeminiForScore(metrics), source: 'ai' };
+    } catch (err) {
+      console.error('Gemini health score error, using local fallback:', err);
+      result = { ...computeLocalFallback(metrics), source: 'formula' };
+    }
+  } else {
+    result = { ...computeLocalFallback(metrics), source: 'formula' };
   }
 
   // Persist to DB

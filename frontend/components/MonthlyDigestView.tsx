@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { getMonthlyDigest, buildDigestPdfUrl } from '@/lib/api/reports.api';
 import { aiCategoryColors } from '@/constants';
 import type { MonthlyDigest } from '@shared/types';
+import { Sparkles } from 'lucide-react';
 
 interface Props {
   bankRecordId: string;
@@ -14,17 +15,35 @@ export default function MonthlyDigestView({ bankRecordId }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [month, setMonth] = useState(() => new Date().toISOString().slice(0, 7));
+  const [source, setSource] = useState<'ai' | 'formula'>('formula');
+  const [aiGenerating, setAiGenerating] = useState(false);
 
   const load = (m: string) => {
     setLoading(true);
     setError('');
-    getMonthlyDigest(bankRecordId, m)
-      .then((res) => setDigest(res.digest))
+    getMonthlyDigest(bankRecordId, m, false)
+      .then((res) => {
+        setDigest(res.digest);
+        if (res.digest?.narrativeSource) setSource(res.digest.narrativeSource);
+      })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   };
 
   useEffect(() => { load(month); }, [bankRecordId, month]);
+
+  const handleGenerateAi = async () => {
+    setAiGenerating(true);
+    try {
+      const res = await getMonthlyDigest(bankRecordId, month, true);
+      setDigest(res.digest);
+      if (res.digest?.narrativeSource) setSource(res.digest.narrativeSource);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setAiGenerating(false);
+    }
+  };
 
   const navigateMonth = (direction: -1 | 1) => {
     const [y, m] = month.split('-').map(Number);
@@ -98,7 +117,29 @@ export default function MonthlyDigestView({ bankRecordId }: Props) {
 
       {/* AI Narrative */}
       <div className="glass-card p-6">
-        <h3 className="text-sm font-semibold text-white mb-2">AI Summary</h3>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-white">AI Summary</h3>
+            {source === 'ai' ? (
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-violet-500/20 text-violet-300">AI-generated</span>
+            ) : (
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-slate-700/50 text-slate-400">Formula-based</span>
+            )}
+          </div>
+          <button
+            onClick={handleGenerateAi}
+            disabled={aiGenerating}
+            className="px-3 py-1.5 text-xs bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 disabled:opacity-50 rounded-lg text-white font-medium transition-all flex items-center gap-1.5"
+          >
+            {aiGenerating ? (
+              <><span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />Generating...</>
+            ) : source === 'ai' ? (
+              <><Sparkles className="w-3 h-3" />Regenerate</>
+            ) : (
+              <><Sparkles className="w-3 h-3" />Generate with AI</>
+            )}
+          </button>
+        </div>
         {narrative.split('\n\n').map((p, i) => (
           <p key={i} className="text-sm text-slate-300 leading-relaxed mb-2 last:mb-0">{p}</p>
         ))}

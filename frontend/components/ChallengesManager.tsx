@@ -6,6 +6,7 @@ import type { ChallengesOverview, AiChallengeSuggestion } from '@shared/types';
 import { AI_CATEGORIES } from '@shared/types';
 import ChallengeProgressCard from './ChallengeProgressCard';
 import BadgeIcon from './BadgeIcon';
+import { Sparkles } from 'lucide-react';
 
 export default function ChallengesManager({ bankRecordId }: { bankRecordId: string }) {
   const [overview, setOverview] = useState<ChallengesOverview | null>(null);
@@ -14,6 +15,8 @@ export default function ChallengesManager({ bankRecordId }: { bankRecordId: stri
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
   const [error, setError] = useState('');
   const [creating, setCreating] = useState(false);
+  const [suggestionsSource, setSuggestionsSource] = useState<'ai' | 'formula'>('formula');
+  const [aiGenerating, setAiGenerating] = useState(false);
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -33,10 +36,26 @@ export default function ChallengesManager({ bankRecordId }: { bankRecordId: stri
 
   const loadSuggestions = () => {
     setSuggestionsLoading(true);
-    getAiSuggestions(bankRecordId)
-      .then((res) => setSuggestions(res.suggestions))
+    getAiSuggestions(bankRecordId, false)
+      .then((res) => {
+        setSuggestions(res.suggestions);
+        if (res.source) setSuggestionsSource(res.source);
+      })
       .catch(() => {})
       .finally(() => setSuggestionsLoading(false));
+  };
+
+  const handleGenerateAi = async () => {
+    setAiGenerating(true);
+    try {
+      const res = await getAiSuggestions(bankRecordId, true);
+      setSuggestions(res.suggestions);
+      if (res.source) setSuggestionsSource(res.source);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setAiGenerating(false);
+    }
   };
 
   useEffect(() => { load(); loadSuggestions(); }, [bankRecordId]);
@@ -152,7 +171,29 @@ export default function ChallengesManager({ bankRecordId }: { bankRecordId: stri
       {/* AI Suggestions */}
       {suggestions.length > 0 && (
         <div className="space-y-3">
-          <h3 className="text-xs text-slate-500">AI Suggestions</h3>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <h3 className="text-xs text-slate-500">AI Suggestions</h3>
+              {suggestionsSource === 'ai' ? (
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-violet-500/20 text-violet-300">AI-generated</span>
+              ) : (
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-slate-700/50 text-slate-400">Formula-based</span>
+              )}
+            </div>
+            <button
+              onClick={handleGenerateAi}
+              disabled={aiGenerating}
+              className="px-3 py-1.5 text-xs bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 disabled:opacity-50 rounded-lg text-white font-medium transition-all flex items-center gap-1.5"
+            >
+              {aiGenerating ? (
+                <><span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />Generating...</>
+              ) : suggestionsSource === 'ai' ? (
+                <><Sparkles className="w-3 h-3" />Regenerate</>
+              ) : (
+                <><Sparkles className="w-3 h-3" />Generate with AI</>
+              )}
+            </button>
+          </div>
           {suggestions.map((s, i) => (
             <div key={i} className="glass-card p-4 flex items-start justify-between gap-3">
               <div className="min-w-0">

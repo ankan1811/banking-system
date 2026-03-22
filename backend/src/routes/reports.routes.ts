@@ -14,7 +14,8 @@ router.get('/digest', async (req: Request, res: Response) => {
   try {
     const { bankRecordId, month } = querySchema.parse(req.query);
     const userId = (req as any).userId as string;
-    const digest = await getMonthlyDigest(userId, bankRecordId, month);
+    const useAi = req.query.ai === 'true';
+    const digest = await getMonthlyDigest(userId, bankRecordId, month, useAi);
     res.json({ digest });
   } catch (error) {
     if (error instanceof z.ZodError) {

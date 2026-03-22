@@ -4,7 +4,7 @@ import { getBudgetStatus } from './budget.service.js';
 import { getGoals } from './goals.service.js';
 import { getHealthScore } from './health-score.service.js';
 import { getMerchantInsights, getIncomeVsExpense } from './analytics.service.js';
-import { redisGet, redisSet } from '../lib/redis.js';
+import { redisGet, redisSet, redisDel } from '../lib/redis.js';
 import type { DigestSection, MonthlyDigest } from '@shared/types';
 import PDFDocument from 'pdfkit';
 
@@ -18,7 +18,8 @@ function extractJSON(text: string): string {
 export async function getMonthlyDigest(
   userId: string,
   bankRecordId: string,
-  month: string
+  month: string,
+  useAi: boolean = false
 ): Promise<MonthlyDigest> {
   const cacheKey = `digest:${userId}:${month}`;
 
@@ -44,6 +45,7 @@ export async function getMonthlyDigest(
         bankRecordId: dbDigest.bankRecordId,
         sections: dbDigest.sections as any,
         narrative: dbDigest.narrative,
+        narrativeSource: 'formula',
         generatedAt: dbDigest.generatedAt.toISOString(),
       };
       const remainingTtlS = Math.floor((DIGEST_TTL_S * 1000 - ageMs) / 1000);
@@ -52,15 +54,29 @@ export async function getMonthlyDigest(
     }
   }
 
-  // Layer 3: Aggregate data + single Gemini call
+  // Layer 3: Aggregate data + narrative generation
   const sections = await aggregateSections(userId, bankRecordId, month);
   let narrative: string;
+  let narrativeSource: 'ai' | 'formula';
 
-  try {
-    narrative = await generateNarrative(sections, month);
-  } catch (err) {
-    console.error('Gemini digest error, using local fallback:', err);
+  if (useAi) {
+    // Clear caches before AI generation
+    await redisDel(cacheKey);
+    await prisma.monthlyDigest.deleteMany({
+      where: { userId, month },
+    });
+
+    try {
+      narrative = await generateNarrative(sections, month);
+      narrativeSource = 'ai';
+    } catch (err) {
+      console.error('Gemini digest error, using local fallback:', err);
+      narrative = generateLocalNarrative(sections, month);
+      narrativeSource = 'formula';
+    }
+  } else {
     narrative = generateLocalNarrative(sections, month);
+    narrativeSource = 'formula';
   }
 
   // Persist to DB
@@ -77,6 +93,7 @@ export async function getMonthlyDigest(
     bankRecordId: dbResult.bankRecordId,
     sections,
     narrative,
+    narrativeSource,
     generatedAt: dbResult.generatedAt.toISOString(),
   };
 

@@ -6,7 +6,8 @@ const MerchantsPage = async ({ searchParams: { id } }: SearchParamProps) => {
   const accounts = await serverApiRequest<any>('/api/accounts');
   if (!accounts) return null;
 
-  const bankRecordId = (id as string) || accounts?.data[0]?.bankRecordId;
+  const accountsData = accounts?.data;
+  const bankRecordId = (id as string) || accountsData[0]?.bankRecordId;
 
   return (
     <section className="home">
@@ -14,7 +15,7 @@ const MerchantsPage = async ({ searchParams: { id } }: SearchParamProps) => {
         <HeaderBox
           type="title"
           title="Merchant Insights"
-          subtext="See where your money goes — top merchants ranked by spending."
+          subtext="See where you spend the most and discover your top merchants."
         />
         {bankRecordId && <MerchantInsightsCard bankRecordId={bankRecordId} />}
       </div>

@@ -6,7 +6,8 @@ const ChallengesPage = async ({ searchParams: { id } }: SearchParamProps) => {
   const accounts = await serverApiRequest<any>('/api/accounts');
   if (!accounts) return null;
 
-  const bankRecordId = (id as string) || accounts?.data[0]?.bankRecordId;
+  const accountsData = accounts?.data;
+  const bankRecordId = (id as string) || accountsData[0]?.bankRecordId;
 
   return (
     <section className="home">
@@ -14,7 +15,7 @@ const ChallengesPage = async ({ searchParams: { id } }: SearchParamProps) => {
         <HeaderBox
           type="title"
           title="Spending Challenges"
-          subtext="Take on AI-powered challenges to build better spending habits."
+          subtext="Take on challenges to build better spending habits and earn badges."
         />
         {bankRecordId && <ChallengesManager bankRecordId={bankRecordId} />}
       </div>

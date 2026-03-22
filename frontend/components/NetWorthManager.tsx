@@ -9,6 +9,7 @@ import type { NetWorthData } from '@shared/types';
 import { ASSET_CATEGORIES, LIABILITY_CATEGORIES } from '@shared/types';
 import NetWorthChart from './NetWorthChart';
 import AssetLiabilityRow from './AssetLiabilityRow';
+import { Sparkles } from 'lucide-react';
 
 export default function NetWorthManager() {
   const [data, setData] = useState<NetWorthData | null>(null);
@@ -20,16 +21,34 @@ export default function NetWorthManager() {
   const [addingLiability, setAddingLiability] = useState(false);
   const [assetForm, setAssetForm] = useState({ name: '', category: 'property', value: '', notes: '' });
   const [liabilityForm, setLiabilityForm] = useState({ name: '', category: 'mortgage', value: '', notes: '' });
+  const [aiInsightSource, setAiInsightSource] = useState<'ai' | 'formula' | null>(null);
+  const [aiGenerating, setAiGenerating] = useState(false);
 
   const load = () => {
     setLoading(true);
-    getNetWorth(months)
-      .then((res) => setData(res.data))
+    getNetWorth(months, false)
+      .then((res) => {
+        setData(res.data);
+        if (res.data?.aiInsightSource) setAiInsightSource(res.data.aiInsightSource);
+      })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   };
 
   useEffect(() => { load(); }, [months]);
+
+  const handleGenerateAi = async () => {
+    setAiGenerating(true);
+    try {
+      const res = await getNetWorth(months, true);
+      setData(res.data);
+      if (res.data?.aiInsightSource) setAiInsightSource(res.data.aiInsightSource);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setAiGenerating(false);
+    }
+  };
 
   const handleCreateAsset = async () => {
     if (!assetForm.name || !assetForm.value) return;
@@ -313,10 +332,30 @@ export default function NetWorthManager() {
       {/* AI Insight */}
       {aiInsight && (
         <div className="glass-card p-5 border-violet-500/20">
-          <div className="flex items-start gap-2">
-            <span className="text-sm">AI</span>
-            <p className="text-sm text-slate-300 leading-relaxed">{aiInsight}</p>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <span className="text-sm">AI</span>
+              {aiInsightSource === 'ai' ? (
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-violet-500/20 text-violet-300">AI-generated</span>
+              ) : (
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-slate-700/50 text-slate-400">Formula-based</span>
+              )}
+            </div>
+            <button
+              onClick={handleGenerateAi}
+              disabled={aiGenerating}
+              className="px-3 py-1.5 text-xs bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 disabled:opacity-50 rounded-lg text-white font-medium transition-all flex items-center gap-1.5"
+            >
+              {aiGenerating ? (
+                <><span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />Generating...</>
+              ) : aiInsightSource === 'ai' ? (
+                <><Sparkles className="w-3 h-3" />Regenerate</>
+              ) : (
+                <><Sparkles className="w-3 h-3" />Generate with AI</>
+              )}
+            </button>
           </div>
+          <p className="text-sm text-slate-300 leading-relaxed">{aiInsight}</p>
         </div>
       )}
     </div>

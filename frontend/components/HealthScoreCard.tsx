@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { getHealthScore } from '@/lib/api/health-score.api';
 import type { HealthScore } from '@shared/types';
+import { Sparkles } from 'lucide-react';
 
 interface Props { bankRecordId: string; }
 
@@ -29,16 +30,34 @@ export default function HealthScoreCard({ bankRecordId }: Props) {
   const [data, setData] = useState<HealthScore | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [source, setSource] = useState<'ai' | 'formula'>('formula');
+  const [aiGenerating, setAiGenerating] = useState(false);
 
   const currentMonth = new Date().toISOString().slice(0, 7);
 
   useEffect(() => {
     setLoading(true);
-    getHealthScore(bankRecordId, currentMonth)
-      .then((res) => setData(res.score))
+    getHealthScore(bankRecordId, currentMonth, false)
+      .then((res) => {
+        setData(res.score);
+        if (res.score?.source) setSource(res.score.source);
+      })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, [bankRecordId]);
+
+  const handleGenerateAi = async () => {
+    setAiGenerating(true);
+    try {
+      const res = await getHealthScore(bankRecordId, currentMonth, true);
+      setData(res.score);
+      if (res.score?.source) setSource(res.score.source);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setAiGenerating(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -62,6 +81,29 @@ export default function HealthScoreCard({ bankRecordId }: Props) {
     <div className="space-y-4">
       {/* Score gauge */}
       <div className="glass-card p-6 flex flex-col items-center">
+        <div className="flex items-center gap-2 mb-3 w-full justify-between">
+          <div className="flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-white">Health Score</h3>
+            {source === 'ai' ? (
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-violet-500/20 text-violet-300">AI-generated</span>
+            ) : (
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-slate-700/50 text-slate-400">Formula-based</span>
+            )}
+          </div>
+          <button
+            onClick={handleGenerateAi}
+            disabled={aiGenerating}
+            className="px-3 py-1.5 text-xs bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 disabled:opacity-50 rounded-lg text-white font-medium transition-all flex items-center gap-1.5"
+          >
+            {aiGenerating ? (
+              <><span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />Generating...</>
+            ) : source === 'ai' ? (
+              <><Sparkles className="w-3 h-3" />Regenerate</>
+            ) : (
+              <><Sparkles className="w-3 h-3" />Generate with AI</>
+            )}
+          </button>
+        </div>
         <div className="relative">
           <svg width={140} height={140} className="-rotate-90">
             <circle cx={70} cy={70} r={radius} fill="none" stroke="rgba(148,163,184,0.1)" strokeWidth={10} />

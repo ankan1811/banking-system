@@ -1,7 +1,7 @@
 import { prisma } from '../lib/db.js';
 import { geminiModel } from '../lib/gemini.js';
 import { getAccount } from './bank.service.js';
-import { redisGet, redisSet, redisDelByPattern } from '../lib/redis.js';
+import { redisGet, redisSet, redisDelByPattern, redisDel } from '../lib/redis.js';
 import { AI_CATEGORIES } from '@shared/types';
 import type { AiChallengeSuggestion, ChallengeProgress, ChallengeStreak, Badge } from '@shared/types';
 
@@ -235,14 +235,17 @@ function serializeChallenge(c: any) {
 
 export async function getAiSuggestions(
   userId: string,
-  bankRecordId: string
-): Promise<AiChallengeSuggestion[]> {
+  bankRecordId: string,
+  useAi: boolean = false
+): Promise<{ suggestions: AiChallengeSuggestion[]; source: 'ai' | 'formula' }> {
   const currentMonth = new Date().toISOString().slice(0, 7);
   const cacheKey = `challenges:${userId}:${bankRecordId}:${currentMonth}`;
 
   // Layer 1: Redis cache
   const redisCached = await redisGet(cacheKey);
-  if (redisCached) return JSON.parse(redisCached) as AiChallengeSuggestion[];
+  if (redisCached) {
+    return JSON.parse(redisCached) as { suggestions: AiChallengeSuggestion[]; source: 'ai' | 'formula' };
+  }
 
   // Layer 2: DB cache (survives server restarts)
   const dbCached = await prisma.challengeSuggestionCache.findUnique({
@@ -252,62 +255,88 @@ export async function getAiSuggestions(
     const ageMs = Date.now() - dbCached.generatedAt.getTime();
     if (ageMs < SUGGESTIONS_TTL_S * 1000) {
       console.log(`[CACHE HIT] challenge suggestions DB ${cacheKey}`);
-      const suggestions = dbCached.suggestions as AiChallengeSuggestion[];
+      const cached = dbCached.suggestions as any;
+      // Support both old format (plain array) and new format ({ suggestions, source })
+      const result = Array.isArray(cached)
+        ? { suggestions: cached as AiChallengeSuggestion[], source: 'formula' as const }
+        : cached as { suggestions: AiChallengeSuggestion[]; source: 'ai' | 'formula' };
       const remainingTtlS = Math.floor((SUGGESTIONS_TTL_S * 1000 - ageMs) / 1000);
-      await redisSet(cacheKey, JSON.stringify(suggestions), remainingTtlS);
-      return suggestions;
+      await redisSet(cacheKey, JSON.stringify(result), remainingTtlS);
+      return result;
     }
   }
 
-  // Layer 3: Gemini call
-  try {
-    const { transactions } = await getAccount(bankRecordId);
-    const monthTxns = transactions.filter((t: any) => (t.date || '').startsWith(currentMonth) && t.amount > 0);
+  // Layer 3: Generate suggestions (AI or formula)
+  if (useAi) {
+    // Clear caches before AI generation
+    await redisDel(cacheKey);
+    await prisma.challengeSuggestionCache.deleteMany({
+      where: { userId, bankRecordId, month: currentMonth },
+    });
 
-    const byCategory: Record<string, number> = {};
-    for (const t of monthTxns) {
-      const cat = (t as any).aiCategory || (t as any).category || 'Other';
-      byCategory[cat] = (byCategory[cat] || 0) + Math.abs((t as any).amount);
-    }
+    try {
+      const { transactions } = await getAccount(bankRecordId);
+      const monthTxns = transactions.filter((t: any) => (t.date || '').startsWith(currentMonth) && t.amount > 0);
 
-    const topCategories = Object.entries(byCategory)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3);
+      const byCategory: Record<string, number> = {};
+      for (const t of monthTxns) {
+        const cat = (t as any).aiCategory || (t as any).category || 'Other';
+        byCategory[cat] = (byCategory[cat] || 0) + Math.abs((t as any).amount);
+      }
 
-    const prompt = `You are a financial wellness coach. Based on this user's top spending categories this month, suggest 3 personalized spending challenges to help them save money. Each challenge should be achievable and motivating.
+      const topCategories = Object.entries(byCategory)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3);
+
+      const prompt = `You are a financial wellness coach. Based on this user's top spending categories this month, suggest 3 personalized spending challenges to help them save money. Each challenge should be achievable and motivating.
 
 Top spending categories: ${JSON.stringify(topCategories.map(([cat, amount]) => ({ category: cat, spent: Math.round(amount) })))}
 
 Respond ONLY with a valid JSON array:
 [{ "title": "string", "description": "string", "type": "category_limit" | "no_spend" | "savings_target", "category": "string or null", "targetAmount": number or null, "duration": "weekly" | "monthly" }]`;
 
-    const result = await geminiModel.generateContent(prompt);
-    const text = result.response.text();
-    const parsed = JSON.parse(extractJSON(text));
+      const result = await geminiModel.generateContent(prompt);
+      const text = result.response.text();
+      const parsed = JSON.parse(extractJSON(text));
 
-    const suggestions: AiChallengeSuggestion[] = Array.isArray(parsed) ? parsed.slice(0, 3).map((s: any) => ({
-      title: String(s.title || ''),
-      description: String(s.description || ''),
-      type: ['category_limit', 'no_spend', 'savings_target'].includes(s.type) ? s.type : 'category_limit',
-      category: s.category && AI_CATEGORIES.includes(s.category) ? s.category : null,
-      targetAmount: typeof s.targetAmount === 'number' ? s.targetAmount : null,
-      duration: s.duration === 'weekly' ? 'weekly' : 'monthly',
-    })) : getDefaultSuggestions();
+      const suggestions: AiChallengeSuggestion[] = Array.isArray(parsed) ? parsed.slice(0, 3).map((s: any) => ({
+        title: String(s.title || ''),
+        description: String(s.description || ''),
+        type: ['category_limit', 'no_spend', 'savings_target'].includes(s.type) ? s.type : 'category_limit',
+        category: s.category && AI_CATEGORIES.includes(s.category) ? s.category : null,
+        targetAmount: typeof s.targetAmount === 'number' ? s.targetAmount : null,
+        duration: s.duration === 'weekly' ? 'weekly' : 'monthly',
+      })) : getDefaultSuggestions();
+
+      const cached = { suggestions, source: 'ai' as const };
+
+      // Persist to DB + Redis
+      await prisma.challengeSuggestionCache.upsert({
+        where: { userId_bankRecordId_month: { userId, bankRecordId, month: currentMonth } },
+        update: { suggestions: cached as any, generatedAt: new Date() },
+        create: { userId, bankRecordId, month: currentMonth, suggestions: cached as any },
+      });
+      await redisSet(cacheKey, JSON.stringify(cached), SUGGESTIONS_TTL_S);
+      return cached;
+    } catch (err) {
+      console.error('AI suggestions error:', err);
+      const defaults = getDefaultSuggestions();
+      const cached = { suggestions: defaults, source: 'formula' as const };
+      await redisSet(cacheKey, JSON.stringify(cached), 5 * 60);
+      return cached;
+    }
+  } else {
+    const defaults = getDefaultSuggestions();
+    const cached = { suggestions: defaults, source: 'formula' as const };
 
     // Persist to DB + Redis
     await prisma.challengeSuggestionCache.upsert({
       where: { userId_bankRecordId_month: { userId, bankRecordId, month: currentMonth } },
-      update: { suggestions: suggestions as any, generatedAt: new Date() },
-      create: { userId, bankRecordId, month: currentMonth, suggestions: suggestions as any },
+      update: { suggestions: cached as any, generatedAt: new Date() },
+      create: { userId, bankRecordId, month: currentMonth, suggestions: cached as any },
     });
-    await redisSet(cacheKey, JSON.stringify(suggestions), SUGGESTIONS_TTL_S);
-    return suggestions;
-  } catch (err) {
-    console.error('AI suggestions error:', err);
-    // Cache defaults for 5 min (cooldown) so we don't hammer Gemini
-    const defaults = getDefaultSuggestions();
-    await redisSet(cacheKey, JSON.stringify(defaults), 5 * 60);
-    return defaults;
+    await redisSet(cacheKey, JSON.stringify(cached), SUGGESTIONS_TTL_S);
+    return cached;
   }
 }
 

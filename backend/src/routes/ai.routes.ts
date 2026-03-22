@@ -8,16 +8,17 @@ const router = Router();
 const insightsSchema = z.object({
   bankRecordId: z.string().min(1),
   currentMonth: z.string().regex(/^\d{4}-\d{2}$/),
+  useAi: z.boolean().optional().default(false),
 });
 
 // POST /api/ai/insights
 router.post('/insights', async (req: Request, res: Response) => {
   try {
-    const { bankRecordId, currentMonth } = insightsSchema.parse(req.body);
+    const { bankRecordId, currentMonth, useAi } = insightsSchema.parse(req.body);
     const userId = (req as any).userId as string;
 
     const { transactions } = await getAccount(bankRecordId);
-    const insights = await generateSpendingInsights(transactions, currentMonth, userId);
+    const insights = await generateSpendingInsights(transactions, currentMonth, userId, useAi);
 
     res.json({ insights });
   } catch (error) {

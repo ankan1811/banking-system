@@ -7,8 +7,8 @@ const AlertsPage = async () => {
       <div className="home-content max-w-3xl">
         <HeaderBox
           type="title"
-          title="Spending Alerts"
-          subtext="Get email notifications when your spending reaches set thresholds."
+          title="Alerts"
+          subtext="Set up custom alerts for spending thresholds, low balances, and more."
         />
         <AlertsManager />
       </div>

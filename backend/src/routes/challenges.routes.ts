@@ -54,8 +54,9 @@ router.get('/suggestions', async (req: Request, res: Response) => {
       res.status(400).json({ error: 'bankRecordId is required' });
       return;
     }
-    const suggestions = await getAiSuggestions(userId, bankRecordId);
-    res.json({ suggestions });
+    const useAi = req.query.ai === 'true';
+    const result = await getAiSuggestions(userId, bankRecordId, useAi);
+    res.json({ suggestions: result.suggestions, source: result.source });
   } catch {
     res.status(500).json({ error: 'Failed to fetch AI suggestions' });
   }

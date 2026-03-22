@@ -6,7 +6,8 @@ const HealthScorePage = async ({ searchParams: { id } }: SearchParamProps) => {
   const accounts = await serverApiRequest<any>('/api/accounts');
   if (!accounts) return null;
 
-  const bankRecordId = (id as string) || accounts?.data[0]?.bankRecordId;
+  const accountsData = accounts?.data;
+  const bankRecordId = (id as string) || accountsData[0]?.bankRecordId;
 
   return (
     <section className="home">
@@ -14,7 +15,7 @@ const HealthScorePage = async ({ searchParams: { id } }: SearchParamProps) => {
         <HeaderBox
           type="title"
           title="Financial Health Score"
-          subtext="AI-powered assessment of your financial health — updated hourly."
+          subtext="See how healthy your finances are based on spending, savings, and debt ratios."
         />
         {bankRecordId && <HealthScoreCard bankRecordId={bankRecordId} />}
       </div>
