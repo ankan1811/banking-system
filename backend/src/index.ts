@@ -25,6 +25,7 @@ import reportsRoutes from './routes/reports.routes.js';
 import splitsRoutes from './routes/splits.routes.js';
 import netWorthRoutes from './routes/net-worth.routes.js';
 import challengesRoutes from './routes/challenges.routes.js';
+import statementUploadRoutes from './routes/statement-upload.routes.js';
 import { requireAuth } from './middleware/auth.js';
 import { accountsRateLimit, aiRateLimit, exportRateLimit, analyticsRateLimit } from './middleware/rateLimit.js';
 
@@ -60,6 +61,7 @@ app.use('/api/reports', requireAuth, analyticsRateLimit, reportsRoutes);
 app.use('/api/splits', requireAuth, splitsRoutes);
 app.use('/api/net-worth', requireAuth, accountsRateLimit, netWorthRoutes);
 app.use('/api/challenges', requireAuth, analyticsRateLimit, challengesRoutes);
+app.use('/api/statements', requireAuth, statementUploadRoutes);
 
 // Health check
 app.get('/health', (_req, res) => {

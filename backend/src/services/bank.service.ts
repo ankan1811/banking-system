@@ -80,13 +80,16 @@ export async function syncBankFromPlaid(bank: { id: string; accessToken: string;
 
 // ─── Background sync trigger (non-blocking) ─────────────────
 
-async function triggerSyncIfNeeded(bank: { id: string; accessToken: string; accountId: string }) {
+async function triggerSyncIfNeeded(bank: { id: string; accessToken: string | null; accountId: string; source?: string }) {
+  // Manual banks have no Plaid access token — nothing to sync
+  if (!bank.accessToken || bank.source === 'manual') return;
+
   const syncKey = `plaid-sync:${bank.id}`;
   const exists = await redisGet(syncKey);
   if (exists) return; // still fresh
 
   // Fire in background, don't block the response
-  syncBankFromPlaid(bank).catch((err) =>
+  syncBankFromPlaid(bank as { id: string; accessToken: string; accountId: string }).catch((err) =>
     console.error(`Background Plaid sync failed for bank ${bank.id}:`, err)
   );
 }

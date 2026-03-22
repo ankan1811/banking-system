@@ -27,15 +27,15 @@ type RawTransaction = {
 
 function mapCategory(name: string, plaidCategory: string): AICategory {
   const text = `${name} ${plaidCategory}`.toLowerCase();
-  if (/food|restaurant|dining|coffee|cafe|starbucks|mcdonald|burger|pizza|grocery|bakery|bar|pub/.test(text)) return 'Food & Dining';
-  if (/airline|flight|uber|lyft|taxi|transit|train|bus|travel|hotel|airbnb|parking/.test(text))               return 'Transport';
-  if (/shopping|amazon|retail|mall|store|merchandise|clothing|fashion|electronics|sparkfun/.test(text))        return 'Shopping';
-  if (/entertainment|netflix|spotify|movie|cinema|game|sport|concert|recreation/.test(text))                   return 'Entertainment';
-  if (/utility|utilities|electric|gas|water|internet|phone|insurance|bill|subscription/.test(text))            return 'Bills & Utilities';
-  if (/health|medical|pharmacy|doctor|hospital|dental|gym|fitness/.test(text))                                 return 'Health';
-  if (/education|school|university|tuition|course|book|learning/.test(text))                                   return 'Education';
-  if (/income|payroll|salary|direct deposit|dividend|interest income/.test(text))                              return 'Income';
-  if (/transfer|payment|zelle|venmo|paypal|wire/.test(text))                                                   return 'Transfers';
+  if (/food|restaurant|dining|coffee|cafe|starbucks|mcdonald|burger|pizza|grocery|bakery|bar|pub|swiggy|zomato|dominos|dunzo|blinkit|bigbasket|dmart|zepto|instamart|eatsure|faasos/.test(text)) return 'Food & Dining';
+  if (/airline|flight|uber|lyft|taxi|transit|train|bus|travel|hotel|airbnb|parking|ola|rapido|irctc|metro|fastag|redbus|makemytrip|goibibo/.test(text))               return 'Transport';
+  if (/shopping|amazon|retail|mall|store|merchandise|clothing|fashion|electronics|sparkfun|flipkart|myntra|ajio|meesho|nykaa|tata.*cliq|reliance|croma|snapdeal/.test(text))        return 'Shopping';
+  if (/entertainment|netflix|spotify|movie|cinema|game|sport|concert|recreation|hotstar|jiocinema|prime.*video|bookmyshow|inox|pvr|zee5|sonyliv/.test(text))                   return 'Entertainment';
+  if (/utility|utilities|electric|gas|water|internet|phone|insurance|bill|subscription|jio|airtel|vodafone|\bvi\b|bsnl|bescom|broadband|dth|tata.*power|gas.*bill|lic|bajaj.*allianz/.test(text))            return 'Bills & Utilities';
+  if (/health|medical|pharmacy|doctor|hospital|dental|gym|fitness|apollo|medplus|pharmeasy|netmeds|practo|1mg/.test(text))                                 return 'Health';
+  if (/education|school|university|tuition|course|book|learning|byju|unacademy|upgrad|coursera|udemy/.test(text))                                   return 'Education';
+  if (/income|payroll|salary|direct deposit|dividend|interest income|credited|int\.cr|interest.*credited/.test(text))                              return 'Income';
+  if (/transfer|payment|zelle|venmo|paypal|wire|upi|neft|rtgs|imps|nach|ecs|mandate|fund.*transfer/.test(text))                                                   return 'Transfers';
   return 'Other';
 }
 
