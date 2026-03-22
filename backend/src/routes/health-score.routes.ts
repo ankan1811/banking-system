@@ -5,17 +5,16 @@ import { getHealthScore } from '../services/health-score.service.js';
 const router = Router();
 
 const querySchema = z.object({
-  bankRecordId: z.string().min(1),
   month: z.string().regex(/^\d{4}-\d{2}$/),
 });
 
-// GET /api/health-score?bankRecordId=x&month=YYYY-MM
+// GET /api/health-score?month=YYYY-MM
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const { bankRecordId, month } = querySchema.parse(req.query);
+    const { month } = querySchema.parse(req.query);
     const userId = (req as any).userId as string;
     const useAi = req.query.ai === 'true';
-    const score = await getHealthScore(userId, bankRecordId, month, useAi);
+    const score = await getHealthScore(userId, month, useAi);
     res.json({ score });
   } catch (error) {
     if (error instanceof z.ZodError) {

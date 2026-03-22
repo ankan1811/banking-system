@@ -12,9 +12,7 @@ import type { IncomeExpenseData } from '@shared/types';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip, Legend);
 
-interface Props { bankRecordId: string; }
-
-export default function IncomeExpenseChart({ bankRecordId }: Props) {
+export default function IncomeExpenseChart() {
   const [data, setData] = useState<IncomeExpenseData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -22,11 +20,11 @@ export default function IncomeExpenseChart({ bankRecordId }: Props) {
 
   useEffect(() => {
     setLoading(true);
-    getIncomeVsExpense(bankRecordId, months)
+    getIncomeVsExpense(months)
       .then((res) => setData(res.data))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [bankRecordId, months]);
+  }, [months]);
 
   if (loading) {
     return (

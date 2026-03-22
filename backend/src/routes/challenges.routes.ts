@@ -33,12 +33,7 @@ router.get('/', async (req: Request, res: Response) => {
 router.get('/overview', async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId as string;
-    const bankRecordId = req.query.bankRecordId as string;
-    if (!bankRecordId) {
-      res.status(400).json({ error: 'bankRecordId is required' });
-      return;
-    }
-    const overview = await getChallengesOverview(userId, bankRecordId);
+    const overview = await getChallengesOverview(userId);
     res.json({ overview });
   } catch {
     res.status(500).json({ error: 'Failed to fetch challenges overview' });
@@ -49,13 +44,8 @@ router.get('/overview', async (req: Request, res: Response) => {
 router.get('/suggestions', async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId as string;
-    const bankRecordId = req.query.bankRecordId as string;
-    if (!bankRecordId) {
-      res.status(400).json({ error: 'bankRecordId is required' });
-      return;
-    }
     const useAi = req.query.ai === 'true';
-    const result = await getAiSuggestions(userId, bankRecordId, useAi);
+    const result = await getAiSuggestions(userId, useAi);
     res.json({ suggestions: result.suggestions, source: result.source });
   } catch {
     res.status(500).json({ error: 'Failed to fetch AI suggestions' });

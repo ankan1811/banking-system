@@ -35,3 +35,32 @@ export const getTransactionsByBankId = async (bankId: string) => {
 
   return transactions;
 };
+
+export const getTransferAdjustments = async (bankIds: string[]): Promise<Map<string, number>> => {
+  const adjustments = new Map<string, number>();
+  if (bankIds.length === 0) return adjustments;
+
+  const [sentGroups, receivedGroups] = await Promise.all([
+    prisma.transaction.groupBy({
+      by: ['senderBankId'],
+      where: { senderBankId: { in: bankIds } },
+      _sum: { amount: true },
+    }),
+    prisma.transaction.groupBy({
+      by: ['receiverBankId'],
+      where: { receiverBankId: { in: bankIds } },
+      _sum: { amount: true },
+    }),
+  ]);
+
+  for (const g of sentGroups) {
+    const amt = g._sum.amount ? parseFloat(g._sum.amount.toString()) : 0;
+    adjustments.set(g.senderBankId, (adjustments.get(g.senderBankId) || 0) - amt);
+  }
+  for (const g of receivedGroups) {
+    const amt = g._sum.amount ? parseFloat(g._sum.amount.toString()) : 0;
+    adjustments.set(g.receiverBankId, (adjustments.get(g.receiverBankId) || 0) + amt);
+  }
+
+  return adjustments;
+};

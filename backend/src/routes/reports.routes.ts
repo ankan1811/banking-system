@@ -5,17 +5,16 @@ import { getMonthlyDigest, generateDigestPDF } from '../services/digest.service.
 const router = Router();
 
 const querySchema = z.object({
-  bankRecordId: z.string().min(1),
   month: z.string().regex(/^\d{4}-\d{2}$/),
 });
 
-// GET /api/reports/digest?bankRecordId=x&month=YYYY-MM
+// GET /api/reports/digest?month=YYYY-MM
 router.get('/digest', async (req: Request, res: Response) => {
   try {
-    const { bankRecordId, month } = querySchema.parse(req.query);
+    const { month } = querySchema.parse(req.query);
     const userId = (req as any).userId as string;
     const useAi = req.query.ai === 'true';
-    const digest = await getMonthlyDigest(userId, bankRecordId, month, useAi);
+    const digest = await getMonthlyDigest(userId, month, useAi);
     res.json({ digest });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -27,12 +26,12 @@ router.get('/digest', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/reports/digest/pdf?bankRecordId=x&month=YYYY-MM
+// GET /api/reports/digest/pdf?month=YYYY-MM
 router.get('/digest/pdf', async (req: Request, res: Response) => {
   try {
-    const { bankRecordId, month } = querySchema.parse(req.query);
+    const { month } = querySchema.parse(req.query);
     const userId = (req as any).userId as string;
-    const digest = await getMonthlyDigest(userId, bankRecordId, month);
+    const digest = await getMonthlyDigest(userId, month);
     const pdf = await generateDigestPDF(digest);
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="digest-${month}.pdf"`);

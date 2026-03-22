@@ -275,7 +275,6 @@ export const MonthlyDigestScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   month: 'month',
-  bankRecordId: 'bankRecordId',
   sections: 'sections',
   narrative: 'narrative',
   narrativeSource: 'narrativeSource',
@@ -406,7 +405,6 @@ export type NetWorthSnapshotScalarFieldEnum = (typeof NetWorthSnapshotScalarFiel
 export const ChallengeSuggestionCacheScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  bankRecordId: 'bankRecordId',
   month: 'month',
   suggestions: 'suggestions',
   generatedAt: 'generatedAt'

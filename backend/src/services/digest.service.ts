@@ -17,7 +17,6 @@ function extractJSON(text: string): string {
 
 export async function getMonthlyDigest(
   userId: string,
-  bankRecordId: string,
   month: string,
   useAi: boolean = false
 ): Promise<MonthlyDigest> {
@@ -42,7 +41,6 @@ export async function getMonthlyDigest(
         id: dbDigest.id,
         userId: dbDigest.userId,
         month: dbDigest.month,
-        bankRecordId: dbDigest.bankRecordId,
         sections: dbDigest.sections as any,
         narrative: dbDigest.narrative,
         narrativeSource: (dbDigest.narrativeSource === 'ai' ? 'ai' : 'formula') as 'ai' | 'formula',
@@ -55,7 +53,7 @@ export async function getMonthlyDigest(
   }
 
   // Layer 3: Aggregate data + narrative generation
-  const sections = await aggregateSections(userId, bankRecordId, month);
+  const sections = await aggregateSections(userId, month);
   let narrative: string;
   let narrativeSource: 'ai' | 'formula';
 
@@ -82,15 +80,14 @@ export async function getMonthlyDigest(
   // Persist to DB
   const dbResult = await prisma.monthlyDigest.upsert({
     where: { userId_month: { userId, month } },
-    update: { sections: sections as any, narrative, bankRecordId, narrativeSource },
-    create: { userId, month, bankRecordId, sections: sections as any, narrative, narrativeSource },
+    update: { sections: sections as any, narrative, narrativeSource },
+    create: { userId, month, sections: sections as any, narrative, narrativeSource },
   });
 
   const result: MonthlyDigest = {
     id: dbResult.id,
     userId: dbResult.userId,
     month: dbResult.month,
-    bankRecordId: dbResult.bankRecordId,
     sections,
     narrative,
     narrativeSource,
@@ -105,16 +102,15 @@ export async function getMonthlyDigest(
 
 async function aggregateSections(
   userId: string,
-  bankRecordId: string,
   month: string
 ): Promise<DigestSection> {
   const [budgetStatuses, goalsData, healthScore, merchants, incomeExpense] =
     await Promise.all([
-      getBudgetStatus(userId, bankRecordId, month).catch(() => []),
+      getBudgetStatus(userId, month).catch(() => []),
       getGoals(userId).catch(() => []),
-      getHealthScore(userId, bankRecordId, month),
-      getMerchantInsights(bankRecordId, 1).catch(() => []),
-      getIncomeVsExpense(bankRecordId, 1),
+      getHealthScore(userId, month),
+      getMerchantInsights(userId, 1).catch(() => []),
+      getIncomeVsExpense(userId, 1),
     ]);
 
   const goals = Array.isArray(goalsData) ? goalsData : [];

@@ -5,9 +5,7 @@ import { getMerchantInsights } from '@/lib/api/analytics.api';
 import { aiCategoryColors } from '@/constants';
 import type { MerchantInsight } from '@shared/types';
 
-interface Props { bankRecordId: string; }
-
-export default function MerchantInsightsCard({ bankRecordId }: Props) {
+export default function MerchantInsightsCard() {
   const [merchants, setMerchants] = useState<MerchantInsight[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -16,11 +14,11 @@ export default function MerchantInsightsCard({ bankRecordId }: Props) {
 
   useEffect(() => {
     setLoading(true);
-    getMerchantInsights(bankRecordId, months)
+    getMerchantInsights(months)
       .then((res) => setMerchants(res.merchants))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [bankRecordId, months]);
+  }, [months]);
 
   if (loading) {
     return (

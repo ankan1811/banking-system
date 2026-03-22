@@ -260,7 +260,6 @@ export type MonthlyDigest = {
   id: string;
   userId: string;
   month: string;
-  bankRecordId: string;
   sections: DigestSection;
   narrative: string;
   generatedAt: string;

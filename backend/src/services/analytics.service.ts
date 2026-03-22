@@ -1,4 +1,4 @@
-import { getAccount } from './bank.service.js';
+import { getAllUserTransactions } from './bank.service.js';
 import { redisGet, redisSet } from '../lib/redis.js';
 import type { AICategory, TrendsData, RecurringPattern, IncomeExpenseData, MerchantInsight } from '@shared/types';
 import { AI_CATEGORIES } from '@shared/types';
@@ -7,12 +7,12 @@ const ANALYTICS_TTL_S = 100 * 60 * 60; // 100 hours in seconds
 
 // ─── Spending Trends ─────────────────────────────────────────
 
-export async function getSpendingTrends(bankRecordId: string, months: number): Promise<TrendsData> {
-  const cacheKey = `trends:${bankRecordId}:${months}`;
+export async function getSpendingTrends(userId: string, months: number): Promise<TrendsData> {
+  const cacheKey = `trends:${userId}:${months}`;
   const raw = await redisGet(cacheKey);
   if (raw) return JSON.parse(raw) as TrendsData;
 
-  const { transactions } = await getAccount(bankRecordId);
+  const transactions = await getAllUserTransactions(userId);
 
   // Generate last N months labels
   const monthLabels: string[] = [];
@@ -72,12 +72,12 @@ function addDays(dateStr: string, days: number): string {
   return d.toISOString().slice(0, 10);
 }
 
-export async function detectRecurring(bankRecordId: string): Promise<RecurringPattern[]> {
-  const cacheKey = `recurring:${bankRecordId}`;
+export async function detectRecurring(userId: string): Promise<RecurringPattern[]> {
+  const cacheKey = `recurring:${userId}`;
   const raw = await redisGet(cacheKey);
   if (raw) return JSON.parse(raw) as RecurringPattern[];
 
-  const { transactions } = await getAccount(bankRecordId);
+  const transactions = await getAllUserTransactions(userId);
 
   // Group debits by normalized merchant name
   const groups = new Map<string, { name: string; amounts: number[]; dates: string[]; category: string }>();
@@ -164,12 +164,12 @@ function generateMonthLabels(months: number): string[] {
   return labels;
 }
 
-export async function getIncomeVsExpense(bankRecordId: string, months: number): Promise<IncomeExpenseData> {
-  const cacheKey = `income-expense:${bankRecordId}:${months}`;
+export async function getIncomeVsExpense(userId: string, months: number): Promise<IncomeExpenseData> {
+  const cacheKey = `income-expense:${userId}:${months}`;
   const raw = await redisGet(cacheKey);
   if (raw) return JSON.parse(raw) as IncomeExpenseData;
 
-  const { transactions } = await getAccount(bankRecordId);
+  const transactions = await getAllUserTransactions(userId);
   const monthLabels = generateMonthLabels(months);
 
   const income: number[] = new Array(months).fill(0);
@@ -218,12 +218,12 @@ export async function getIncomeVsExpense(bankRecordId: string, months: number): 
 
 // ─── Merchant Insights ───────────────────────────────────────
 
-export async function getMerchantInsights(bankRecordId: string, months: number): Promise<MerchantInsight[]> {
-  const cacheKey = `merchants:${bankRecordId}:${months}`;
+export async function getMerchantInsights(userId: string, months: number): Promise<MerchantInsight[]> {
+  const cacheKey = `merchants:${userId}:${months}`;
   const raw = await redisGet(cacheKey);
   if (raw) return JSON.parse(raw) as MerchantInsight[];
 
-  const { transactions } = await getAccount(bankRecordId);
+  const transactions = await getAllUserTransactions(userId);
   const monthLabels = generateMonthLabels(months);
   const currentMonth = monthLabels[monthLabels.length - 1];
   const prevMonth = monthLabels.length >= 2 ? monthLabels[monthLabels.length - 2] : null;

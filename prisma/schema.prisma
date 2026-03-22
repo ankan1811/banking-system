@@ -228,7 +228,6 @@ model MonthlyDigest {
   id              String   @id @default(uuid())
   userId          String
   month           String
-  bankRecordId    String
   sections        Json
   narrative       String
   narrativeSource String   @default("formula")

@@ -5,21 +5,17 @@ import { getRecurring } from '@/lib/api/analytics.api';
 import { aiCategoryColors } from '@/constants';
 import type { RecurringPattern } from '@shared/types';
 
-interface Props {
-  bankRecordId: string;
-}
-
-export default function RecurringTransactionsCard({ bankRecordId }: Props) {
+export default function RecurringTransactionsCard() {
   const [patterns, setPatterns] = useState<RecurringPattern[]>([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
-    getRecurring(bankRecordId)
+    getRecurring()
       .then((res) => setPatterns(res.recurring))
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [bankRecordId]);
+  }, []);
 
   if (loading || patterns.length === 0) return null;
 

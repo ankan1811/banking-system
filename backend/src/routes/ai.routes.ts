@@ -1,12 +1,12 @@
 import { Router, type Request, type Response } from 'express';
 import { z } from 'zod';
 import { generateSpendingInsights, generateFinancialPlan } from '../services/gemini.service.js';
-import { getAccount } from '../services/bank.service.js';
+import { getAllUserTransactions } from '../services/bank.service.js';
+import { categorizeTransactions } from '../services/gemini.service.js';
 
 const router = Router();
 
 const insightsSchema = z.object({
-  bankRecordId: z.string().min(1),
   currentMonth: z.string().regex(/^\d{4}-\d{2}$/),
   useAi: z.boolean().optional().default(false),
 });
@@ -14,10 +14,11 @@ const insightsSchema = z.object({
 // POST /api/ai/insights
 router.post('/insights', async (req: Request, res: Response) => {
   try {
-    const { bankRecordId, currentMonth, useAi } = insightsSchema.parse(req.body);
+    const { currentMonth, useAi } = insightsSchema.parse(req.body);
     const userId = (req as any).userId as string;
 
-    const { transactions } = await getAccount(bankRecordId);
+    const rawTransactions = await getAllUserTransactions(userId);
+    const transactions = categorizeTransactions(rawTransactions);
     const insights = await generateSpendingInsights(transactions, currentMonth, userId, useAi);
 
     res.json({ insights });
@@ -34,15 +35,14 @@ router.post('/insights', async (req: Request, res: Response) => {
 // POST /api/ai/financial-plan
 const financialPlanSchema = z.object({
   description: z.string().min(1).max(1000),
-  bankRecordId: z.string().min(1),
 });
 
 router.post('/financial-plan', async (req: Request, res: Response) => {
   try {
-    const { description, bankRecordId } = financialPlanSchema.parse(req.body);
+    const { description } = financialPlanSchema.parse(req.body);
     const userId = (req as any).userId as string;
 
-    const plan = await generateFinancialPlan(description, bankRecordId, userId);
+    const plan = await generateFinancialPlan(description, userId);
     res.json({ plan });
   } catch (error) {
     if (error instanceof z.ZodError) {

@@ -13,11 +13,7 @@ import type { TrendsData } from '@shared/types';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip, Legend);
 
-interface Props {
-  bankRecordId: string;
-}
-
-export default function SpendingTrendsChart({ bankRecordId }: Props) {
+export default function SpendingTrendsChart() {
   const [trends, setTrends] = useState<TrendsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -26,11 +22,11 @@ export default function SpendingTrendsChart({ bankRecordId }: Props) {
 
   useEffect(() => {
     setLoading(true);
-    getSpendingTrends(bankRecordId, months)
+    getSpendingTrends(months)
       .then((res) => setTrends(res.trends))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [bankRecordId, months]);
+  }, [months]);
 
   if (loading) {
     return (

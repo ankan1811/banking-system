@@ -6,11 +6,7 @@ import { aiCategoryColors } from '@/constants';
 import type { MonthlyDigest } from '@shared/types';
 import { Sparkles } from 'lucide-react';
 
-interface Props {
-  bankRecordId: string;
-}
-
-export default function MonthlyDigestView({ bankRecordId }: Props) {
+export default function MonthlyDigestView() {
   const [digest, setDigest] = useState<MonthlyDigest | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -21,7 +17,7 @@ export default function MonthlyDigestView({ bankRecordId }: Props) {
   const load = (m: string) => {
     setLoading(true);
     setError('');
-    getMonthlyDigest(bankRecordId, m, false)
+    getMonthlyDigest(m, false)
       .then((res) => {
         setDigest(res.digest);
         if (res.digest?.narrativeSource) setSource(res.digest.narrativeSource);
@@ -30,12 +26,12 @@ export default function MonthlyDigestView({ bankRecordId }: Props) {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { load(month); }, [bankRecordId, month]);
+  useEffect(() => { load(month); }, [month]);
 
   const handleGenerateAi = async () => {
     setAiGenerating(true);
     try {
-      const res = await getMonthlyDigest(bankRecordId, month, true);
+      const res = await getMonthlyDigest(month, true);
       setDigest(res.digest);
       if (res.digest?.narrativeSource) setSource(res.digest.narrativeSource);
     } catch (err: any) {
@@ -91,7 +87,7 @@ export default function MonthlyDigestView({ bankRecordId }: Props) {
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => window.open(buildDigestPdfUrl(bankRecordId, month), '_blank')}
+            onClick={() => window.open(buildDigestPdfUrl(month), '_blank')}
             className="px-2.5 py-1 text-xs text-violet-300 border border-violet-500/30 hover:bg-violet-600/20 rounded-lg transition-colors"
           >
             PDF

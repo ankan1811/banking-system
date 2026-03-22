@@ -12,7 +12,6 @@ const upsertSchema = z.object({
 });
 
 const statusQuerySchema = z.object({
-  bankRecordId: z.string().min(1),
   month: z.string().regex(/^\d{4}-\d{2}$/),
 });
 
@@ -32,12 +31,12 @@ router.get('/', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/budgets/status?bankRecordId=x&month=YYYY-MM
+// GET /api/budgets/status?month=YYYY-MM
 router.get('/status', async (req: Request, res: Response) => {
   try {
-    const { bankRecordId, month } = statusQuerySchema.parse(req.query);
+    const { month } = statusQuerySchema.parse(req.query);
     const userId = (req as any).userId as string;
-    const statuses = await getBudgetStatus(userId, bankRecordId, month);
+    const statuses = await getBudgetStatus(userId, month);
     res.json({ statuses });
   } catch (error) {
     if (error instanceof z.ZodError) {

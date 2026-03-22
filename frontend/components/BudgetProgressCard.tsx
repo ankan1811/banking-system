@@ -6,11 +6,7 @@ import { aiCategoryColors } from '@/constants';
 import { AI_CATEGORIES } from '@shared/types';
 import type { BudgetStatus, AICategory } from '@shared/types';
 
-interface Props {
-  bankRecordId: string;
-}
-
-export default function BudgetProgressCard({ bankRecordId }: Props) {
+export default function BudgetProgressCard() {
   const [statuses, setStatuses] = useState<BudgetStatus[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -24,13 +20,13 @@ export default function BudgetProgressCard({ bankRecordId }: Props) {
 
   const load = () => {
     setLoading(true);
-    getBudgetStatus(bankRecordId, currentMonth)
+    getBudgetStatus(currentMonth)
       .then((res) => setStatuses(res.statuses))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { load(); }, [bankRecordId]);
+  useEffect(() => { load(); }, []);
 
   const handleSaveEdit = async (category: string, budgetId: string | null) => {
     const limit = parseFloat(editValue);

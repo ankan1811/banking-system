@@ -1,14 +1,7 @@
 import HeaderBox from '@/components/HeaderBox';
 import SpendingTrendsChart from '@/components/SpendingTrendsChart';
-import { serverApiRequest } from '@/lib/api/server-client';
 
-const TrendsPage = async ({ searchParams: { id } }: SearchParamProps) => {
-  const accounts = await serverApiRequest<any>('/api/accounts');
-  if (!accounts) return null;
-
-  const accountsData = accounts?.data;
-  const bankRecordId = (id as string) || accountsData[0]?.bankRecordId;
-
+const TrendsPage = () => {
   return (
     <section className="home">
       <div className="home-content max-w-3xl">
@@ -17,7 +10,7 @@ const TrendsPage = async ({ searchParams: { id } }: SearchParamProps) => {
           title="Spending Trends"
           subtext="Visualize how your spending changes over time across categories."
         />
-        {bankRecordId && <SpendingTrendsChart bankRecordId={bankRecordId} />}
+        <SpendingTrendsChart />
       </div>
     </section>
   );

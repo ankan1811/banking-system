@@ -1,6 +1,6 @@
 import { createHash } from 'crypto';
 import { geminiModel } from '../lib/gemini.js';
-import { getAccounts, getAccount } from './bank.service.js';
+import { getAccounts, getAccount, getAllUserTransactions } from './bank.service.js';
 import { getGoals } from './goals.service.js';
 import { redisGet, redisSet, redisDel } from '../lib/redis.js';
 import type { AICategory, SpendingInsight, ChatMessage, FinancialPlan, PlanMilestone } from '@shared/types';
@@ -221,7 +221,6 @@ const FIN_PLAN_TTL_S = 24 * 60 * 60; // 24 hours
 
 export async function generateFinancialPlan(
   description: string,
-  bankRecordId: string,
   userId: string
 ): Promise<FinancialPlan> {
   const descHash = createHash('md5').update(description.toLowerCase().trim()).digest('hex');
@@ -230,7 +229,7 @@ export async function generateFinancialPlan(
   if (raw) return JSON.parse(raw) as FinancialPlan;
 
   // ── Gather financial context ──────────────────────────────
-  const { transactions } = await getAccount(bankRecordId);
+  const transactions = await getAllUserTransactions(userId);
   const { totalCurrentBalance } = await getAccounts(userId);
   const existingGoals = await getGoals(userId);
   const activeGoals = existingGoals.filter((g: any) => g.status === 'active');

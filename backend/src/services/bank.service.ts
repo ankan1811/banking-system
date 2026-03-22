@@ -2,7 +2,7 @@ import { createHash } from 'crypto';
 import { CountryCode } from 'plaid';
 import { plaidClient } from '../lib/plaid.js';
 import { getBanks as getBanksFromDb, getBank as getBankFromDb } from './user.service.js';
-import { getTransactionsByBankId } from './transaction.service.js';
+import { getTransactionsByBankId, getTransferAdjustments } from './transaction.service.js';
 import { categorizeTransactions } from './gemini.service.js';
 import { evaluateAlerts } from './alerts.service.js';
 import { prisma } from '../lib/db.js';
@@ -94,24 +94,63 @@ async function triggerSyncIfNeeded(bank: { id: string; accessToken: string | nul
   );
 }
 
+// ─── getAllUserTransactions (aggregate across all banks) ──────
+
+export async function getAllUserTransactions(userId: string) {
+  const banks = await prisma.bank.findMany({
+    where: { userId },
+    select: { id: true, accountId: true },
+  });
+  const bankIds = banks.map((b) => b.id);
+  if (bankIds.length === 0) return [];
+
+  const dbRows = await prisma.plaidTransaction.findMany({
+    where: { bankId: { in: bankIds } },
+    orderBy: { date: 'desc' },
+  });
+
+  return dbRows.map((t) => ({
+    id: t.id,
+    name: t.name,
+    merchantName: t.merchantName,
+    paymentChannel: t.paymentChannel,
+    type: t.type,
+    accountId: t.accountId,
+    amount: parseFloat(t.amount.toString()),
+    pending: t.pending,
+    category: t.category,
+    aiCategory: t.category,
+    date: t.date,
+    createdAt: t.syncedAt?.toISOString() || t.date,
+    image: t.image,
+  }));
+}
+
 // ─── getAccounts (DB-only reads) ─────────────────────────────
 
 export const getAccounts = async (userId: string) => {
   const banks = await getBanksFromDb(userId);
 
-  const accounts = banks.map((bank) => ({
-    id: bank.accountId,
-    availableBalance: bank.availableBalance ? parseFloat(bank.availableBalance.toString()) : 0,
-    currentBalance: bank.currentBalance ? parseFloat(bank.currentBalance.toString()) : 0,
-    institutionId: bank.institutionId || '',
-    name: bank.accountName || bank.accountId,
-    officialName: bank.officialName,
-    mask: bank.mask || '',
-    type: bank.accountType || 'depository',
-    subtype: bank.accountSubtype || 'checking',
-    bankRecordId: bank.id,
-    shareableId: bank.shareableId,
-  }));
+  // Compute net transfer adjustments for all banks in one batch
+  const bankIds = banks.map((b) => b.id);
+  const adjustments = await getTransferAdjustments(bankIds);
+
+  const accounts = banks.map((bank) => {
+    const adj = adjustments.get(bank.id) || 0;
+    return {
+      id: bank.accountId,
+      availableBalance: (bank.availableBalance ? parseFloat(bank.availableBalance.toString()) : 0) + adj,
+      currentBalance: (bank.currentBalance ? parseFloat(bank.currentBalance.toString()) : 0) + adj,
+      institutionId: bank.institutionId || '',
+      name: bank.accountName || bank.accountId,
+      officialName: bank.officialName,
+      mask: bank.mask || '',
+      type: bank.accountType || 'depository',
+      subtype: bank.accountSubtype || 'checking',
+      bankRecordId: bank.id,
+      shareableId: bank.shareableId,
+    };
+  });
 
   const totalBanks = accounts.length;
   const totalCurrentBalance = accounts.reduce((sum, a) => sum + a.currentBalance, 0);
@@ -144,8 +183,18 @@ export const getAccount = async (bankRecordId: string, userId?: string) => {
     bankRecordId: bank.id,
   };
 
-  // Get Razorpay transfers
+  // Get in-app transfers and compute balance adjustment
   const transferTransactionsData = await getTransactionsByBankId(bank.id);
+
+  let transferAdjustment = 0;
+  for (const t of transferTransactionsData.documents) {
+    const amt = typeof t.amount === 'object' ? parseFloat(t.amount.toString()) : Number(t.amount);
+    if (t.senderBankId === bank.id) transferAdjustment -= amt;
+    else transferAdjustment += amt;
+  }
+  account.availableBalance += transferAdjustment;
+  account.currentBalance += transferAdjustment;
+
   const transferTransactions = transferTransactionsData.documents.map(
     (transferData: any) => ({
       id: transferData.id,

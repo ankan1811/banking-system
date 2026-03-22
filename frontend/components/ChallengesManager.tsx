@@ -8,7 +8,7 @@ import ChallengeProgressCard from './ChallengeProgressCard';
 import BadgeIcon from './BadgeIcon';
 import { Sparkles } from 'lucide-react';
 
-export default function ChallengesManager({ bankRecordId }: { bankRecordId: string }) {
+export default function ChallengesManager() {
   const [overview, setOverview] = useState<ChallengesOverview | null>(null);
   const [suggestions, setSuggestions] = useState<AiChallengeSuggestion[]>([]);
   const [loading, setLoading] = useState(true);
@@ -28,7 +28,7 @@ export default function ChallengesManager({ bankRecordId }: { bankRecordId: stri
 
   const load = () => {
     setLoading(true);
-    getChallengesOverview(bankRecordId)
+    getChallengesOverview()
       .then((res) => setOverview(res.overview))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
@@ -36,7 +36,7 @@ export default function ChallengesManager({ bankRecordId }: { bankRecordId: stri
 
   const loadSuggestions = () => {
     setSuggestionsLoading(true);
-    getAiSuggestions(bankRecordId, false)
+    getAiSuggestions(false)
       .then((res) => {
         setSuggestions(res.suggestions);
         if (res.source) setSuggestionsSource(res.source);
@@ -48,7 +48,7 @@ export default function ChallengesManager({ bankRecordId }: { bankRecordId: stri
   const handleGenerateAi = async () => {
     setAiGenerating(true);
     try {
-      const res = await getAiSuggestions(bankRecordId, true);
+      const res = await getAiSuggestions(true);
       setSuggestions(res.suggestions);
       if (res.source) setSuggestionsSource(res.source);
     } catch (err) {
@@ -58,7 +58,7 @@ export default function ChallengesManager({ bankRecordId }: { bankRecordId: stri
     }
   };
 
-  useEffect(() => { load(); loadSuggestions(); }, [bankRecordId]);
+  useEffect(() => { load(); loadSuggestions(); }, []);
 
   const handleCreate = async () => {
     if (!form.title || !form.description) return;

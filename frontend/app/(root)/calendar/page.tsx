@@ -1,14 +1,7 @@
 import HeaderBox from '@/components/HeaderBox';
 import BillCalendar from '@/components/BillCalendar';
-import { serverApiRequest } from '@/lib/api/server-client';
 
-const CalendarPage = async ({ searchParams: { id } }: SearchParamProps) => {
-  const accounts = await serverApiRequest<any>('/api/accounts');
-  if (!accounts) return null;
-
-  const accountsData = accounts?.data;
-  const bankRecordId = (id as string) || accountsData[0]?.bankRecordId;
-
+const CalendarPage = () => {
   return (
     <section className="home">
       <div className="home-content max-w-3xl">
@@ -17,7 +10,7 @@ const CalendarPage = async ({ searchParams: { id } }: SearchParamProps) => {
           title="Bill Calendar"
           subtext="Track upcoming bills and recurring payments on a monthly calendar."
         />
-        {bankRecordId && <BillCalendar bankRecordId={bankRecordId} />}
+        <BillCalendar />
       </div>
     </section>
   );

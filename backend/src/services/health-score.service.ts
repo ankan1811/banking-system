@@ -1,6 +1,6 @@
 import { prisma } from '../lib/db.js';
 import { geminiModel } from '../lib/gemini.js';
-import { getAccount } from './bank.service.js';
+import { getAllUserTransactions } from './bank.service.js';
 import { getBudgetStatus } from './budget.service.js';
 import { redisGet, redisSet, redisDel } from '../lib/redis.js';
 import type { HealthScore } from '@shared/types';
@@ -14,7 +14,6 @@ function extractJSON(text: string): string {
 
 export async function getHealthScore(
   userId: string,
-  bankRecordId: string,
   month: string,
   useAi: boolean = false
 ): Promise<HealthScore> {
@@ -49,7 +48,7 @@ export async function getHealthScore(
   }
 
   // Layer 3: Compute score (AI or formula)
-  const metrics = await computeMetrics(userId, bankRecordId, month);
+  const metrics = await computeMetrics(userId, month);
 
   let result: HealthScore;
   if (useAi) {
@@ -105,14 +104,12 @@ interface Metrics {
   goalCount: number;
 }
 
-async function computeMetrics(userId: string, bankRecordId: string, month: string): Promise<Metrics> {
-  const [accountData, budgetStatuses, goals] = await Promise.all([
-    getAccount(bankRecordId),
-    getBudgetStatus(userId, bankRecordId, month).catch(() => []),
+async function computeMetrics(userId: string, month: string): Promise<Metrics> {
+  const [transactions, budgetStatuses, goals] = await Promise.all([
+    getAllUserTransactions(userId),
+    getBudgetStatus(userId, month).catch(() => []),
     prisma.savingsGoal.findMany({ where: { userId, status: 'active' } }),
   ]);
-
-  const { transactions } = accountData;
   const monthTxns = transactions.filter((t: any) => (t.date || '').startsWith(month));
 
   let totalIncome = 0;

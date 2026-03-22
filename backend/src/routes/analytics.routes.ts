@@ -4,12 +4,12 @@ import { getSpendingTrends, detectRecurring, getIncomeVsExpense, getMerchantInsi
 
 const router = Router();
 
-// GET /api/analytics/trends?bankRecordId=x&months=6
+// GET /api/analytics/trends?months=6
 router.get('/trends', async (req: Request, res: Response) => {
   try {
-    const bankRecordId = z.string().min(1).parse(req.query.bankRecordId);
+    const userId = (req as any).userId as string;
     const months = z.coerce.number().int().min(2).max(12).default(6).parse(req.query.months);
-    const trends = await getSpendingTrends(bankRecordId, months);
+    const trends = await getSpendingTrends(userId, months);
     res.json({ trends });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -21,28 +21,24 @@ router.get('/trends', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/analytics/recurring?bankRecordId=x
+// GET /api/analytics/recurring
 router.get('/recurring', async (req: Request, res: Response) => {
   try {
-    const bankRecordId = z.string().min(1).parse(req.query.bankRecordId);
-    const recurring = await detectRecurring(bankRecordId);
+    const userId = (req as any).userId as string;
+    const recurring = await detectRecurring(userId);
     res.json({ recurring });
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      res.status(400).json({ error: 'Invalid input', details: error.errors });
-      return;
-    }
     console.error('Recurring detection error:', error);
     res.status(500).json({ error: 'Failed to detect recurring transactions' });
   }
 });
 
-// GET /api/analytics/income-expense?bankRecordId=x&months=6
+// GET /api/analytics/income-expense?months=6
 router.get('/income-expense', async (req: Request, res: Response) => {
   try {
-    const bankRecordId = z.string().min(1).parse(req.query.bankRecordId);
+    const userId = (req as any).userId as string;
     const months = z.coerce.number().int().min(2).max(12).default(6).parse(req.query.months);
-    const data = await getIncomeVsExpense(bankRecordId, months);
+    const data = await getIncomeVsExpense(userId, months);
     res.json({ data });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -54,12 +50,12 @@ router.get('/income-expense', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/analytics/merchants?bankRecordId=x&months=6
+// GET /api/analytics/merchants?months=6
 router.get('/merchants', async (req: Request, res: Response) => {
   try {
-    const bankRecordId = z.string().min(1).parse(req.query.bankRecordId);
+    const userId = (req as any).userId as string;
     const months = z.coerce.number().int().min(2).max(12).default(6).parse(req.query.months);
-    const merchants = await getMerchantInsights(bankRecordId, months);
+    const merchants = await getMerchantInsights(userId, months);
     res.json({ merchants });
   } catch (error) {
     if (error instanceof z.ZodError) {

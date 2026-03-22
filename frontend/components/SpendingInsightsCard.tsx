@@ -14,7 +14,7 @@ interface SpendingInsight {
   generatedAt: string;
 }
 
-const SpendingInsightsCard = ({ bankRecordId }: { bankRecordId: string }) => {
+const SpendingInsightsCard = () => {
   const [insights, setInsights] = useState<SpendingInsight | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -23,20 +23,20 @@ const SpendingInsightsCard = ({ bankRecordId }: { bankRecordId: string }) => {
 
   useEffect(() => {
     const currentMonth = new Date().toISOString().slice(0, 7);
-    getInsights(bankRecordId, currentMonth, false)
+    getInsights(currentMonth, false)
       .then((res) => {
         setInsights(res.insights);
         if (res.insights?.source) setSource(res.insights.source);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [bankRecordId]);
+  }, []);
 
   const handleGenerateAi = async () => {
     setAiGenerating(true);
     try {
       const currentMonth = new Date().toISOString().slice(0, 7);
-      const res = await getInsights(bankRecordId, currentMonth, true);
+      const res = await getInsights(currentMonth, true);
       setInsights(res.insights);
       if (res.insights?.source) setSource(res.insights.source);
     } catch (err: any) {

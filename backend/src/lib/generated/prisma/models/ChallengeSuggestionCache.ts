@@ -27,7 +27,6 @@ export type AggregateChallengeSuggestionCache = {
 export type ChallengeSuggestionCacheMinAggregateOutputType = {
   id: string | null
   userId: string | null
-  bankRecordId: string | null
   month: string | null
   generatedAt: Date | null
 }
@@ -35,7 +34,6 @@ export type ChallengeSuggestionCacheMinAggregateOutputType = {
 export type ChallengeSuggestionCacheMaxAggregateOutputType = {
   id: string | null
   userId: string | null
-  bankRecordId: string | null
   month: string | null
   generatedAt: Date | null
 }
@@ -43,7 +41,6 @@ export type ChallengeSuggestionCacheMaxAggregateOutputType = {
 export type ChallengeSuggestionCacheCountAggregateOutputType = {
   id: number
   userId: number
-  bankRecordId: number
   month: number
   suggestions: number
   generatedAt: number
@@ -54,7 +51,6 @@ export type ChallengeSuggestionCacheCountAggregateOutputType = {
 export type ChallengeSuggestionCacheMinAggregateInputType = {
   id?: true
   userId?: true
-  bankRecordId?: true
   month?: true
   generatedAt?: true
 }
@@ -62,7 +58,6 @@ export type ChallengeSuggestionCacheMinAggregateInputType = {
 export type ChallengeSuggestionCacheMaxAggregateInputType = {
   id?: true
   userId?: true
-  bankRecordId?: true
   month?: true
   generatedAt?: true
 }
@@ -70,7 +65,6 @@ export type ChallengeSuggestionCacheMaxAggregateInputType = {
 export type ChallengeSuggestionCacheCountAggregateInputType = {
   id?: true
   userId?: true
-  bankRecordId?: true
   month?: true
   suggestions?: true
   generatedAt?: true
@@ -152,7 +146,6 @@ export type ChallengeSuggestionCacheGroupByArgs<ExtArgs extends runtime.Types.Ex
 export type ChallengeSuggestionCacheGroupByOutputType = {
   id: string
   userId: string
-  bankRecordId: string
   month: string
   suggestions: runtime.JsonValue
   generatedAt: Date
@@ -182,7 +175,6 @@ export type ChallengeSuggestionCacheWhereInput = {
   NOT?: Prisma.ChallengeSuggestionCacheWhereInput | Prisma.ChallengeSuggestionCacheWhereInput[]
   id?: Prisma.StringFilter<"ChallengeSuggestionCache"> | string
   userId?: Prisma.StringFilter<"ChallengeSuggestionCache"> | string
-  bankRecordId?: Prisma.StringFilter<"ChallengeSuggestionCache"> | string
   month?: Prisma.StringFilter<"ChallengeSuggestionCache"> | string
   suggestions?: Prisma.JsonFilter<"ChallengeSuggestionCache">
   generatedAt?: Prisma.DateTimeFilter<"ChallengeSuggestionCache"> | Date | string
@@ -191,7 +183,6 @@ export type ChallengeSuggestionCacheWhereInput = {
 export type ChallengeSuggestionCacheOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  bankRecordId?: Prisma.SortOrder
   month?: Prisma.SortOrder
   suggestions?: Prisma.SortOrder
   generatedAt?: Prisma.SortOrder
@@ -199,21 +190,19 @@ export type ChallengeSuggestionCacheOrderByWithRelationInput = {
 
 export type ChallengeSuggestionCacheWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  userId_bankRecordId_month?: Prisma.ChallengeSuggestionCacheUserIdBankRecordIdMonthCompoundUniqueInput
+  userId_month?: Prisma.ChallengeSuggestionCacheUserIdMonthCompoundUniqueInput
   AND?: Prisma.ChallengeSuggestionCacheWhereInput | Prisma.ChallengeSuggestionCacheWhereInput[]
   OR?: Prisma.ChallengeSuggestionCacheWhereInput[]
   NOT?: Prisma.ChallengeSuggestionCacheWhereInput | Prisma.ChallengeSuggestionCacheWhereInput[]
   userId?: Prisma.StringFilter<"ChallengeSuggestionCache"> | string
-  bankRecordId?: Prisma.StringFilter<"ChallengeSuggestionCache"> | string
   month?: Prisma.StringFilter<"ChallengeSuggestionCache"> | string
   suggestions?: Prisma.JsonFilter<"ChallengeSuggestionCache">
   generatedAt?: Prisma.DateTimeFilter<"ChallengeSuggestionCache"> | Date | string
-}, "id" | "userId_bankRecordId_month">
+}, "id" | "userId_month">
 
 export type ChallengeSuggestionCacheOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  bankRecordId?: Prisma.SortOrder
   month?: Prisma.SortOrder
   suggestions?: Prisma.SortOrder
   generatedAt?: Prisma.SortOrder
@@ -228,7 +217,6 @@ export type ChallengeSuggestionCacheScalarWhereWithAggregatesInput = {
   NOT?: Prisma.ChallengeSuggestionCacheScalarWhereWithAggregatesInput | Prisma.ChallengeSuggestionCacheScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"ChallengeSuggestionCache"> | string
   userId?: Prisma.StringWithAggregatesFilter<"ChallengeSuggestionCache"> | string
-  bankRecordId?: Prisma.StringWithAggregatesFilter<"ChallengeSuggestionCache"> | string
   month?: Prisma.StringWithAggregatesFilter<"ChallengeSuggestionCache"> | string
   suggestions?: Prisma.JsonWithAggregatesFilter<"ChallengeSuggestionCache">
   generatedAt?: Prisma.DateTimeWithAggregatesFilter<"ChallengeSuggestionCache"> | Date | string
@@ -237,7 +225,6 @@ export type ChallengeSuggestionCacheScalarWhereWithAggregatesInput = {
 export type ChallengeSuggestionCacheCreateInput = {
   id?: string
   userId: string
-  bankRecordId: string
   month: string
   suggestions: Prisma.JsonNullValueInput | runtime.InputJsonValue
   generatedAt?: Date | string
@@ -246,7 +233,6 @@ export type ChallengeSuggestionCacheCreateInput = {
 export type ChallengeSuggestionCacheUncheckedCreateInput = {
   id?: string
   userId: string
-  bankRecordId: string
   month: string
   suggestions: Prisma.JsonNullValueInput | runtime.InputJsonValue
   generatedAt?: Date | string
@@ -255,7 +241,6 @@ export type ChallengeSuggestionCacheUncheckedCreateInput = {
 export type ChallengeSuggestionCacheUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  bankRecordId?: Prisma.StringFieldUpdateOperationsInput | string
   month?: Prisma.StringFieldUpdateOperationsInput | string
   suggestions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   generatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -264,7 +249,6 @@ export type ChallengeSuggestionCacheUpdateInput = {
 export type ChallengeSuggestionCacheUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  bankRecordId?: Prisma.StringFieldUpdateOperationsInput | string
   month?: Prisma.StringFieldUpdateOperationsInput | string
   suggestions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   generatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -273,7 +257,6 @@ export type ChallengeSuggestionCacheUncheckedUpdateInput = {
 export type ChallengeSuggestionCacheCreateManyInput = {
   id?: string
   userId: string
-  bankRecordId: string
   month: string
   suggestions: Prisma.JsonNullValueInput | runtime.InputJsonValue
   generatedAt?: Date | string
@@ -282,7 +265,6 @@ export type ChallengeSuggestionCacheCreateManyInput = {
 export type ChallengeSuggestionCacheUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  bankRecordId?: Prisma.StringFieldUpdateOperationsInput | string
   month?: Prisma.StringFieldUpdateOperationsInput | string
   suggestions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   generatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -291,22 +273,19 @@ export type ChallengeSuggestionCacheUpdateManyMutationInput = {
 export type ChallengeSuggestionCacheUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  bankRecordId?: Prisma.StringFieldUpdateOperationsInput | string
   month?: Prisma.StringFieldUpdateOperationsInput | string
   suggestions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   generatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type ChallengeSuggestionCacheUserIdBankRecordIdMonthCompoundUniqueInput = {
+export type ChallengeSuggestionCacheUserIdMonthCompoundUniqueInput = {
   userId: string
-  bankRecordId: string
   month: string
 }
 
 export type ChallengeSuggestionCacheCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  bankRecordId?: Prisma.SortOrder
   month?: Prisma.SortOrder
   suggestions?: Prisma.SortOrder
   generatedAt?: Prisma.SortOrder
@@ -315,7 +294,6 @@ export type ChallengeSuggestionCacheCountOrderByAggregateInput = {
 export type ChallengeSuggestionCacheMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  bankRecordId?: Prisma.SortOrder
   month?: Prisma.SortOrder
   generatedAt?: Prisma.SortOrder
 }
@@ -323,7 +301,6 @@ export type ChallengeSuggestionCacheMaxOrderByAggregateInput = {
 export type ChallengeSuggestionCacheMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  bankRecordId?: Prisma.SortOrder
   month?: Prisma.SortOrder
   generatedAt?: Prisma.SortOrder
 }
@@ -333,7 +310,6 @@ export type ChallengeSuggestionCacheMinOrderByAggregateInput = {
 export type ChallengeSuggestionCacheSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
-  bankRecordId?: boolean
   month?: boolean
   suggestions?: boolean
   generatedAt?: boolean
@@ -342,7 +318,6 @@ export type ChallengeSuggestionCacheSelect<ExtArgs extends runtime.Types.Extensi
 export type ChallengeSuggestionCacheSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
-  bankRecordId?: boolean
   month?: boolean
   suggestions?: boolean
   generatedAt?: boolean
@@ -351,7 +326,6 @@ export type ChallengeSuggestionCacheSelectCreateManyAndReturn<ExtArgs extends ru
 export type ChallengeSuggestionCacheSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
-  bankRecordId?: boolean
   month?: boolean
   suggestions?: boolean
   generatedAt?: boolean
@@ -360,13 +334,12 @@ export type ChallengeSuggestionCacheSelectUpdateManyAndReturn<ExtArgs extends ru
 export type ChallengeSuggestionCacheSelectScalar = {
   id?: boolean
   userId?: boolean
-  bankRecordId?: boolean
   month?: boolean
   suggestions?: boolean
   generatedAt?: boolean
 }
 
-export type ChallengeSuggestionCacheOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "bankRecordId" | "month" | "suggestions" | "generatedAt", ExtArgs["result"]["challengeSuggestionCache"]>
+export type ChallengeSuggestionCacheOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "month" | "suggestions" | "generatedAt", ExtArgs["result"]["challengeSuggestionCache"]>
 
 export type $ChallengeSuggestionCachePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ChallengeSuggestionCache"
@@ -374,7 +347,6 @@ export type $ChallengeSuggestionCachePayload<ExtArgs extends runtime.Types.Exten
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     userId: string
-    bankRecordId: string
     month: string
     suggestions: runtime.JsonValue
     generatedAt: Date
@@ -803,7 +775,6 @@ export interface Prisma__ChallengeSuggestionCacheClient<T, Null = never, ExtArgs
 export interface ChallengeSuggestionCacheFieldRefs {
   readonly id: Prisma.FieldRef<"ChallengeSuggestionCache", 'String'>
   readonly userId: Prisma.FieldRef<"ChallengeSuggestionCache", 'String'>
-  readonly bankRecordId: Prisma.FieldRef<"ChallengeSuggestionCache", 'String'>
   readonly month: Prisma.FieldRef<"ChallengeSuggestionCache", 'String'>
   readonly suggestions: Prisma.FieldRef<"ChallengeSuggestionCache", 'Json'>
   readonly generatedAt: Prisma.FieldRef<"ChallengeSuggestionCache", 'DateTime'>

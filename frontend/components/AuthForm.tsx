@@ -29,7 +29,7 @@ import CustomInput from './CustomInput';
 import { authFormSchema, otpSchema } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
 import { requestSignInOTP, verifySignInOTP, requestSignUpOTP, verifySignUpOTP, googleSignIn, updateProfile } from '@/lib/api/auth.api';
-import PlaidLink from './PlaidLink';
+import StatementUpload from './StatementUpload';
 import { countries, getStatesForCountry } from '@/lib/countryStateData';
 import { completeProfileSchema } from '@/lib/utils';
 import DatePicker from './DatePicker';
@@ -177,6 +177,26 @@ const AuthForm = ({ type }: { type: string }) => {
     }
   };
 
+  const [dummyLoading, setDummyLoading] = useState(false);
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8787';
+
+  const handleUseDummy = async () => {
+    setDummyLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/statements/upload-dummy`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to load dummy statement');
+      window.location.href = '/';
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load dummy statement');
+      setDummyLoading(false);
+    }
+  };
+
   const renderGoogleButton = useCallback(() => {
     if (typeof window === 'undefined' || !(window as any).google) return;
     if (!googleBtnRef.current) return;
@@ -281,7 +301,25 @@ const AuthForm = ({ type }: { type: string }) => {
 
       {user ? (
         <div className="flex flex-col gap-4">
-          <PlaidLink user={user} variant="primary" />
+          <StatementUpload />
+          <div className="flex items-center justify-center gap-4 mt-1">
+            <button
+              type="button"
+              onClick={handleUseDummy}
+              disabled={dummyLoading}
+              className="text-xs text-slate-500 hover:text-slate-300 transition-colors disabled:opacity-50"
+            >
+              {dummyLoading ? 'Loading...' : 'Use dummy SBI Bank statement'}
+            </button>
+            <span className="text-slate-600 text-xs">|</span>
+            <button
+              type="button"
+              onClick={() => { window.location.href = '/'; }}
+              className="text-xs text-slate-500 hover:text-slate-300 transition-colors"
+            >
+              Skip for now
+            </button>
+          </div>
         </div>
       ) : step === 'complete-profile' ? (
         <Form {...profileForm}>

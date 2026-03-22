@@ -23,7 +23,7 @@ const FEASIBILITY_STYLES: Record<string, { bg: string; text: string; label: stri
   very_challenging: { bg: 'bg-rose-500/20', text: 'text-rose-400', label: 'Very Challenging' },
 };
 
-export default function GoalsManager({ bankRecordId }: { bankRecordId?: string }) {
+export default function GoalsManager() {
   const [goals, setGoals] = useState<SavingsGoal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -69,12 +69,12 @@ export default function GoalsManager({ bankRecordId }: { bankRecordId?: string }
   };
 
   const handleGeneratePlan = async () => {
-    if (!planDescription.trim() || !bankRecordId) return;
+    if (!planDescription.trim()) return;
     setPlanLoading(true);
     setPlanError('');
     setPlan(null);
     try {
-      const res = await generatePlan(planDescription, bankRecordId);
+      const res = await generatePlan(planDescription);
       setPlan(res.plan);
     } catch (err: any) {
       setPlanError(err.message || 'Failed to generate plan');
@@ -134,8 +134,7 @@ export default function GoalsManager({ bankRecordId }: { bankRecordId?: string }
   return (
     <div className="space-y-4">
       {/* AI Financial Planner */}
-      {bankRecordId && (
-        <div className="glass-card p-5 border border-violet-500/20">
+      <div className="glass-card p-5 border border-violet-500/20">
           <button
             onClick={() => { setShowPlanGenerator(!showPlanGenerator); setPlan(null); setPlanError(''); setPlanDescription(''); }}
             className="flex items-center gap-2 w-full"
@@ -291,7 +290,6 @@ export default function GoalsManager({ bankRecordId }: { bankRecordId?: string }
             </div>
           )}
         </div>
-      )}
 
       {/* Active goals */}
       {active.length > 0 && (

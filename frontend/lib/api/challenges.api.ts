@@ -1,16 +1,16 @@
 import { apiRequest } from './client';
 import type { SpendingChallenge, ChallengesOverview, AiChallengeSuggestion } from '@shared/types';
 
-export async function getChallengesOverview(bankRecordId: string) {
+export async function getChallengesOverview() {
   return apiRequest<{ overview: ChallengesOverview }>(
-    `/api/challenges/overview?bankRecordId=${bankRecordId}`
+    `/api/challenges/overview`
   );
 }
 
-export async function getAiSuggestions(bankRecordId: string, useAi: boolean = false) {
-  const aiParam = useAi ? '&ai=true' : '';
+export async function getAiSuggestions(useAi: boolean = false) {
+  const aiParam = useAi ? '?ai=true' : '';
   return apiRequest<{ suggestions: AiChallengeSuggestion[]; source?: 'ai' | 'formula' }>(
-    `/api/challenges/suggestions?bankRecordId=${bankRecordId}${aiParam}`
+    `/api/challenges/suggestions${aiParam}`
   );
 }
 

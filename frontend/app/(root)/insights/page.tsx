@@ -5,11 +5,12 @@ import { serverApiRequest } from '@/lib/api/server-client';
 
 const Insights = async ({ searchParams: { id } }: SearchParamProps) => {
   const accounts = await serverApiRequest<any>('/api/accounts');
-  if (!accounts) return null;
-
-  const accountsData = accounts?.data;
+  const accountsData = accounts?.data ?? [];
   const bankRecordId = (id as string) || accountsData[0]?.bankRecordId;
-  const account = await serverApiRequest<any>('/api/accounts/' + bankRecordId);
+
+  const account = bankRecordId
+    ? await serverApiRequest<any>('/api/accounts/' + bankRecordId).catch(() => null)
+    : null;
 
   return (
     <section className="home">
@@ -27,11 +28,9 @@ const Insights = async ({ searchParams: { id } }: SearchParamProps) => {
             </div>
           )}
 
-          {bankRecordId && (
-            <div className="lg:col-span-1">
-              <SpendingInsightsCard bankRecordId={bankRecordId} />
-            </div>
-          )}
+          <div className="lg:col-span-1">
+            <SpendingInsightsCard />
+          </div>
         </div>
       </div>
     </section>

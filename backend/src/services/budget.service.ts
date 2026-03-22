@@ -1,5 +1,5 @@
 import { prisma } from '../lib/db.js';
-import { getAccount } from './bank.service.js';
+import { getAllUserTransactions } from './bank.service.js';
 import { redisGet, redisSet } from '../lib/redis.js';
 import type { AICategory } from '@shared/types';
 import { AI_CATEGORIES } from '@shared/types';
@@ -32,17 +32,15 @@ export async function deleteBudget(userId: string, budgetId: string) {
   return prisma.budget.delete({ where: { id: budgetId } });
 }
 
-export async function getBudgetStatus(userId: string, bankRecordId: string, month: string) {
-  const cacheKey = `budget-status:${userId}:${bankRecordId}:${month}`;
+export async function getBudgetStatus(userId: string, month: string) {
+  const cacheKey = `budget-status:${userId}:${month}`;
   const raw = await redisGet(cacheKey);
   if (raw) return JSON.parse(raw);
 
-  const [budgets, accountData] = await Promise.all([
+  const [budgets, transactions] = await Promise.all([
     prisma.budget.findMany({ where: { userId, month } }),
-    getAccount(bankRecordId),
+    getAllUserTransactions(userId),
   ]);
-
-  const { transactions } = accountData;
 
   // Aggregate spending per AI category for this month
   const spendingMap: Record<string, number> = {};

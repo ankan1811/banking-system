@@ -5,8 +5,6 @@ import { getHealthScore } from '@/lib/api/health-score.api';
 import type { HealthScore } from '@shared/types';
 import { Sparkles } from 'lucide-react';
 
-interface Props { bankRecordId: string; }
-
 const SCORE_COLORS = {
   low: { ring: '#ef4444', bg: 'text-rose-400', label: 'Needs Work' },
   mid: { ring: '#f59e0b', bg: 'text-amber-400', label: 'Good' },
@@ -26,7 +24,7 @@ const BREAKDOWN_LABELS: Record<string, string> = {
   goalProgress: 'Goal Progress',
 };
 
-export default function HealthScoreCard({ bankRecordId }: Props) {
+export default function HealthScoreCard() {
   const [data, setData] = useState<HealthScore | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -37,19 +35,19 @@ export default function HealthScoreCard({ bankRecordId }: Props) {
 
   useEffect(() => {
     setLoading(true);
-    getHealthScore(bankRecordId, currentMonth, false)
+    getHealthScore(currentMonth, false)
       .then((res) => {
         setData(res.score);
         if (res.score?.source) setSource(res.score.source);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [bankRecordId]);
+  }, []);
 
   const handleGenerateAi = async () => {
     setAiGenerating(true);
     try {
-      const res = await getHealthScore(bankRecordId, currentMonth, true);
+      const res = await getHealthScore(currentMonth, true);
       setData(res.score);
       if (res.score?.source) setSource(res.score.source);
     } catch (err: any) {

@@ -7,9 +7,9 @@ export async function getBudgets(month: string) {
   return apiRequest<{ budgets: Budget[] }>(`/api/budgets?month=${month}`);
 }
 
-export async function getBudgetStatus(bankRecordId: string, month: string) {
+export async function getBudgetStatus(month: string) {
   return apiRequest<{ statuses: BudgetStatus[] }>(
-    `/api/budgets/status?bankRecordId=${bankRecordId}&month=${month}`
+    `/api/budgets/status?month=${month}`
   );
 }
 

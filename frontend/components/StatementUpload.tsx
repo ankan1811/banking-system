@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation';
 import { Upload, Loader2, CheckCircle, FileText } from 'lucide-react';
 
 const BANKS = [
-  'SBI', 'HDFC', 'ICICI', 'Axis', 'Kotak', 'PNB', 'BOB',
-  'Canara', 'Union', 'IndusInd', 'Yes Bank', 'IDFC First',
-  'Federal', 'RBL', 'Other',
+  'SBI Bank', 'HDFC Bank', 'ICICI Bank', 'Axis Bank', 'Kotak Bank', 'PNB Bank', 'BOB Bank',
+  'Canara Bank', 'Union Bank', 'IndusInd Bank', 'Yes Bank', 'IDFC First Bank',
+  'Federal Bank', 'RBL Bank', 'Other Bank',
 ];
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8787';
@@ -19,6 +19,28 @@ export default function StatementUpload() {
   const [uploading, setUploading] = useState(false);
   const [result, setResult] = useState<{ bankRecordId: string; transactionCount: number } | null>(null);
   const [error, setError] = useState('');
+  const [dummyLoading, setDummyLoading] = useState(false);
+
+  const handleUseDummy = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDummyLoading(true);
+    setError('');
+    try {
+      const res = await fetch(`${API_BASE}/api/statements/upload-dummy`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to load dummy statement');
+      setResult(data);
+      setTimeout(() => router.push('/'), 2000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load dummy statement');
+    } finally {
+      setDummyLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,7 +82,13 @@ export default function StatementUpload() {
           value={bankName}
           onChange={(e) => setBankName(e.target.value)}
           required
-          className="w-full px-3 py-2.5 bg-slate-700/50 border border-slate-600/50 rounded-lg text-white text-sm focus:outline-none focus:border-violet-500/50"
+          defaultValue=""
+          className="w-full px-3 pr-10 py-2.5 bg-slate-700/50 border border-slate-600/50 rounded-lg text-white text-sm focus:outline-none focus:border-violet-500/50 appearance-none"
+          style={{
+            backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")",
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'right 12px center',
+          }}
         >
           <option value="" disabled>Choose bank...</option>
           {BANKS.map((b) => (
@@ -103,6 +131,16 @@ export default function StatementUpload() {
             className="hidden"
           />
         </label>
+        <p className="text-center text-xs text-slate-500 mt-2">
+          or{' '}
+          <span
+            role="button"
+            onClick={handleUseDummy}
+            className="text-violet-300 hover:text-violet-200 cursor-pointer underline underline-offset-2 font-medium"
+          >
+            {dummyLoading ? 'loading...' : 'use dummy SBI bank CSV'}
+          </span>
+        </p>
       </div>
 
       {/* Error */}

@@ -5,10 +5,6 @@ import { getRecurring } from '@/lib/api/analytics.api';
 import { aiCategoryColors } from '@/constants';
 import type { RecurringPattern } from '@shared/types';
 
-interface Props {
-  bankRecordId: string;
-}
-
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 function addMonths(date: Date, n: number): Date {
@@ -72,7 +68,7 @@ function projectBills(patterns: RecurringPattern[], month: Date): Map<string, Bi
   return map;
 }
 
-export default function BillCalendar({ bankRecordId }: Props) {
+export default function BillCalendar() {
   const [patterns, setPatterns] = useState<RecurringPattern[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentMonth, setCurrentMonth] = useState(() => {
@@ -82,11 +78,11 @@ export default function BillCalendar({ bankRecordId }: Props) {
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
   useEffect(() => {
-    getRecurring(bankRecordId)
+    getRecurring()
       .then((res) => setPatterns(res.recurring))
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [bankRecordId]);
+  }, []);
 
   const billMap = useMemo(() => projectBills(patterns, currentMonth), [patterns, currentMonth]);
 

@@ -1,6 +1,6 @@
 import { prisma } from '../lib/db.js';
 import { geminiModel } from '../lib/gemini.js';
-import { getAccount } from './bank.service.js';
+import { getAllUserTransactions } from './bank.service.js';
 import { redisGet, redisSet, redisDelByPattern, redisDel } from '../lib/redis.js';
 import { AI_CATEGORIES } from '@shared/types';
 import type { AiChallengeSuggestion, ChallengeProgress, ChallengeStreak, Badge } from '@shared/types';
@@ -8,10 +8,10 @@ import type { AiChallengeSuggestion, ChallengeProgress, ChallengeStreak, Badge }
 const SUGGESTIONS_TTL_S = 30 * 24 * 60 * 60; // 30 days in seconds
 const CHALLENGE_PROGRESS_TTL_S = 24 * 60 * 60;  // 24 hours in seconds
 
-export async function clearSuggestionsCache(bankRecordId: string) {
-  await redisDelByPattern(`challenges:*:${bankRecordId}:*`);
+export async function clearSuggestionsCache(userId: string) {
+  await redisDelByPattern(`challenges:${userId}:*`);
   // Also clear from DB
-  prisma.challengeSuggestionCache.deleteMany({ where: { bankRecordId } }).catch(() => {});
+  prisma.challengeSuggestionCache.deleteMany({ where: { userId } }).catch(() => {});
 }
 
 function extractJSON(text: string): string {
@@ -76,10 +76,9 @@ export async function abandonChallenge(userId: string, challengeId: string) {
 // ─── Progress Calculation ───────────────────────────────────
 
 export async function getChallengeProgress(
-  userId: string,
-  bankRecordId: string
+  userId: string
 ): Promise<ChallengeProgress[]> {
-  const cacheKey = `challenge-progress:${userId}:${bankRecordId}`;
+  const cacheKey = `challenge-progress:${userId}`;
   const raw = await redisGet(cacheKey);
   if (raw) return JSON.parse(raw) as ChallengeProgress[];
 
@@ -89,7 +88,7 @@ export async function getChallengeProgress(
 
   if (activeChallenges.length === 0) return [];
 
-  const { transactions } = await getAccount(bankRecordId);
+  const transactions = await getAllUserTransactions(userId);
   const now = new Date();
 
   const results: ChallengeProgress[] = [];
@@ -235,11 +234,10 @@ function serializeChallenge(c: any) {
 
 export async function getAiSuggestions(
   userId: string,
-  bankRecordId: string,
   useAi: boolean = false
 ): Promise<{ suggestions: AiChallengeSuggestion[]; source: 'ai' | 'formula' }> {
   const currentMonth = new Date().toISOString().slice(0, 7);
-  const cacheKey = `challenges:${userId}:${bankRecordId}:${currentMonth}`;
+  const cacheKey = `challenges:${userId}:${currentMonth}`;
 
   // Layer 1: Redis cache
   const redisCached = await redisGet(cacheKey);
@@ -248,8 +246,8 @@ export async function getAiSuggestions(
   }
 
   // Layer 2: DB cache (survives server restarts)
-  const dbCached = await prisma.challengeSuggestionCache.findUnique({
-    where: { userId_bankRecordId_month: { userId, bankRecordId, month: currentMonth } },
+  const dbCached = await prisma.challengeSuggestionCache.findFirst({
+    where: { userId, month: currentMonth },
   });
   if (dbCached) {
     const ageMs = Date.now() - dbCached.generatedAt.getTime();
@@ -271,11 +269,11 @@ export async function getAiSuggestions(
     // Clear caches before AI generation
     await redisDel(cacheKey);
     await prisma.challengeSuggestionCache.deleteMany({
-      where: { userId, bankRecordId, month: currentMonth },
+      where: { userId, month: currentMonth },
     });
 
     try {
-      const { transactions } = await getAccount(bankRecordId);
+      const transactions = await getAllUserTransactions(userId);
       const monthTxns = transactions.filter((t: any) => (t.date || '').startsWith(currentMonth) && t.amount > 0);
 
       const byCategory: Record<string, number> = {};
@@ -312,9 +310,9 @@ Respond ONLY with a valid JSON array:
 
       // Persist to DB + Redis
       await prisma.challengeSuggestionCache.upsert({
-        where: { userId_bankRecordId_month: { userId, bankRecordId, month: currentMonth } },
+        where: { userId_month: { userId, month: currentMonth } },
         update: { suggestions: cached as any, generatedAt: new Date() },
-        create: { userId, bankRecordId, month: currentMonth, suggestions: cached as any },
+        create: { userId, month: currentMonth, suggestions: cached as any },
       });
       await redisSet(cacheKey, JSON.stringify(cached), SUGGESTIONS_TTL_S);
       return cached;
@@ -331,9 +329,9 @@ Respond ONLY with a valid JSON array:
 
     // Persist to DB + Redis
     await prisma.challengeSuggestionCache.upsert({
-      where: { userId_bankRecordId_month: { userId, bankRecordId, month: currentMonth } },
+      where: { userId_month: { userId, month: currentMonth } },
       update: { suggestions: cached as any, generatedAt: new Date() },
-      create: { userId, bankRecordId, month: currentMonth, suggestions: cached as any },
+      create: { userId, month: currentMonth, suggestions: cached as any },
     });
     await redisSet(cacheKey, JSON.stringify(cached), SUGGESTIONS_TTL_S);
     return cached;
@@ -454,9 +452,9 @@ async function checkBadges(userId: string, savingsPercent?: number) {
 
 // ─── Overview (bundled endpoint) ────────────────────────────
 
-export async function getChallengesOverview(userId: string, bankRecordId: string) {
+export async function getChallengesOverview(userId: string) {
   const [progress, { streak, badges }, history] = await Promise.all([
-    getChallengeProgress(userId, bankRecordId),
+    getChallengeProgress(userId),
     getStreakAndBadges(userId),
     prisma.spendingChallenge.findMany({
       where: { userId, status: { in: ['completed', 'failed', 'abandoned'] } },
