@@ -17,6 +17,7 @@ export const sidebarLinks: SidebarLink[] = [
   { icon: Landmark, route: "/my-banks", label: "My Banks" },
   { icon: ArrowLeftRight, route: "/transaction-history", label: "Transaction History" },
   { icon: SendHorizonal, route: "/payment-transfer", label: "Transfer Funds" },
+  { icon: FileUp, route: "/upload-statement", label: "Upload Statement" },
   { icon: SplitSquareHorizontal, route: "/splits", label: "Split Expenses" },
   { icon: Sparkles, route: "/insights", label: "AI Insights" },
   { icon: Wallet, route: "/budgets", label: "Budgets" },
@@ -30,7 +31,6 @@ export const sidebarLinks: SidebarLink[] = [
   { icon: Store, route: "/merchants", label: "Merchants" },
   { icon: CalendarDays, route: "/calendar", label: "Bill Calendar" },
   { icon: FileBarChart, route: "/reports", label: "Reports" },
-  { icon: FileUp, route: "/upload-statement", label: "Upload Statement" },
   { icon: Settings, route: "/settings", label: "Settings" },
 ];
 

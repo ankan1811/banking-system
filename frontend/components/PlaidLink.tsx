@@ -55,8 +55,8 @@ const PlaidLink = ({ user, variant }: PlaidLinkProps) => {
   useEffect(() => {
     const getLinkToken = async () => {
       try {
-        const data = await createLinkToken();
-        setToken(data?.linkToken);
+        const data = await createLinkToken() as { linkToken?: string };
+        if (data?.linkToken) setToken(data.linkToken);
       } catch (err) {
         console.error('Failed to create Plaid link token:', err);
       }
@@ -79,7 +79,7 @@ const PlaidLink = ({ user, variant }: PlaidLinkProps) => {
     ) : null;
   }
 
-  return <PlaidLinkButton token={token} variant={variant} />;
+  return <PlaidLinkButton token={token!} variant={variant ?? 'primary'} />;
 };
 
 export default PlaidLink
