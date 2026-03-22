@@ -36,7 +36,7 @@ export default function MerchantInsightsCard({ bankRecordId }: Props) {
     );
   }
 
-  if (error) return <div className="glass-card p-6"><p className="text-sm text-slate-500">{error}</p></div>;
+  if (error) return <div className="glass-card p-6"><p className="text-sm text-red-400">{error}</p></div>;
 
   const filtered = search
     ? merchants.filter((m) => m.name.toLowerCase().includes(search.toLowerCase()))
@@ -56,7 +56,7 @@ export default function MerchantInsightsCard({ bankRecordId }: Props) {
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
           <h3 className="text-sm font-semibold text-white">Top Merchants</h3>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-400 mt-0.5">
             {merchants.length} merchants · ${totalSpent.toFixed(2)} total
           </p>
         </div>
@@ -66,7 +66,7 @@ export default function MerchantInsightsCard({ bankRecordId }: Props) {
               key={m}
               onClick={() => setMonths(m)}
               className={`px-2 py-0.5 rounded text-xs transition-colors ${
-                months === m ? 'bg-violet-600 text-white' : 'text-slate-500 hover:text-slate-300'
+                months === m ? 'bg-violet-600 text-white' : 'text-slate-400 hover:text-white'
               }`}
             >
               {m}mo
@@ -81,7 +81,7 @@ export default function MerchantInsightsCard({ bankRecordId }: Props) {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Search merchants..."
-        className="w-full px-3 py-1.5 bg-slate-700/30 border border-slate-600/30 rounded-lg text-white text-xs placeholder-slate-500 focus:outline-none focus:border-violet-500/50"
+        className="w-full px-3 py-2 bg-slate-800/50 border border-slate-600/40 rounded-lg text-white text-sm placeholder-slate-400 focus:outline-none focus:border-violet-500/60"
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -93,7 +93,7 @@ export default function MerchantInsightsCard({ bankRecordId }: Props) {
             return (
               <div key={i} className="flex items-center gap-3 py-2.5 border-b border-slate-700/30 last:border-0">
                 {/* Rank */}
-                <span className="text-xs text-slate-600 w-5 text-right shrink-0">{i + 1}</span>
+                <span className="text-xs text-slate-400 w-5 text-right shrink-0 font-mono">{i + 1}</span>
 
                 {/* Category dot */}
                 <span
@@ -104,7 +104,7 @@ export default function MerchantInsightsCard({ bankRecordId }: Props) {
                 {/* Name + category */}
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-white font-medium truncate">{m.name}</p>
-                  <p className="text-[10px] text-slate-500">
+                  <p className="text-[11px] text-slate-400">
                     {m.category} · {m.transactionCount} txns · avg ${m.avgAmount.toFixed(2)}
                   </p>
                 </div>
@@ -113,9 +113,9 @@ export default function MerchantInsightsCard({ bankRecordId }: Props) {
                 <div className="text-right shrink-0">
                   <p className="text-xs text-white font-medium">${m.totalSpent.toFixed(2)}</p>
                   <div className="flex items-center justify-end gap-1">
-                    <span className="text-[10px] text-slate-600">{pct.toFixed(1)}%</span>
+                    <span className="text-[11px] text-slate-400">{pct.toFixed(1)}%</span>
                     {m.trend !== 0 && (
-                      <span className={`text-[10px] ${m.trend > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
+                      <span className={`text-[11px] font-medium ${m.trend > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
                         {m.trend > 0 ? '↑' : '↓'}{Math.abs(m.trend).toFixed(0)}%
                       </span>
                     )}
@@ -125,7 +125,7 @@ export default function MerchantInsightsCard({ bankRecordId }: Props) {
             );
           })}
           {filtered.length === 0 && (
-            <p className="text-xs text-slate-500 text-center py-4">No merchants found</p>
+            <p className="text-xs text-slate-400 text-center py-4">No merchants found</p>
           )}
         </div>
 
@@ -133,7 +133,7 @@ export default function MerchantInsightsCard({ bankRecordId }: Props) {
         <div className="space-y-3">
           <div>
             <h3 className="text-sm font-semibold text-white">Spending by Category</h3>
-            <p className="text-xs text-slate-500 mt-0.5">{sortedCategories.length} categories · last {months}mo</p>
+            <p className="text-xs text-slate-400 mt-0.5">{sortedCategories.length} categories · last {months}mo</p>
           </div>
           <div className="space-y-2">
             {sortedCategories.map(([category, amount]) => {
@@ -148,11 +148,11 @@ export default function MerchantInsightsCard({ bankRecordId }: Props) {
                       <span className="text-xs text-slate-300">{category}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-slate-500">{pct.toFixed(1)}%</span>
+                      <span className="text-xs text-slate-400">{pct.toFixed(1)}%</span>
                       <span className="text-xs text-white font-medium">${amount.toFixed(2)}</span>
                     </div>
                   </div>
-                  <div className="h-1.5 rounded-full bg-slate-700/40 overflow-hidden">
+                  <div className="h-2 rounded-full bg-slate-700/50 overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all duration-500"
                       style={{ width: `${barWidth}%`, backgroundColor: color }}
@@ -162,7 +162,7 @@ export default function MerchantInsightsCard({ bankRecordId }: Props) {
               );
             })}
             {sortedCategories.length === 0 && (
-              <p className="text-xs text-slate-500 text-center py-4">No category data</p>
+              <p className="text-xs text-slate-400 text-center py-4">No category data</p>
             )}
           </div>
         </div>
