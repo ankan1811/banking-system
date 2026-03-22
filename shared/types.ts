@@ -430,3 +430,24 @@ export type NetWorthData = {
   history: NetWorthSnapshot[];
   aiInsight: string | null;
 };
+
+// ─── Financial Plan Generator ───────────────────────────────
+
+export type PlanMilestone = {
+  month: string;
+  targetSaved: number;
+  action: string;
+};
+
+export type FinancialPlan = {
+  goalName: string;
+  targetAmount: number;
+  targetDate: string;
+  monthlySavingsNeeded: number;
+  milestones: PlanMilestone[];
+  tips: string[];
+  feasibility: 'easy' | 'moderate' | 'challenging' | 'very_challenging';
+  suggestedEmoji: string;
+  suggestedColor: string;
+  generatedAt: string;
+};

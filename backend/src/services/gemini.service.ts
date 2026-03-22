@@ -1,7 +1,9 @@
+import { createHash } from 'crypto';
 import { geminiModel } from '../lib/gemini.js';
 import { getAccounts, getAccount } from './bank.service.js';
+import { getGoals } from './goals.service.js';
 import { redisGet, redisSet } from '../lib/redis.js';
-import type { AICategory, SpendingInsight, ChatMessage } from '@shared/types';
+import type { AICategory, SpendingInsight, ChatMessage, FinancialPlan, PlanMilestone } from '@shared/types';
 
 // ─── Helpers ────────────────────────────────────────────────
 
@@ -195,7 +197,174 @@ Total transactions this month: ${currentTxns.length}`;
   }
 }
 
-// ─── 3. AI Chatbot ──────────────────────────────────────────
+// ─── 3. Financial Plan Generator ─────────────────────────────
+
+const FIN_PLAN_TTL_S = 24 * 60 * 60; // 24 hours
+
+export async function generateFinancialPlan(
+  description: string,
+  bankRecordId: string,
+  userId: string
+): Promise<FinancialPlan> {
+  const descHash = createHash('md5').update(description.toLowerCase().trim()).digest('hex');
+  const cacheKey = `fin-plan:${userId}:${descHash}`;
+  const raw = await redisGet(cacheKey);
+  if (raw) return JSON.parse(raw) as FinancialPlan;
+
+  // ── Gather financial context ──────────────────────────────
+  const { transactions } = await getAccount(bankRecordId);
+  const { totalCurrentBalance } = await getAccounts(userId);
+  const existingGoals = await getGoals(userId);
+  const activeGoals = existingGoals.filter((g: any) => g.status === 'active');
+
+  const now = new Date();
+  const threeMonthsAgo = new Date(now);
+  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+  const threeMonthsAgoStr = threeMonthsAgo.toISOString().split('T')[0];
+
+  const recentTxns = (transactions || []).filter((t: any) => t.date >= threeMonthsAgoStr);
+  let totalIncome = 0;
+  let totalExpenses = 0;
+  for (const t of recentTxns) {
+    if (t.amount < 0) totalIncome += Math.abs(t.amount);
+    else totalExpenses += t.amount;
+  }
+  const avgMonthlyIncome = Math.round((totalIncome / 3) * 100) / 100;
+  const avgMonthlyExpenses = Math.round((totalExpenses / 3) * 100) / 100;
+  const avgMonthlySavings = avgMonthlyIncome - avgMonthlyExpenses;
+
+  const totalGoalCommitments = activeGoals.reduce((s: number, g: any) => {
+    const remaining = parseFloat(g.targetAmount.toString()) - parseFloat(g.savedAmount.toString());
+    return s + Math.max(remaining, 0);
+  }, 0);
+
+  // ── Gemini prompt ─────────────────────────────────────────
+  const prompt = `You are a financial planner. Based on the user's financial situation, create a detailed savings plan for their described goal.
+
+User's goal description: "${description}"
+Today's date: ${now.toISOString().split('T')[0]}
+
+Financial context:
+- Total balance across all accounts: $${totalCurrentBalance.toFixed(2)}
+- Average monthly income: $${avgMonthlyIncome}
+- Average monthly expenses: $${avgMonthlyExpenses}
+- Average monthly net savings: $${avgMonthlySavings.toFixed(2)}
+- Active savings goals: ${activeGoals.length} (total remaining: $${totalGoalCommitments.toFixed(2)})
+${activeGoals.map((g: any) => `  - ${g.name}: $${parseFloat(g.savedAmount.toString()).toFixed(2)} / $${parseFloat(g.targetAmount.toString()).toFixed(2)}`).join('\n')}
+
+Respond ONLY with valid JSON:
+{
+  "goalName": "short name for the goal",
+  "targetAmount": number,
+  "targetDate": "YYYY-MM-DD",
+  "monthlySavingsNeeded": number,
+  "milestones": [{ "month": "YYYY-MM", "targetSaved": number, "action": "what to do this month" }],
+  "tips": ["actionable tip 1", "actionable tip 2", "actionable tip 3"],
+  "feasibility": "easy|moderate|challenging|very_challenging",
+  "suggestedEmoji": "single emoji",
+  "suggestedColor": "hex color string"
+}
+
+Rules:
+- Infer the target amount and timeline from the description. If not specified, suggest reasonable defaults.
+- The targetDate should be realistic given their savings capacity.
+- Create 3-6 milestones spread evenly across the timeline.
+- Feasibility: easy (<25% of monthly surplus), moderate (25-50%), challenging (50-75%), very_challenging (>75%).
+- Account for existing goal commitments when assessing feasibility.
+- Tips should be specific and actionable.`;
+
+  try {
+    const result = await geminiModel.generateContent(prompt);
+    const text = result.response.text();
+    const parsed = JSON.parse(extractJSON(text));
+
+    const plan: FinancialPlan = {
+      goalName: parsed.goalName || description.slice(0, 40),
+      targetAmount: parsed.targetAmount || 1000,
+      targetDate: parsed.targetDate || '',
+      monthlySavingsNeeded: parsed.monthlySavingsNeeded || 0,
+      milestones: parsed.milestones || [],
+      tips: parsed.tips || [],
+      feasibility: parsed.feasibility || 'moderate',
+      suggestedEmoji: parsed.suggestedEmoji || '🎯',
+      suggestedColor: parsed.suggestedColor || '#8b5cf6',
+      generatedAt: new Date().toISOString(),
+    };
+
+    await redisSet(cacheKey, JSON.stringify(plan), FIN_PLAN_TTL_S);
+    return plan;
+  } catch (err) {
+    console.error('Gemini financial plan error:', err);
+
+    // ── Formula-based fallback ────────────────────────────────
+    const amountMatch = description.match(/\$?([\d,]+(?:\.\d+)?)/);
+    const targetAmount = amountMatch ? parseFloat(amountMatch[1].replace(/,/g, '')) : 1000;
+
+    let targetMonths = 12;
+    const monthsMatch = description.match(/(\d+)\s*months?/i);
+    const yearsMatch = description.match(/(\d+)\s*years?/i);
+    if (monthsMatch) targetMonths = parseInt(monthsMatch[1]);
+    else if (yearsMatch) targetMonths = parseInt(yearsMatch[1]) * 12;
+
+    const monthlySavingsNeeded = Math.round((targetAmount / targetMonths) * 100) / 100;
+
+    const targetDate = new Date(now);
+    targetDate.setMonth(targetDate.getMonth() + targetMonths);
+
+    // Generate milestones
+    const milestoneInterval = Math.max(1, Math.floor(targetMonths / 5));
+    const milestones: PlanMilestone[] = [];
+    for (let i = milestoneInterval; i <= targetMonths; i += milestoneInterval) {
+      const d = new Date(now);
+      d.setMonth(d.getMonth() + i);
+      milestones.push({
+        month: d.toISOString().slice(0, 7),
+        targetSaved: Math.round((targetAmount / targetMonths) * i * 100) / 100,
+        action: i >= targetMonths
+          ? 'Final milestone — goal complete!'
+          : `Save $${monthlySavingsNeeded}/month. You should have $${Math.round((targetAmount / targetMonths) * i)} saved by now.`,
+      });
+    }
+
+    // Feasibility
+    const savingsRatio = avgMonthlySavings > 0 ? monthlySavingsNeeded / avgMonthlySavings : 1;
+    const feasibility = savingsRatio < 0.25 ? 'easy' : savingsRatio < 0.5 ? 'moderate' : savingsRatio < 0.75 ? 'challenging' : 'very_challenging';
+
+    // Tips based on feasibility
+    const tips: string[] = [];
+    if (feasibility === 'easy') {
+      tips.push(`At $${monthlySavingsNeeded}/month, this is well within your savings capacity.`);
+      tips.push('Consider automating a monthly transfer to a dedicated savings account.');
+    } else if (feasibility === 'moderate') {
+      tips.push(`You'll need to save about ${Math.round(savingsRatio * 100)}% of your current monthly surplus.`);
+      tips.push('Look for discretionary spending (Shopping, Entertainment) to cut back on.');
+    } else {
+      tips.push(`This goal requires saving ${Math.round(savingsRatio * 100)}% of your current surplus — consider extending the timeline.`);
+      tips.push('Reducing your top spending category could free up the needed funds.');
+    }
+    tips.push(`Your current monthly net savings is $${avgMonthlySavings.toFixed(2)}.`);
+
+    const goalName = description.length > 40 ? description.slice(0, 40) + '...' : description;
+
+    const fallback: FinancialPlan = {
+      goalName,
+      targetAmount,
+      targetDate: targetDate.toISOString().split('T')[0],
+      monthlySavingsNeeded,
+      milestones,
+      tips,
+      feasibility,
+      suggestedEmoji: '🎯',
+      suggestedColor: '#8b5cf6',
+      generatedAt: new Date().toISOString(),
+    };
+
+    await redisSet(cacheKey, JSON.stringify(fallback), 5 * 60);
+    return fallback;
+  }
+}
+
+// ─── 4. AI Chatbot ──────────────────────────────────────────
 
 const CHAT_CONTEXT_TTL_S = 100 * 60 * 60; // 100 hours in seconds
 
