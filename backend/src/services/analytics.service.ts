@@ -1,24 +1,16 @@
 import { getAccount } from './bank.service.js';
+import { redisGet, redisSet } from '../lib/redis.js';
 import type { AICategory, TrendsData, RecurringPattern, IncomeExpenseData, MerchantInsight } from '@shared/types';
 import { AI_CATEGORIES } from '@shared/types';
 
-// ─── In-memory caches ────────────────────────────────────────
-type CacheEntry<T> = { data: T; expiresAt: number };
-const trendsCache = new Map<string, CacheEntry<TrendsData>>();
-const recurringCache = new Map<string, CacheEntry<RecurringPattern[]>>();
-const incomeExpenseCache = new Map<string, CacheEntry<IncomeExpenseData>>();
-const merchantCache = new Map<string, CacheEntry<MerchantInsight[]>>();
-const TRENDS_TTL = 24 * 60 * 60 * 1000;
-const RECURRING_TTL = 24 * 60 * 60 * 1000;
-const IE_TTL = 24 * 60 * 60 * 1000;
-const MERCHANT_TTL = 24 * 60 * 60 * 1000;
+const ANALYTICS_TTL_S = 24 * 60 * 60; // 24 hours in seconds
 
 // ─── Spending Trends ─────────────────────────────────────────
 
 export async function getSpendingTrends(bankRecordId: string, months: number): Promise<TrendsData> {
-  const cacheKey = `${bankRecordId}:${months}`;
-  const cached = trendsCache.get(cacheKey);
-  if (cached && cached.expiresAt > Date.now()) return cached.data;
+  const cacheKey = `trends:${bankRecordId}:${months}`;
+  const raw = await redisGet(cacheKey);
+  if (raw) return JSON.parse(raw) as TrendsData;
 
   const { transactions } = await getAccount(bankRecordId);
 
@@ -58,7 +50,7 @@ export async function getSpendingTrends(bankRecordId: string, months: number): P
     totals,
   };
 
-  trendsCache.set(cacheKey, { data: result, expiresAt: Date.now() + TRENDS_TTL });
+  await redisSet(cacheKey, JSON.stringify(result), ANALYTICS_TTL_S);
   return result;
 }
 
@@ -81,9 +73,9 @@ function addDays(dateStr: string, days: number): string {
 }
 
 export async function detectRecurring(bankRecordId: string): Promise<RecurringPattern[]> {
-  const cacheKey = bankRecordId;
-  const cached = recurringCache.get(cacheKey);
-  if (cached && cached.expiresAt > Date.now()) return cached.data;
+  const cacheKey = `recurring:${bankRecordId}`;
+  const raw = await redisGet(cacheKey);
+  if (raw) return JSON.parse(raw) as RecurringPattern[];
 
   const { transactions } = await getAccount(bankRecordId);
 
@@ -156,7 +148,7 @@ export async function detectRecurring(bankRecordId: string): Promise<RecurringPa
   // Sort by amount desc
   patterns.sort((a, b) => b.normalizedAmount - a.normalizedAmount);
 
-  recurringCache.set(cacheKey, { data: patterns, expiresAt: Date.now() + RECURRING_TTL });
+  await redisSet(cacheKey, JSON.stringify(patterns), ANALYTICS_TTL_S);
   return patterns;
 }
 
@@ -173,9 +165,9 @@ function generateMonthLabels(months: number): string[] {
 }
 
 export async function getIncomeVsExpense(bankRecordId: string, months: number): Promise<IncomeExpenseData> {
-  const cacheKey = `${bankRecordId}:${months}`;
-  const cached = incomeExpenseCache.get(cacheKey);
-  if (cached && cached.expiresAt > Date.now()) return cached.data;
+  const cacheKey = `income-expense:${bankRecordId}:${months}`;
+  const raw = await redisGet(cacheKey);
+  if (raw) return JSON.parse(raw) as IncomeExpenseData;
 
   const { transactions } = await getAccount(bankRecordId);
   const monthLabels = generateMonthLabels(months);
@@ -220,16 +212,16 @@ export async function getIncomeVsExpense(bankRecordId: string, months: number): 
     },
   };
 
-  incomeExpenseCache.set(cacheKey, { data: result, expiresAt: Date.now() + IE_TTL });
+  await redisSet(cacheKey, JSON.stringify(result), ANALYTICS_TTL_S);
   return result;
 }
 
 // ─── Merchant Insights ───────────────────────────────────────
 
 export async function getMerchantInsights(bankRecordId: string, months: number): Promise<MerchantInsight[]> {
-  const cacheKey = `${bankRecordId}:${months}`;
-  const cached = merchantCache.get(cacheKey);
-  if (cached && cached.expiresAt > Date.now()) return cached.data;
+  const cacheKey = `merchants:${bankRecordId}:${months}`;
+  const raw = await redisGet(cacheKey);
+  if (raw) return JSON.parse(raw) as MerchantInsight[];
 
   const { transactions } = await getAccount(bankRecordId);
   const monthLabels = generateMonthLabels(months);
@@ -311,6 +303,6 @@ export async function getMerchantInsights(bankRecordId: string, months: number):
   merchants.sort((a, b) => b.totalSpent - a.totalSpent);
   const top50 = merchants.slice(0, 50);
 
-  merchantCache.set(cacheKey, { data: top50, expiresAt: Date.now() + MERCHANT_TTL });
+  await redisSet(cacheKey, JSON.stringify(top50), ANALYTICS_TTL_S);
   return top50;
 }

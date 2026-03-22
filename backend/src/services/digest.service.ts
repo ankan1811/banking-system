@@ -4,12 +4,11 @@ import { getBudgetStatus } from './budget.service.js';
 import { getGoals } from './goals.service.js';
 import { getHealthScore } from './health-score.service.js';
 import { getMerchantInsights, getIncomeVsExpense } from './analytics.service.js';
+import { redisGet, redisSet } from '../lib/redis.js';
 import type { DigestSection, MonthlyDigest } from '@shared/types';
 import PDFDocument from 'pdfkit';
 
-// ─── Cache: 24-hour in-memory TTL ─────────────────────────────
-const digestCache = new Map<string, { data: MonthlyDigest; expiresAt: number }>();
-const DIGEST_TTL = 24 * 60 * 60 * 1000; // 24 hours
+const DIGEST_TTL_S = 24 * 60 * 60; // 24 hours in seconds
 
 function extractJSON(text: string): string {
   const match = text.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -21,13 +20,13 @@ export async function getMonthlyDigest(
   bankRecordId: string,
   month: string
 ): Promise<MonthlyDigest> {
-  const cacheKey = `${userId}:${month}`;
+  const cacheKey = `digest:${userId}:${month}`;
 
-  // Layer 1: In-memory cache
-  const cached = digestCache.get(cacheKey);
-  if (cached && cached.expiresAt > Date.now()) {
-    console.log(`[CACHE HIT] digest in-memory ${cacheKey}`);
-    return cached.data;
+  // Layer 1: Redis cache
+  const redisCached = await redisGet(cacheKey);
+  if (redisCached) {
+    console.log(`[CACHE HIT] digest Redis ${cacheKey}`);
+    return JSON.parse(redisCached) as MonthlyDigest;
   }
 
   // Layer 2: DB cache
@@ -36,7 +35,7 @@ export async function getMonthlyDigest(
   });
   if (dbDigest) {
     const ageMs = Date.now() - dbDigest.updatedAt.getTime();
-    if (ageMs < DIGEST_TTL) {
+    if (ageMs < DIGEST_TTL_S * 1000) {
       console.log(`[CACHE HIT] digest DB ${cacheKey}`);
       const result: MonthlyDigest = {
         id: dbDigest.id,
@@ -47,7 +46,8 @@ export async function getMonthlyDigest(
         narrative: dbDigest.narrative,
         generatedAt: dbDigest.generatedAt.toISOString(),
       };
-      digestCache.set(cacheKey, { data: result, expiresAt: Date.now() + DIGEST_TTL });
+      const remainingTtlS = Math.floor((DIGEST_TTL_S * 1000 - ageMs) / 1000);
+      await redisSet(cacheKey, JSON.stringify(result), remainingTtlS);
       return result;
     }
   }
@@ -80,7 +80,7 @@ export async function getMonthlyDigest(
     generatedAt: dbResult.generatedAt.toISOString(),
   };
 
-  digestCache.set(cacheKey, { data: result, expiresAt: Date.now() + DIGEST_TTL });
+  await redisSet(cacheKey, JSON.stringify(result), DIGEST_TTL_S);
   return result;
 }
 

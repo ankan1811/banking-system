@@ -1,22 +1,17 @@
 import { prisma } from '../lib/db.js';
+import { redisGet, redisSet, redisDel, redisDelByPrefix } from '../lib/redis.js';
 
-// ─── In-memory caches ────────────────────────────────────────
-const notesCache = new Map<string, { data: Map<string, any>; expiresAt: number }>();
-const NOTES_TTL = 24 * 60 * 60 * 1000;
-const userTagsCache = new Map<string, { data: string[]; expiresAt: number }>();
-const TAGS_TTL = 24 * 60 * 60 * 1000;
+const NOTES_TTL_S = 24 * 60 * 60; // 24 hours in seconds
 
-function invalidateNotesCache(userId: string) {
-  for (const [key] of notesCache) {
-    if (key.startsWith(userId)) notesCache.delete(key);
-  }
-  userTagsCache.delete(userId);
+async function invalidateNotesCache(userId: string) {
+  await redisDelByPrefix(`notes:${userId}:`);
+  await redisDel(`tags:${userId}`);
 }
 
 export async function batchGetNotes(userId: string, hashes: string[]) {
-  const cacheKey = `${userId}:${hashes.sort().join(',')}`;
-  const cached = notesCache.get(cacheKey);
-  if (cached && cached.expiresAt > Date.now()) return cached.data;
+  const cacheKey = `notes:${userId}:${hashes.sort().join(',')}`;
+  const raw = await redisGet(cacheKey);
+  if (raw) return new Map<string, any>(JSON.parse(raw));
 
   const notes = await prisma.transactionNote.findMany({
     where: { userId, transactionHash: { in: hashes } },
@@ -35,7 +30,7 @@ export async function batchGetNotes(userId: string, hashes: string[]) {
     });
   }
 
-  notesCache.set(cacheKey, { data: map, expiresAt: Date.now() + NOTES_TTL });
+  await redisSet(cacheKey, JSON.stringify([...map.entries()]), NOTES_TTL_S);
   return map;
 }
 
@@ -50,7 +45,7 @@ export async function upsertNote(
     update: { note, tags },
     create: { userId, transactionHash, note, tags },
   });
-  invalidateNotesCache(userId);
+  await invalidateNotesCache(userId);
   return result;
 }
 
@@ -60,12 +55,13 @@ export async function deleteNote(userId: string, transactionHash: string) {
   });
   if (!existing) throw new Error('Note not found');
   await prisma.transactionNote.delete({ where: { id: existing.id } });
-  invalidateNotesCache(userId);
+  await invalidateNotesCache(userId);
 }
 
 export async function getUserTags(userId: string): Promise<string[]> {
-  const cached = userTagsCache.get(userId);
-  if (cached && cached.expiresAt > Date.now()) return cached.data;
+  const cacheKey = `tags:${userId}`;
+  const raw = await redisGet(cacheKey);
+  if (raw) return JSON.parse(raw) as string[];
 
   const notes = await prisma.transactionNote.findMany({
     where: { userId, tags: { isEmpty: false } },
@@ -78,6 +74,6 @@ export async function getUserTags(userId: string): Promise<string[]> {
   }
 
   const tags = [...tagSet].sort();
-  userTagsCache.set(userId, { data: tags, expiresAt: Date.now() + TAGS_TTL });
+  await redisSet(cacheKey, JSON.stringify(tags), NOTES_TTL_S);
   return tags;
 }

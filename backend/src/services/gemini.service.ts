@@ -1,5 +1,6 @@
 import { geminiModel } from '../lib/gemini.js';
 import { getAccounts, getAccount } from './bank.service.js';
+import { redisGet, redisSet } from '../lib/redis.js';
 import type { AICategory, SpendingInsight, ChatMessage } from '@shared/types';
 
 // ─── Helpers ────────────────────────────────────────────────
@@ -49,18 +50,16 @@ export function categorizeTransactions(
 
 type CategorizedTransaction = RawTransaction & { aiCategory: AICategory };
 
-// Simple in-memory cache: key = `${userId}:${month}` → { data, expiresAt }
-const insightsCache = new Map<string, { data: SpendingInsight; expiresAt: number }>();
-const INSIGHTS_TTL = 24 * 60 * 60 * 1000; // 24 hours
+const INSIGHTS_TTL_S = 24 * 60 * 60; // 24 hours in seconds
 
 export async function generateSpendingInsights(
   transactions: CategorizedTransaction[],
   currentMonth: string, // "YYYY-MM"
   userId: string
 ): Promise<SpendingInsight> {
-  const cacheKey = `${userId}:${currentMonth}`;
-  const cached = insightsCache.get(cacheKey);
-  if (cached && cached.expiresAt > Date.now()) return cached.data;
+  const cacheKey = `insights:${userId}:${currentMonth}`;
+  const raw = await redisGet(cacheKey);
+  if (raw) return JSON.parse(raw) as SpendingInsight;
 
   // Pre-aggregate data
   const [year, month] = currentMonth.split('-').map(Number);
@@ -124,7 +123,7 @@ Total transactions this month: ${currentTxns.length}`;
       generatedAt: new Date().toISOString(),
     };
 
-    insightsCache.set(cacheKey, { data: insight, expiresAt: Date.now() + INSIGHTS_TTL });
+    await redisSet(cacheKey, JSON.stringify(insight), INSIGHTS_TTL_S);
     return insight;
   } catch (err) {
     console.error('Gemini insights error:', err);
@@ -143,22 +142,21 @@ Total transactions this month: ${currentTxns.length}`;
       savingsTips: [],
       generatedAt: new Date().toISOString(),
     };
-    insightsCache.set(cacheKey, { data: fallback, expiresAt: Date.now() + 5 * 60 * 1000 });
+    await redisSet(cacheKey, JSON.stringify(fallback), 5 * 60);
     return fallback;
   }
 }
 
 // ─── 3. AI Chatbot ──────────────────────────────────────────
 
-// Cache built financial context per user (24-hour TTL) to avoid redundant Plaid calls per chat message
-const chatContextCache = new Map<string, { data: string; expiresAt: number }>();
-const CHAT_CONTEXT_TTL = 24 * 60 * 60 * 1000;
+const CHAT_CONTEXT_TTL_S = 24 * 60 * 60; // 24 hours in seconds
 
 async function buildFinancialContext(userId: string): Promise<string> {
-  const cached = chatContextCache.get(userId);
-  if (cached && cached.expiresAt > Date.now()) {
+  const cacheKey = `chat-context:${userId}`;
+  const raw = await redisGet(cacheKey);
+  if (raw) {
     console.log(`[CACHE HIT] chat context for ${userId}`);
-    return cached.data;
+    return raw;
   }
 
   const { data: accounts, totalBanks, totalCurrentBalance } = await getAccounts(userId);
@@ -209,7 +207,7 @@ ${a.recentTransactions.map((t: any) => `    - ${t.date}: ${t.name} | $${t.amount
 `).join('\n')}
   `.trim();
 
-  chatContextCache.set(userId, { data: context, expiresAt: Date.now() + CHAT_CONTEXT_TTL });
+  await redisSet(cacheKey, context, CHAT_CONTEXT_TTL_S);
   return context;
 }
 

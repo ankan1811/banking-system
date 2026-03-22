@@ -1,10 +1,9 @@
 import { prisma } from '../lib/db.js';
 import { geminiModel } from '../lib/gemini.js';
 import { getAccounts } from './bank.service.js';
+import { redisGet, redisSet } from '../lib/redis.js';
 
-// ─── Cache for AI insight (24-hour TTL) ──────────────────────
-const insightCache = new Map<string, { data: string; expiresAt: number }>();
-const INSIGHT_TTL = 24 * 60 * 60 * 1000;
+const INSIGHT_TTL_S = 24 * 60 * 60; // 24 hours in seconds
 
 function extractJSON(text: string): string {
   const match = text.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -208,8 +207,9 @@ export async function getNetWorth(userId: string, months: number = 12) {
 }
 
 async function getNetWorthInsight(userId: string, history: any[]): Promise<string> {
-  const cached = insightCache.get(userId);
-  if (cached && cached.expiresAt > Date.now()) return cached.data;
+  const cacheKey = `net-worth-insight:${userId}`;
+  const raw = await redisGet(cacheKey);
+  if (raw) return raw;
 
   const last6 = history.slice(-6);
   const prompt = `Given these monthly net worth snapshots for a user, provide a 2-sentence insight about the trend and one actionable tip. Return plain text only, no JSON.
@@ -220,13 +220,13 @@ Snapshots: ${JSON.stringify(last6.map((s: any) => ({ month: s.month, netWorth: s
     const result = await geminiModel.generateContent(prompt);
     const text = result.response.text().trim();
 
-    insightCache.set(userId, { data: text, expiresAt: Date.now() + INSIGHT_TTL });
+    await redisSet(cacheKey, text, INSIGHT_TTL_S);
     return text;
   } catch (err) {
     console.error('Gemini net worth insight error:', err);
     // Cache a fallback so we stop retrying while rate-limited (5 min cooldown)
     const fallback = 'Net worth insight is temporarily unavailable. Please check back later.';
-    insightCache.set(userId, { data: fallback, expiresAt: Date.now() + 5 * 60 * 1000 });
+    await redisSet(cacheKey, fallback, 5 * 60);
     return fallback;
   }
 }

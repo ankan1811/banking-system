@@ -1,7 +1,10 @@
 import { prisma } from '../lib/db.js';
 import { getAccount } from './bank.service.js';
+import { redisGet, redisSet } from '../lib/redis.js';
 import type { AICategory } from '@shared/types';
 import { AI_CATEGORIES } from '@shared/types';
+
+const BUDGET_STATUS_TTL_S = 60 * 60; // 1 hour in seconds
 
 export async function getBudgets(userId: string, month: string) {
   return prisma.budget.findMany({
@@ -30,6 +33,10 @@ export async function deleteBudget(userId: string, budgetId: string) {
 }
 
 export async function getBudgetStatus(userId: string, bankRecordId: string, month: string) {
+  const cacheKey = `budget-status:${userId}:${bankRecordId}:${month}`;
+  const raw = await redisGet(cacheKey);
+  if (raw) return JSON.parse(raw);
+
   const [budgets, accountData] = await Promise.all([
     prisma.budget.findMany({ where: { userId, month } }),
     getAccount(bankRecordId),
@@ -74,7 +81,7 @@ export async function getBudgetStatus(userId: string, bankRecordId: string, mont
     }
   }
 
-  return statuses.sort((a, b) => {
+  const sorted = statuses.sort((a, b) => {
     // Sort: over-budget first, then by percent used desc, then by spent desc
     const aOver = a.percentUsed !== null && a.percentUsed >= 100;
     const bOver = b.percentUsed !== null && b.percentUsed >= 100;
@@ -83,4 +90,7 @@ export async function getBudgetStatus(userId: string, bankRecordId: string, mont
     if (a.percentUsed !== null && b.percentUsed !== null) return b.percentUsed - a.percentUsed;
     return b.spent - a.spent;
   });
+
+  await redisSet(cacheKey, JSON.stringify(sorted), BUDGET_STATUS_TTL_S);
+  return sorted;
 }

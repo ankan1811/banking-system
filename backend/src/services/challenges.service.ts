@@ -1,17 +1,15 @@
 import { prisma } from '../lib/db.js';
 import { geminiModel } from '../lib/gemini.js';
 import { getAccount } from './bank.service.js';
+import { redisGet, redisSet, redisDelByPattern } from '../lib/redis.js';
 import { AI_CATEGORIES } from '@shared/types';
 import type { AiChallengeSuggestion, ChallengeProgress, ChallengeStreak, Badge } from '@shared/types';
 
-// ─── Cache for AI suggestions (30-day TTL, DB-backed + in-memory) ──
-const suggestionsCache = new Map<string, { data: AiChallengeSuggestion[]; expiresAt: number }>();
-const SUGGESTIONS_TTL = 30 * 24 * 60 * 60 * 1000; // 30 days
+const SUGGESTIONS_TTL_S = 30 * 24 * 60 * 60; // 30 days in seconds
+const CHALLENGE_PROGRESS_TTL_S = 60 * 60;      // 1 hour in seconds
 
-export function clearSuggestionsCache(bankRecordId: string) {
-  for (const key of suggestionsCache.keys()) {
-    if (key.includes(`:${bankRecordId}:`)) suggestionsCache.delete(key);
-  }
+export async function clearSuggestionsCache(bankRecordId: string) {
+  await redisDelByPattern(`challenges:*:${bankRecordId}:*`);
   // Also clear from DB
   prisma.challengeSuggestionCache.deleteMany({ where: { bankRecordId } }).catch(() => {});
 }
@@ -81,6 +79,10 @@ export async function getChallengeProgress(
   userId: string,
   bankRecordId: string
 ): Promise<ChallengeProgress[]> {
+  const cacheKey = `challenge-progress:${userId}:${bankRecordId}`;
+  const raw = await redisGet(cacheKey);
+  if (raw) return JSON.parse(raw) as ChallengeProgress[];
+
   const activeChallenges = await prisma.spendingChallenge.findMany({
     where: { userId, status: 'active' },
   });
@@ -207,6 +209,7 @@ export async function getChallengeProgress(
     results.push(progress);
   }
 
+  await redisSet(cacheKey, JSON.stringify(results), CHALLENGE_PROGRESS_TTL_S);
   return results;
 }
 
@@ -235,11 +238,11 @@ export async function getAiSuggestions(
   bankRecordId: string
 ): Promise<AiChallengeSuggestion[]> {
   const currentMonth = new Date().toISOString().slice(0, 7);
-  const cacheKey = `${userId}:${bankRecordId}:${currentMonth}`;
+  const cacheKey = `challenges:${userId}:${bankRecordId}:${currentMonth}`;
 
-  // Layer 1: In-memory cache
-  const memCached = suggestionsCache.get(cacheKey);
-  if (memCached && memCached.expiresAt > Date.now()) return memCached.data;
+  // Layer 1: Redis cache
+  const redisCached = await redisGet(cacheKey);
+  if (redisCached) return JSON.parse(redisCached) as AiChallengeSuggestion[];
 
   // Layer 2: DB cache (survives server restarts)
   const dbCached = await prisma.challengeSuggestionCache.findUnique({
@@ -247,10 +250,11 @@ export async function getAiSuggestions(
   });
   if (dbCached) {
     const ageMs = Date.now() - dbCached.generatedAt.getTime();
-    if (ageMs < SUGGESTIONS_TTL) {
+    if (ageMs < SUGGESTIONS_TTL_S * 1000) {
       console.log(`[CACHE HIT] challenge suggestions DB ${cacheKey}`);
       const suggestions = dbCached.suggestions as AiChallengeSuggestion[];
-      suggestionsCache.set(cacheKey, { data: suggestions, expiresAt: dbCached.generatedAt.getTime() + SUGGESTIONS_TTL });
+      const remainingTtlS = Math.floor((SUGGESTIONS_TTL_S * 1000 - ageMs) / 1000);
+      await redisSet(cacheKey, JSON.stringify(suggestions), remainingTtlS);
       return suggestions;
     }
   }
@@ -290,19 +294,19 @@ Respond ONLY with a valid JSON array:
       duration: s.duration === 'weekly' ? 'weekly' : 'monthly',
     })) : getDefaultSuggestions();
 
-    // Persist to DB + in-memory
+    // Persist to DB + Redis
     await prisma.challengeSuggestionCache.upsert({
       where: { userId_bankRecordId_month: { userId, bankRecordId, month: currentMonth } },
       update: { suggestions: suggestions as any, generatedAt: new Date() },
       create: { userId, bankRecordId, month: currentMonth, suggestions: suggestions as any },
     });
-    suggestionsCache.set(cacheKey, { data: suggestions, expiresAt: Date.now() + SUGGESTIONS_TTL });
+    await redisSet(cacheKey, JSON.stringify(suggestions), SUGGESTIONS_TTL_S);
     return suggestions;
   } catch (err) {
     console.error('AI suggestions error:', err);
-    // Cache defaults in memory (5 min cooldown) so we don't hammer Gemini
+    // Cache defaults for 5 min (cooldown) so we don't hammer Gemini
     const defaults = getDefaultSuggestions();
-    suggestionsCache.set(cacheKey, { data: defaults, expiresAt: Date.now() + 5 * 60 * 1000 });
+    await redisSet(cacheKey, JSON.stringify(defaults), 5 * 60);
     return defaults;
   }
 }

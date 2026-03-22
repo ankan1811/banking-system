@@ -2,11 +2,10 @@ import { prisma } from '../lib/db.js';
 import { geminiModel } from '../lib/gemini.js';
 import { getAccount } from './bank.service.js';
 import { getBudgetStatus } from './budget.service.js';
+import { redisGet, redisSet } from '../lib/redis.js';
 import type { HealthScore } from '@shared/types';
 
-// ─── Cache: 24-hour in-memory TTL ─────────────────────────────
-const scoreCache = new Map<string, { data: HealthScore; expiresAt: number }>();
-const SCORE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+const SCORE_TTL_S = 24 * 60 * 60; // 24 hours in seconds
 
 function extractJSON(text: string): string {
   const match = text.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -18,13 +17,13 @@ export async function getHealthScore(
   bankRecordId: string,
   month: string
 ): Promise<HealthScore> {
-  const cacheKey = `${userId}:${month}`;
+  const cacheKey = `health:${userId}:${month}`;
 
-  // Layer 1: In-memory cache
-  const cached = scoreCache.get(cacheKey);
-  if (cached && cached.expiresAt > Date.now()) {
-    console.log(`[CACHE HIT] health score in-memory ${cacheKey}`);
-    return cached.data;
+  // Layer 1: Redis cache
+  const redisCached = await redisGet(cacheKey);
+  if (redisCached) {
+    console.log(`[CACHE HIT] health score Redis ${cacheKey}`);
+    return JSON.parse(redisCached) as HealthScore;
   }
 
   // Layer 2: DB cache (survives restarts)
@@ -33,7 +32,7 @@ export async function getHealthScore(
   });
   if (dbScore) {
     const ageMs = Date.now() - dbScore.updatedAt.getTime();
-    if (ageMs < SCORE_TTL) {
+    if (ageMs < SCORE_TTL_S * 1000) {
       console.log(`[CACHE HIT] health score DB ${cacheKey}`);
       const result: HealthScore = {
         score: dbScore.score,
@@ -41,7 +40,8 @@ export async function getHealthScore(
         tips: dbScore.tips as string[],
         generatedAt: dbScore.generatedAt.toISOString(),
       };
-      scoreCache.set(cacheKey, { data: result, expiresAt: Date.now() + SCORE_TTL });
+      const remainingTtlS = Math.floor((SCORE_TTL_S * 1000 - ageMs) / 1000);
+      await redisSet(cacheKey, JSON.stringify(result), remainingTtlS);
       return result;
     }
   }
@@ -74,7 +74,7 @@ export async function getHealthScore(
     },
   });
 
-  scoreCache.set(cacheKey, { data: result, expiresAt: Date.now() + SCORE_TTL });
+  await redisSet(cacheKey, JSON.stringify(result), SCORE_TTL_S);
   return result;
 }
 
