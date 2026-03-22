@@ -2,7 +2,7 @@ import {
   LayoutDashboard, Landmark, ArrowLeftRight, SendHorizonal,
   SplitSquareHorizontal, Sparkles, Wallet, Target, TrendingUp,
   Bell, HeartPulse, Trophy, ArrowDownUp, PiggyBank,
-  Store, CalendarDays, FileBarChart, Settings,
+  Store, CalendarDays, FileBarChart, Settings, FileUp,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -30,6 +30,7 @@ export const sidebarLinks: SidebarLink[] = [
   { icon: Store, route: "/merchants", label: "Merchants" },
   { icon: CalendarDays, route: "/calendar", label: "Bill Calendar" },
   { icon: FileBarChart, route: "/reports", label: "Reports" },
+  { icon: FileUp, route: "/upload-statement", label: "Upload Statement" },
   { icon: Settings, route: "/settings", label: "Settings" },
 ];
 

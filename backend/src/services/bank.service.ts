@@ -188,7 +188,7 @@ export const getAccount = async (bankRecordId: string, userId?: string) => {
       image: t.image,
     }));
     console.log(`[DB] Loaded ${rawTransactions.length} plaid txns for bank ${bank.id}`);
-  } else if (!bank.lastSyncedAt) {
+  } else if (!bank.lastSyncedAt && bank.accessToken && bank.source !== 'manual') {
     // First ever load — no DB data yet, must fetch from Plaid synchronously
     console.log(`[PLAID] First load for bank ${bank.id}, fetching from Plaid`);
     rawTransactions = await getTransactions(bank.accessToken, bank.id);
