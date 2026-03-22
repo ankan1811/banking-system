@@ -96,6 +96,15 @@ bank/
 │       │   ├── db.ts                 # Prisma client singleton (PostgreSQL connection)
 │       │   ├── gemini.ts             # Google Gemini AI client (gemini-2.0-flash model)
 │       │   ├── plaid.ts              # Plaid API client (sandbox environment)
+│       │   ├── redis.ts              # Upstash Redis client (ioredis) with in-memory fallback:
+│       │   │                         #   redisGet(key) — tries Redis, falls back to in-memory Map
+│       │   │                         #   redisSet(key, value, ttlSeconds) — writes in-memory FIRST
+│       │   │                         #     (guaranteed), then best-effort Redis write
+│       │   │                         #   redisDel(key) — delete from both stores
+│       │   │                         #   redisDelByPrefix(prefix) — SCAN-based prefix invalidation
+│       │   │                         #   redisDelByPattern(glob) — SCAN-based glob invalidation
+│       │   │                         #   Lazy-connects only when REDIS_URL is set; without it,
+│       │   │                         #   all operations silently use in-memory only
 │       │   └── utils.ts              # Backend utility functions
 │       │
 │       ├── middleware/               # ── MIDDLEWARE ──
@@ -224,23 +233,24 @@ bank/
 │           │
 │           ├── gemini.service.ts     # AI SERVICE — Google Gemini integration:
 │           │                         #   categorizeTransactions() — batch 50/call, DB-cached
-│           │                         #   generateSpendingInsights() — 5-min in-memory cache
-│           │                         #   buildFinancialContext() — 5-min context cache
+│           │                         #   generateSpendingInsights() — 24-hr Redis cache
+│           │                         #   buildFinancialContext() — 24-hr Redis cache
 │           │                         #   chat() — Gemini chat with financial context
 │           │
 │           ├── budget.service.ts     # Budget CRUD + getBudgetStatus():
 │           │                         #   Joins live Plaid spending with budget limits
 │           │                         #   Calculates percentUsed per category
+│           │                         #   1-hr Redis cache per user/bankRecord/month
 │           │
 │           ├── goals.service.ts      # Savings goal CRUD + contributions:
 │           │                         #   addContribution() — Prisma transaction updates
 │           │                         #     savedAmount + auto-completes if target reached
 │           │
-│           ├── analytics.service.ts  # Analytics with in-memory TTL caches:
-│           │                         #   getSpendingTrends()   — 5-min cache, multi-month
-│           │                         #   detectRecurring()     — 1-hr cache, subscription detection
-│           │                         #   getIncomeVsExpense()  — 5-min cache, monthly P&L
-│           │                         #   getMerchantInsights() — 5-min cache, top 50 merchants
+│           ├── analytics.service.ts  # Analytics with 24-hr Redis caches:
+│           │                         #   getSpendingTrends()   — 24-hr Redis, multi-month
+│           │                         #   detectRecurring()     — 24-hr Redis, subscription detection
+│           │                         #   getIncomeVsExpense()  — 24-hr Redis, monthly P&L
+│           │                         #   getMerchantInsights() — 24-hr Redis, top 50 merchants
 │           │                         #   normalizeName()       — shared merchant name normalizer
 │           │
 │           ├── alerts.service.ts     # Alert evaluation + Resend email:
@@ -253,7 +263,7 @@ bank/
 │           │                         #   exportPDF() — PDFKit, formatted bank statement
 │           │
 │           ├── health-score.service.ts # AI financial health score (3-layer cache):
-│           │                         #   Layer 1: In-memory (1-hr TTL)
+│           │                         #   Layer 1: Redis (24-hr TTL)
 │           │                         #   Layer 2: DB (FinancialHealthScore table)
 │           │                         #   Layer 3: Gemini call (pre-aggregated ~200 bytes)
 │           │                         #   Fallback: Local rule-based score if Gemini fails
@@ -263,12 +273,12 @@ bank/
 │           │                         #   Runs on cached getAccount() data (0 extra API calls)
 │           │
 │           ├── notes.service.ts      # Transaction notes/tags CRUD:
-│           │                         #   batchGetNotes()  — 2-min cache, batch by hashes
-│           │                         #   upsertNote()     — create/update with cache invalidation
-│           │                         #   getUserTags()    — 5-min cache, distinct tags
+│           │                         #   batchGetNotes()  — 24-hr Redis, batch by hashes
+│           │                         #   upsertNote()     — create/update with Redis invalidation
+│           │                         #   getUserTags()    — 24-hr Redis, distinct tags
 │           │
 │           ├── digest.service.ts    # Monthly Digest (3-layer cache like health score):
-│           │                         #   Layer 1: In-memory (1-hr TTL)
+│           │                         #   Layer 1: Redis (24-hr TTL)
 │           │                         #   Layer 2: DB (MonthlyDigest table, permanent for past months)
 │           │                         #   Layer 3: Aggregates all services + single Gemini narrative call
 │           │                         #   generateDigestPDF() — PDFKit full report export
@@ -304,12 +314,12 @@ bank/
 │           ├── net-worth.service.ts # Net worth tracker:
 │           │                         #   Manual assets/liabilities CRUD (6 functions)
 │           │                         #   getNetWorth() — aggregate Plaid + manual, snapshot, AI insight
-│           │                         #   getNetWorthInsight() — Gemini trend analysis (1-hr cache)
+│           │                         #   getNetWorthInsight() — Gemini trend analysis (24-hr Redis)
 │           │
 │           └── challenges.service.ts # Spending challenges + gamification:
 │                                     #   getChallenges(), createChallenge(), abandonChallenge()
-│                                     #   getChallengeProgress() — real-time vs transaction data
-│                                     #   getAiSuggestions() — Gemini suggestions (10-min cache)
+│                                     #   getChallengeProgress() — 1-hr Redis cache
+│                                     #   getAiSuggestions() — 30-day Redis + DB cache
 │                                     #   getStreakAndBadges() — streak + 8 badge types
 │                                     #   getChallengesOverview() — bundled endpoint
 │

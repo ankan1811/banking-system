@@ -12,7 +12,7 @@
 
 📈💹🚀✨
 
-Built with **Next.js 14**, **Express.js**, **Prisma**, **PostgreSQL**, **Plaid**, **Razorpay**, and **Google Gemini**.
+Built with **Next.js 14**, **Express.js**, **Prisma**, **PostgreSQL**, **Upstash Redis**, **Plaid**, **Razorpay**, and **Google Gemini**.
 
 ---
 
@@ -101,22 +101,27 @@ Built with **Next.js 14**, **Express.js**, **Prisma**, **PostgreSQL**, **Plaid**
 - **Recipient lookup** by sharable ID
 
 ### Caching & Rate Limiting
-All external API calls are aggressively cached to stay within free tier limits:
+All external API calls are aggressively cached via **Upstash Redis** (primary) with an automatic **in-memory fallback** to stay within free tier limits. Cache persists across server restarts and Render spin-downs.
 
-| Cache | TTL | Impact |
-|-------|-----|--------|
-| `getAccount()` (Plaid + Gemini) | 5 min | ~80% fewer Plaid and Gemini calls |
-| `getAccounts()` (Plaid) | 5 min | Dashboard loads instantly on repeat |
-| `getInstitution()` (Plaid) | 24 hr | Static bank info cached long-term |
-| Chat financial context | 5 min | 0 Plaid calls per chat message |
-| AI transaction categories | Permanent (DB) | Never re-categorize the same transaction |
-| Spending insights | 5 min | Gemini called once per user/month window |
-| Analytics (trends, recurring, income/expense, merchants) | 5-60 min | Pure aggregation on cached data |
-| Financial health score | 1 hr (memory) + DB | At most 1 Gemini call per user per hour |
-| Monthly digest | 1 hr (memory) + DB | At most 1 Gemini call per user per month |
-| Net worth AI insight | 1 hr (memory) | At most 1 Gemini call per user per hour |
-| Challenge AI suggestions | 10 min (memory) | At most 1 Gemini call per user per 10 min |
-| Net worth snapshots | Permanent (DB) | Monthly snapshots stored for historical charts |
+| Cache | TTL | Storage | Impact |
+|-------|-----|---------|--------|
+| `getAccount()` (Plaid + Gemini) | 5 min | In-memory | ~80% fewer Plaid and Gemini calls |
+| `getAccounts()` (Plaid) | 5 min | In-memory | Dashboard loads instantly on repeat |
+| `getInstitution()` (Plaid) | 24 hr | In-memory | Static bank info cached long-term |
+| Chat financial context | 24 hr | Redis | 0 Plaid calls per chat message |
+| AI transaction categories | Permanent | DB | Never re-categorize the same transaction |
+| Spending insights | 24 hr | Redis | Gemini called once per user per day |
+| Analytics (trends, recurring, income/expense, merchants) | 24 hr | Redis | Pure aggregation on cached data |
+| Financial health score | 24 hr | Redis + DB | At most 1 Gemini call per user per day |
+| Monthly digest | 24 hr | Redis + DB | At most 1 Gemini call per user per month |
+| Net worth AI insight | 24 hr | Redis | At most 1 Gemini call per user per day |
+| Challenge AI suggestions | 30 days | Redis + DB | At most 1 Gemini call per user per month |
+| Budget status | 1 hr | Redis | Aggregation cached per user/month |
+| Challenge progress | 1 hr | Redis | Progress calculation cached per user |
+| Transaction notes & tags | 24 hr | Redis | Batch notes cached, invalidated on write |
+| Net worth snapshots | Permanent | DB | Monthly snapshots stored for historical charts |
+
+**Resilience:** If Redis is unavailable (quota exceeded or connection error), all cache operations silently fall back to an in-memory Map. The app never breaks — it just degrades to pre-Redis behavior.
 
 Rate limits per user per minute:
 
@@ -148,6 +153,7 @@ Rate limits per user per minute:
 | **Backend** | Express.js, TypeScript |
 | **ORM** | Prisma |
 | **Database** | PostgreSQL (Local / Neon / Supabase — your choice) |
+| **Cache** | Upstash Redis (free tier) with in-memory fallback via ioredis |
 | **Auth** | Custom JWT + OTP (jose, Resend) + Google OAuth |
 | **Bank Data** | Plaid API (sandbox) |
 | **Payments** | Razorpay (test mode) |
@@ -246,7 +252,7 @@ bank/
 │   │   │   ├── net-worth.service.ts # Assets/liabilities + net worth + AI insight
 │   │   │   └── challenges.service.ts # Challenges + progress + AI suggestions + streaks
 │   │   ├── middleware/               # JWT auth + rate limiter factory
-│   │   └── lib/                      # Prisma, Plaid, Gemini clients
+│   │   └── lib/                      # Prisma, Plaid, Gemini, Redis clients
 │   └── prisma/
 │       └── schema.prisma             # Database schema (20 tables)
 │
@@ -341,6 +347,9 @@ GOOGLE_CLIENT_ID=
 
 # GEMINI AI (get from https://aistudio.google.com/app/apikey — free tier)
 GEMINI_API_KEY=
+
+# UPSTASH REDIS (optional — get from https://console.upstash.com — free tier)
+REDIS_URL=
 
 # APP
 FRONTEND_URL=http://localhost:3003

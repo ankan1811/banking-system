@@ -98,7 +98,30 @@
     No real money moves in test mode.
 
 --------------------------------------------------------------------------------
- 6. RESEND_API_KEY — Email (OTP Delivery)
+ 6. REDIS_URL — Upstash Redis (Caching)
+--------------------------------------------------------------------------------
+
+    1. Sign up free at   https://console.upstash.com (GitHub login works)
+    2. Create a Redis database (pick a region close to your Render server,
+       e.g. us-east-1 or eu-west-1)
+    3. Copy the connection URL (starts with rediss://)
+       →  REDIS_URL
+
+    Free tier: 500K commands/month, 256MB storage, no expiry.
+    Enough for ~150+ active daily users.
+
+    If REDIS_URL is not set, the app silently falls back to in-memory caching
+    (cache is lost on every server restart / Render spin-down).
+
+    Redis is used for: spending insights, chat context, health score, monthly
+    digest, analytics (trends, recurring, income/expense, merchants), net worth
+    insight, challenge suggestions, challenge progress, budget status, and
+    transaction notes/tags — 14 cache points total.
+
+    Rate limiting stays in-memory (no Redis calls per request).
+
+--------------------------------------------------------------------------------
+ 7. RESEND_API_KEY — Email (OTP Delivery)
 --------------------------------------------------------------------------------
 
     1. Sign up free at   https://resend.com
@@ -121,6 +144,7 @@
   ──────────────────────────────────────────────────────────────────────
   Nice to have   GEMINI_API_KEY       AI categorization, insights, chatbot
   Nice to have   GOOGLE_CLIENT_ID     Google OAuth (OTP login still works)
+  Nice to have   REDIS_URL            Persistent caching (falls back to in-memory)
   ──────────────────────────────────────────────────────────────────────
   Optional       RAZORPAY_*           Only needed for payment transfers
   Optional       RESEND_API_KEY       Only for real emails (MASTER_OTP bypasses)
