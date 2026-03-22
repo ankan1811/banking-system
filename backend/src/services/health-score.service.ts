@@ -40,7 +40,7 @@ export async function getHealthScore(
         breakdown: dbScore.breakdown as HealthScore['breakdown'],
         tips: dbScore.tips as string[],
         generatedAt: dbScore.generatedAt.toISOString(),
-        source: 'formula',
+        source: (dbScore.source === 'ai' ? 'ai' : 'formula') as 'ai' | 'formula',
       };
       const remainingTtlS = Math.floor((SCORE_TTL_S * 1000 - ageMs) / 1000);
       await redisSet(cacheKey, JSON.stringify(result), remainingTtlS);
@@ -76,6 +76,7 @@ export async function getHealthScore(
       score: result.score,
       breakdown: result.breakdown as any,
       tips: result.tips,
+      source: result.source || 'formula',
     },
     create: {
       userId,
@@ -83,6 +84,7 @@ export async function getHealthScore(
       score: result.score,
       breakdown: result.breakdown as any,
       tips: result.tips,
+      source: result.source || 'formula',
     },
   });
 

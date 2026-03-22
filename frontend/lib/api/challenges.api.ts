@@ -7,9 +7,10 @@ export async function getChallengesOverview(bankRecordId: string) {
   );
 }
 
-export async function getAiSuggestions(bankRecordId: string) {
-  return apiRequest<{ suggestions: AiChallengeSuggestion[] }>(
-    `/api/challenges/suggestions?bankRecordId=${bankRecordId}`
+export async function getAiSuggestions(bankRecordId: string, useAi: boolean = false) {
+  const aiParam = useAi ? '&ai=true' : '';
+  return apiRequest<{ suggestions: AiChallengeSuggestion[]; source?: 'ai' | 'formula' }>(
+    `/api/challenges/suggestions?bankRecordId=${bankRecordId}${aiParam}`
   );
 }
 

@@ -1,8 +1,9 @@
 import { apiRequest } from './client';
 import type { NetWorthData, ManualAsset, ManualLiability } from '@shared/types';
 
-export async function getNetWorth(months = 12) {
-  return apiRequest<{ data: NetWorthData }>(`/api/net-worth?months=${months}`);
+export async function getNetWorth(months = 12, useAi: boolean = false) {
+  const aiParam = useAi ? '&ai=true' : '';
+  return apiRequest<{ data: NetWorthData }>(`/api/net-worth?months=${months}${aiParam}`);
 }
 
 export async function getManualAssets() {

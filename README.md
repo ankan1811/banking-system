@@ -3,7 +3,7 @@
 **AI-powered full-stack fintech app** 🏦
 
 💳 **Banking:** Plaid linking + Razorpay transfers + Real-time balances + Multi-account  
-🤖 **AI (Gemini):** Transaction categorization + Spending insights + Financial chatbot + Health score + Monthly digest + Challenge suggestions  
+🤖 **AI (Gemini):** Transaction categorization + Spending insights + Financial chatbot + Health score + Monthly digest + Challenge suggestions + Financial plan generator
 📊 **Analytics:** Spending trends + Income/Expense + Merchant insights + Recurring detection + Bill calendar  
 💰 **Planning:** Budgets + Savings goals + Spending alerts + Split expenses + Net worth tracker  
 🎮 **Gamification:** Spending challenges + Streaks + 8 badge types  
@@ -57,10 +57,17 @@ Built with **Next.js 14**, **Express.js**, **Prisma**, **PostgreSQL**, **Upstash
 - **AI chatbot** — Floating chat panel (bottom-right) powered by Gemini. Has full context of your accounts, balances, and recent transactions. Supports quick-prompt shortcuts. Rate-limited to 10 messages/minute per user.
 - **Category breakdown chart** — Doughnut chart on the dashboard visualizing spending by AI category with a color-coded legend.
 - **Financial health score** — AI-generated 0-100 score based on budget adherence, savings rate, spending trends, and goal progress. Uses a 3-layer cache (in-memory 1hr + DB persistence + local rule-based fallback) to minimize Gemini calls to at most 1 per user per hour.
+- **AI financial plan generator** — Describe a financial goal in plain text (e.g., "Save $10,000 for a down payment in 2 years") and Gemini creates a step-by-step savings plan with milestones, monthly savings needed, feasibility rating, and actionable tips. Includes a "Create Goal from Plan" button to instantly convert the plan into a tracked savings goal.
+- **On-demand AI generation** — All AI features (insights, health score, digest, challenges, net worth insight) follow a strict two-mode pattern:
+  1. **Default (page load):** Cache hit → return cached data. Cache miss → formula-based fallback (predefined calculations), cached for 5 minutes. Gemini is **never** called.
+  2. **"Generate with AI" button click:** Existing cache is cleared → Gemini is called → result cached with long TTL (100 hours). If Gemini fails, formula fallback is used.
+  3. **Subsequent page loads:** Cached AI data is returned with the correct source badge until TTL expires, then reverts to formula fallback.
+
+  Each feature displays a **source badge** ("AI-generated" or "Formula-based") so users always know what they're seeing. The `source` field is persisted through all cache layers (Redis + PostgreSQL) so the badge survives server restarts.
 
 ### Budget & Financial Planning
 - **Budget tracker** — Set monthly spending limits per AI category. Real-time progress bars (green < 75%, amber 75-90%, red > 90%). Inline editing and management on the `/budgets` page.
-- **Savings goals** — Create named goals with target amounts, target dates, emoji icons, and color coding. Log manual contributions with an SVG progress ring. Auto-completes when target is reached.
+- **Savings goals** — Create named goals with target amounts, target dates, emoji icons, and color coding. Log manual contributions with an SVG progress ring. Auto-completes when target is reached. Includes AI Financial Planner section to generate goals from natural language descriptions.
 - **Spending alerts** — Set email alert rules for category monthly limits, single transaction thresholds, or low balance. Alerts are evaluated in the background when transactions are fetched and sent via Resend. Deduplication via trigger logs prevents spam.
 
 ### Analytics & Reports
@@ -129,12 +136,12 @@ All external API calls are aggressively cached via **Upstash Redis** (primary) w
 | `getInstitution()` (Plaid) | 100 hr | In-memory | Static bank info cached long-term |
 | Chat financial context | 100 hr | Redis | 0 Plaid calls per chat message |
 | AI transaction categories | Permanent | DB | Never re-categorize the same transaction |
-| Spending insights | 100 hr | Redis | Gemini called once per user per ~4 days |
+| Spending insights | 100 hr (AI) / 5 min (formula) | Redis | Gemini only on explicit user request |
 | Analytics (trends, recurring, income/expense, merchants) | 100 hr | Redis | Pure aggregation on cached data |
-| Financial health score | 100 hr | Redis + DB | At most 1 Gemini call per user per ~4 days |
-| Monthly digest | 100 hr | Redis + DB | At most 1 Gemini call per user per month |
-| Net worth AI insight | 100 hr | Redis | At most 1 Gemini call per user per ~4 days |
-| Challenge AI suggestions | 30 days | Redis + DB | At most 1 Gemini call per user per month |
+| Financial health score | 100 hr (AI) / 5 min (formula) | Redis + DB | Gemini only on explicit user request |
+| Monthly digest | 100 hr (AI) / 5 min (formula) | Redis + DB | Gemini only on explicit user request |
+| Net worth AI insight | 100 hr (AI) / 5 min (formula) | Redis | Gemini only on explicit user request |
+| Challenge AI suggestions | 30 days (AI) / 5 min (formula) | Redis + DB | Gemini only on explicit user request |
 | Budget status | 24 hr | Redis | Aggregation cached per user/month |
 | Challenge progress | 24 hr | Redis | Progress calculation cached per user |
 | Transaction notes & tags | 100 hr | Redis | Batch notes cached, invalidated on write |
@@ -189,7 +196,7 @@ bank/
 │   │   ├── SpendingInsightsCard.tsx  # AI insights display
 │   │   ├── BudgetProgressCard.tsx    # Budget progress bars
 │   │   ├── GoalCard.tsx              # Savings goal progress ring
-│   │   ├── GoalsManager.tsx          # Goals CRUD manager
+│   │   ├── GoalsManager.tsx          # Goals CRUD manager + AI financial planner
 │   │   ├── SpendingTrendsChart.tsx   # Multi-month trends chart
 │   │   ├── RecurringTransactionsCard.tsx  # Subscriptions card
 │   │   ├── AlertsManager.tsx         # Alert rules manager

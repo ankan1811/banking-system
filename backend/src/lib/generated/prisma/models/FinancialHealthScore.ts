@@ -39,6 +39,7 @@ export type FinancialHealthScoreMinAggregateOutputType = {
   userId: string | null
   month: string | null
   score: number | null
+  source: string | null
   generatedAt: Date | null
   updatedAt: Date | null
 }
@@ -48,6 +49,7 @@ export type FinancialHealthScoreMaxAggregateOutputType = {
   userId: string | null
   month: string | null
   score: number | null
+  source: string | null
   generatedAt: Date | null
   updatedAt: Date | null
 }
@@ -59,6 +61,7 @@ export type FinancialHealthScoreCountAggregateOutputType = {
   score: number
   breakdown: number
   tips: number
+  source: number
   generatedAt: number
   updatedAt: number
   _all: number
@@ -78,6 +81,7 @@ export type FinancialHealthScoreMinAggregateInputType = {
   userId?: true
   month?: true
   score?: true
+  source?: true
   generatedAt?: true
   updatedAt?: true
 }
@@ -87,6 +91,7 @@ export type FinancialHealthScoreMaxAggregateInputType = {
   userId?: true
   month?: true
   score?: true
+  source?: true
   generatedAt?: true
   updatedAt?: true
 }
@@ -98,6 +103,7 @@ export type FinancialHealthScoreCountAggregateInputType = {
   score?: true
   breakdown?: true
   tips?: true
+  source?: true
   generatedAt?: true
   updatedAt?: true
   _all?: true
@@ -196,6 +202,7 @@ export type FinancialHealthScoreGroupByOutputType = {
   score: number
   breakdown: runtime.JsonValue
   tips: runtime.JsonValue
+  source: string
   generatedAt: Date
   updatedAt: Date
   _count: FinancialHealthScoreCountAggregateOutputType | null
@@ -230,6 +237,7 @@ export type FinancialHealthScoreWhereInput = {
   score?: Prisma.IntFilter<"FinancialHealthScore"> | number
   breakdown?: Prisma.JsonFilter<"FinancialHealthScore">
   tips?: Prisma.JsonFilter<"FinancialHealthScore">
+  source?: Prisma.StringFilter<"FinancialHealthScore"> | string
   generatedAt?: Prisma.DateTimeFilter<"FinancialHealthScore"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"FinancialHealthScore"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -242,6 +250,7 @@ export type FinancialHealthScoreOrderByWithRelationInput = {
   score?: Prisma.SortOrder
   breakdown?: Prisma.SortOrder
   tips?: Prisma.SortOrder
+  source?: Prisma.SortOrder
   generatedAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -258,6 +267,7 @@ export type FinancialHealthScoreWhereUniqueInput = Prisma.AtLeast<{
   score?: Prisma.IntFilter<"FinancialHealthScore"> | number
   breakdown?: Prisma.JsonFilter<"FinancialHealthScore">
   tips?: Prisma.JsonFilter<"FinancialHealthScore">
+  source?: Prisma.StringFilter<"FinancialHealthScore"> | string
   generatedAt?: Prisma.DateTimeFilter<"FinancialHealthScore"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"FinancialHealthScore"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -270,6 +280,7 @@ export type FinancialHealthScoreOrderByWithAggregationInput = {
   score?: Prisma.SortOrder
   breakdown?: Prisma.SortOrder
   tips?: Prisma.SortOrder
+  source?: Prisma.SortOrder
   generatedAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.FinancialHealthScoreCountOrderByAggregateInput
@@ -289,6 +300,7 @@ export type FinancialHealthScoreScalarWhereWithAggregatesInput = {
   score?: Prisma.IntWithAggregatesFilter<"FinancialHealthScore"> | number
   breakdown?: Prisma.JsonWithAggregatesFilter<"FinancialHealthScore">
   tips?: Prisma.JsonWithAggregatesFilter<"FinancialHealthScore">
+  source?: Prisma.StringWithAggregatesFilter<"FinancialHealthScore"> | string
   generatedAt?: Prisma.DateTimeWithAggregatesFilter<"FinancialHealthScore"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"FinancialHealthScore"> | Date | string
 }
@@ -299,6 +311,7 @@ export type FinancialHealthScoreCreateInput = {
   score: number
   breakdown: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tips: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  source?: string
   generatedAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutHealthScoresInput
@@ -311,6 +324,7 @@ export type FinancialHealthScoreUncheckedCreateInput = {
   score: number
   breakdown: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tips: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  source?: string
   generatedAt?: Date | string
   updatedAt?: Date | string
 }
@@ -321,6 +335,7 @@ export type FinancialHealthScoreUpdateInput = {
   score?: Prisma.IntFieldUpdateOperationsInput | number
   breakdown?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tips?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  source?: Prisma.StringFieldUpdateOperationsInput | string
   generatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutHealthScoresNestedInput
@@ -333,6 +348,7 @@ export type FinancialHealthScoreUncheckedUpdateInput = {
   score?: Prisma.IntFieldUpdateOperationsInput | number
   breakdown?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tips?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  source?: Prisma.StringFieldUpdateOperationsInput | string
   generatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -344,6 +360,7 @@ export type FinancialHealthScoreCreateManyInput = {
   score: number
   breakdown: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tips: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  source?: string
   generatedAt?: Date | string
   updatedAt?: Date | string
 }
@@ -354,6 +371,7 @@ export type FinancialHealthScoreUpdateManyMutationInput = {
   score?: Prisma.IntFieldUpdateOperationsInput | number
   breakdown?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tips?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  source?: Prisma.StringFieldUpdateOperationsInput | string
   generatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -365,6 +383,7 @@ export type FinancialHealthScoreUncheckedUpdateManyInput = {
   score?: Prisma.IntFieldUpdateOperationsInput | number
   breakdown?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tips?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  source?: Prisma.StringFieldUpdateOperationsInput | string
   generatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -391,6 +410,7 @@ export type FinancialHealthScoreCountOrderByAggregateInput = {
   score?: Prisma.SortOrder
   breakdown?: Prisma.SortOrder
   tips?: Prisma.SortOrder
+  source?: Prisma.SortOrder
   generatedAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -404,6 +424,7 @@ export type FinancialHealthScoreMaxOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   month?: Prisma.SortOrder
   score?: Prisma.SortOrder
+  source?: Prisma.SortOrder
   generatedAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -413,6 +434,7 @@ export type FinancialHealthScoreMinOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   month?: Prisma.SortOrder
   score?: Prisma.SortOrder
+  source?: Prisma.SortOrder
   generatedAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -469,6 +491,7 @@ export type FinancialHealthScoreCreateWithoutUserInput = {
   score: number
   breakdown: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tips: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  source?: string
   generatedAt?: Date | string
   updatedAt?: Date | string
 }
@@ -479,6 +502,7 @@ export type FinancialHealthScoreUncheckedCreateWithoutUserInput = {
   score: number
   breakdown: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tips: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  source?: string
   generatedAt?: Date | string
   updatedAt?: Date | string
 }
@@ -519,6 +543,7 @@ export type FinancialHealthScoreScalarWhereInput = {
   score?: Prisma.IntFilter<"FinancialHealthScore"> | number
   breakdown?: Prisma.JsonFilter<"FinancialHealthScore">
   tips?: Prisma.JsonFilter<"FinancialHealthScore">
+  source?: Prisma.StringFilter<"FinancialHealthScore"> | string
   generatedAt?: Prisma.DateTimeFilter<"FinancialHealthScore"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"FinancialHealthScore"> | Date | string
 }
@@ -529,6 +554,7 @@ export type FinancialHealthScoreCreateManyUserInput = {
   score: number
   breakdown: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tips: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  source?: string
   generatedAt?: Date | string
   updatedAt?: Date | string
 }
@@ -539,6 +565,7 @@ export type FinancialHealthScoreUpdateWithoutUserInput = {
   score?: Prisma.IntFieldUpdateOperationsInput | number
   breakdown?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tips?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  source?: Prisma.StringFieldUpdateOperationsInput | string
   generatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -549,6 +576,7 @@ export type FinancialHealthScoreUncheckedUpdateWithoutUserInput = {
   score?: Prisma.IntFieldUpdateOperationsInput | number
   breakdown?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tips?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  source?: Prisma.StringFieldUpdateOperationsInput | string
   generatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -559,6 +587,7 @@ export type FinancialHealthScoreUncheckedUpdateManyWithoutUserInput = {
   score?: Prisma.IntFieldUpdateOperationsInput | number
   breakdown?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   tips?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  source?: Prisma.StringFieldUpdateOperationsInput | string
   generatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -572,6 +601,7 @@ export type FinancialHealthScoreSelect<ExtArgs extends runtime.Types.Extensions.
   score?: boolean
   breakdown?: boolean
   tips?: boolean
+  source?: boolean
   generatedAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -584,6 +614,7 @@ export type FinancialHealthScoreSelectCreateManyAndReturn<ExtArgs extends runtim
   score?: boolean
   breakdown?: boolean
   tips?: boolean
+  source?: boolean
   generatedAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -596,6 +627,7 @@ export type FinancialHealthScoreSelectUpdateManyAndReturn<ExtArgs extends runtim
   score?: boolean
   breakdown?: boolean
   tips?: boolean
+  source?: boolean
   generatedAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -608,11 +640,12 @@ export type FinancialHealthScoreSelectScalar = {
   score?: boolean
   breakdown?: boolean
   tips?: boolean
+  source?: boolean
   generatedAt?: boolean
   updatedAt?: boolean
 }
 
-export type FinancialHealthScoreOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "month" | "score" | "breakdown" | "tips" | "generatedAt" | "updatedAt", ExtArgs["result"]["financialHealthScore"]>
+export type FinancialHealthScoreOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "month" | "score" | "breakdown" | "tips" | "source" | "generatedAt" | "updatedAt", ExtArgs["result"]["financialHealthScore"]>
 export type FinancialHealthScoreInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -635,6 +668,7 @@ export type $FinancialHealthScorePayload<ExtArgs extends runtime.Types.Extension
     score: number
     breakdown: runtime.JsonValue
     tips: runtime.JsonValue
+    source: string
     generatedAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["financialHealthScore"]>
@@ -1067,6 +1101,7 @@ export interface FinancialHealthScoreFieldRefs {
   readonly score: Prisma.FieldRef<"FinancialHealthScore", 'Int'>
   readonly breakdown: Prisma.FieldRef<"FinancialHealthScore", 'Json'>
   readonly tips: Prisma.FieldRef<"FinancialHealthScore", 'Json'>
+  readonly source: Prisma.FieldRef<"FinancialHealthScore", 'String'>
   readonly generatedAt: Prisma.FieldRef<"FinancialHealthScore", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"FinancialHealthScore", 'DateTime'>
 }

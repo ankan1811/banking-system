@@ -55,11 +55,11 @@ app.use('/api/analytics', requireAuth, analyticsRateLimit, analyticsRoutes);
 app.use('/api/alerts', requireAuth, alertsRoutes);
 app.use('/api/search', requireAuth, accountsRateLimit, searchRoutes);
 app.use('/api/notes', requireAuth, notesRoutes);
-app.use('/api/health-score', requireAuth, aiRateLimit, healthScoreRoutes);
-app.use('/api/reports', requireAuth, aiRateLimit, reportsRoutes);
+app.use('/api/health-score', requireAuth, analyticsRateLimit, healthScoreRoutes);
+app.use('/api/reports', requireAuth, analyticsRateLimit, reportsRoutes);
 app.use('/api/splits', requireAuth, splitsRoutes);
 app.use('/api/net-worth', requireAuth, accountsRateLimit, netWorthRoutes);
-app.use('/api/challenges', requireAuth, aiRateLimit, challengesRoutes);
+app.use('/api/challenges', requireAuth, analyticsRateLimit, challengesRoutes);
 
 // Health check
 app.get('/health', (_req, res) => {

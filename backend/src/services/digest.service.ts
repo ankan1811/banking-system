@@ -45,7 +45,7 @@ export async function getMonthlyDigest(
         bankRecordId: dbDigest.bankRecordId,
         sections: dbDigest.sections as any,
         narrative: dbDigest.narrative,
-        narrativeSource: 'formula',
+        narrativeSource: (dbDigest.narrativeSource === 'ai' ? 'ai' : 'formula') as 'ai' | 'formula',
         generatedAt: dbDigest.generatedAt.toISOString(),
       };
       const remainingTtlS = Math.floor((DIGEST_TTL_S * 1000 - ageMs) / 1000);
@@ -82,8 +82,8 @@ export async function getMonthlyDigest(
   // Persist to DB
   const dbResult = await prisma.monthlyDigest.upsert({
     where: { userId_month: { userId, month } },
-    update: { sections: sections as any, narrative, bankRecordId },
-    create: { userId, month, bankRecordId, sections: sections as any, narrative },
+    update: { sections: sections as any, narrative, bankRecordId, narrativeSource },
+    create: { userId, month, bankRecordId, sections: sections as any, narrative, narrativeSource },
   });
 
   const result: MonthlyDigest = {

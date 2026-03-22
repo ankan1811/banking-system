@@ -30,6 +30,7 @@ export type MonthlyDigestMinAggregateOutputType = {
   month: string | null
   bankRecordId: string | null
   narrative: string | null
+  narrativeSource: string | null
   generatedAt: Date | null
   updatedAt: Date | null
 }
@@ -40,6 +41,7 @@ export type MonthlyDigestMaxAggregateOutputType = {
   month: string | null
   bankRecordId: string | null
   narrative: string | null
+  narrativeSource: string | null
   generatedAt: Date | null
   updatedAt: Date | null
 }
@@ -51,6 +53,7 @@ export type MonthlyDigestCountAggregateOutputType = {
   bankRecordId: number
   sections: number
   narrative: number
+  narrativeSource: number
   generatedAt: number
   updatedAt: number
   _all: number
@@ -63,6 +66,7 @@ export type MonthlyDigestMinAggregateInputType = {
   month?: true
   bankRecordId?: true
   narrative?: true
+  narrativeSource?: true
   generatedAt?: true
   updatedAt?: true
 }
@@ -73,6 +77,7 @@ export type MonthlyDigestMaxAggregateInputType = {
   month?: true
   bankRecordId?: true
   narrative?: true
+  narrativeSource?: true
   generatedAt?: true
   updatedAt?: true
 }
@@ -84,6 +89,7 @@ export type MonthlyDigestCountAggregateInputType = {
   bankRecordId?: true
   sections?: true
   narrative?: true
+  narrativeSource?: true
   generatedAt?: true
   updatedAt?: true
   _all?: true
@@ -168,6 +174,7 @@ export type MonthlyDigestGroupByOutputType = {
   bankRecordId: string
   sections: runtime.JsonValue
   narrative: string
+  narrativeSource: string
   generatedAt: Date
   updatedAt: Date
   _count: MonthlyDigestCountAggregateOutputType | null
@@ -200,6 +207,7 @@ export type MonthlyDigestWhereInput = {
   bankRecordId?: Prisma.StringFilter<"MonthlyDigest"> | string
   sections?: Prisma.JsonFilter<"MonthlyDigest">
   narrative?: Prisma.StringFilter<"MonthlyDigest"> | string
+  narrativeSource?: Prisma.StringFilter<"MonthlyDigest"> | string
   generatedAt?: Prisma.DateTimeFilter<"MonthlyDigest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MonthlyDigest"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -212,6 +220,7 @@ export type MonthlyDigestOrderByWithRelationInput = {
   bankRecordId?: Prisma.SortOrder
   sections?: Prisma.SortOrder
   narrative?: Prisma.SortOrder
+  narrativeSource?: Prisma.SortOrder
   generatedAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -228,6 +237,7 @@ export type MonthlyDigestWhereUniqueInput = Prisma.AtLeast<{
   bankRecordId?: Prisma.StringFilter<"MonthlyDigest"> | string
   sections?: Prisma.JsonFilter<"MonthlyDigest">
   narrative?: Prisma.StringFilter<"MonthlyDigest"> | string
+  narrativeSource?: Prisma.StringFilter<"MonthlyDigest"> | string
   generatedAt?: Prisma.DateTimeFilter<"MonthlyDigest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MonthlyDigest"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -240,6 +250,7 @@ export type MonthlyDigestOrderByWithAggregationInput = {
   bankRecordId?: Prisma.SortOrder
   sections?: Prisma.SortOrder
   narrative?: Prisma.SortOrder
+  narrativeSource?: Prisma.SortOrder
   generatedAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.MonthlyDigestCountOrderByAggregateInput
@@ -257,6 +268,7 @@ export type MonthlyDigestScalarWhereWithAggregatesInput = {
   bankRecordId?: Prisma.StringWithAggregatesFilter<"MonthlyDigest"> | string
   sections?: Prisma.JsonWithAggregatesFilter<"MonthlyDigest">
   narrative?: Prisma.StringWithAggregatesFilter<"MonthlyDigest"> | string
+  narrativeSource?: Prisma.StringWithAggregatesFilter<"MonthlyDigest"> | string
   generatedAt?: Prisma.DateTimeWithAggregatesFilter<"MonthlyDigest"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"MonthlyDigest"> | Date | string
 }
@@ -267,6 +279,7 @@ export type MonthlyDigestCreateInput = {
   bankRecordId: string
   sections: Prisma.JsonNullValueInput | runtime.InputJsonValue
   narrative: string
+  narrativeSource?: string
   generatedAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutMonthlyDigestsInput
@@ -279,6 +292,7 @@ export type MonthlyDigestUncheckedCreateInput = {
   bankRecordId: string
   sections: Prisma.JsonNullValueInput | runtime.InputJsonValue
   narrative: string
+  narrativeSource?: string
   generatedAt?: Date | string
   updatedAt?: Date | string
 }
@@ -289,6 +303,7 @@ export type MonthlyDigestUpdateInput = {
   bankRecordId?: Prisma.StringFieldUpdateOperationsInput | string
   sections?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   narrative?: Prisma.StringFieldUpdateOperationsInput | string
+  narrativeSource?: Prisma.StringFieldUpdateOperationsInput | string
   generatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutMonthlyDigestsNestedInput
@@ -301,6 +316,7 @@ export type MonthlyDigestUncheckedUpdateInput = {
   bankRecordId?: Prisma.StringFieldUpdateOperationsInput | string
   sections?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   narrative?: Prisma.StringFieldUpdateOperationsInput | string
+  narrativeSource?: Prisma.StringFieldUpdateOperationsInput | string
   generatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -312,6 +328,7 @@ export type MonthlyDigestCreateManyInput = {
   bankRecordId: string
   sections: Prisma.JsonNullValueInput | runtime.InputJsonValue
   narrative: string
+  narrativeSource?: string
   generatedAt?: Date | string
   updatedAt?: Date | string
 }
@@ -322,6 +339,7 @@ export type MonthlyDigestUpdateManyMutationInput = {
   bankRecordId?: Prisma.StringFieldUpdateOperationsInput | string
   sections?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   narrative?: Prisma.StringFieldUpdateOperationsInput | string
+  narrativeSource?: Prisma.StringFieldUpdateOperationsInput | string
   generatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -333,6 +351,7 @@ export type MonthlyDigestUncheckedUpdateManyInput = {
   bankRecordId?: Prisma.StringFieldUpdateOperationsInput | string
   sections?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   narrative?: Prisma.StringFieldUpdateOperationsInput | string
+  narrativeSource?: Prisma.StringFieldUpdateOperationsInput | string
   generatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -359,6 +378,7 @@ export type MonthlyDigestCountOrderByAggregateInput = {
   bankRecordId?: Prisma.SortOrder
   sections?: Prisma.SortOrder
   narrative?: Prisma.SortOrder
+  narrativeSource?: Prisma.SortOrder
   generatedAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -369,6 +389,7 @@ export type MonthlyDigestMaxOrderByAggregateInput = {
   month?: Prisma.SortOrder
   bankRecordId?: Prisma.SortOrder
   narrative?: Prisma.SortOrder
+  narrativeSource?: Prisma.SortOrder
   generatedAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -379,6 +400,7 @@ export type MonthlyDigestMinOrderByAggregateInput = {
   month?: Prisma.SortOrder
   bankRecordId?: Prisma.SortOrder
   narrative?: Prisma.SortOrder
+  narrativeSource?: Prisma.SortOrder
   generatedAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -431,6 +453,7 @@ export type MonthlyDigestCreateWithoutUserInput = {
   bankRecordId: string
   sections: Prisma.JsonNullValueInput | runtime.InputJsonValue
   narrative: string
+  narrativeSource?: string
   generatedAt?: Date | string
   updatedAt?: Date | string
 }
@@ -441,6 +464,7 @@ export type MonthlyDigestUncheckedCreateWithoutUserInput = {
   bankRecordId: string
   sections: Prisma.JsonNullValueInput | runtime.InputJsonValue
   narrative: string
+  narrativeSource?: string
   generatedAt?: Date | string
   updatedAt?: Date | string
 }
@@ -481,6 +505,7 @@ export type MonthlyDigestScalarWhereInput = {
   bankRecordId?: Prisma.StringFilter<"MonthlyDigest"> | string
   sections?: Prisma.JsonFilter<"MonthlyDigest">
   narrative?: Prisma.StringFilter<"MonthlyDigest"> | string
+  narrativeSource?: Prisma.StringFilter<"MonthlyDigest"> | string
   generatedAt?: Prisma.DateTimeFilter<"MonthlyDigest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MonthlyDigest"> | Date | string
 }
@@ -491,6 +516,7 @@ export type MonthlyDigestCreateManyUserInput = {
   bankRecordId: string
   sections: Prisma.JsonNullValueInput | runtime.InputJsonValue
   narrative: string
+  narrativeSource?: string
   generatedAt?: Date | string
   updatedAt?: Date | string
 }
@@ -501,6 +527,7 @@ export type MonthlyDigestUpdateWithoutUserInput = {
   bankRecordId?: Prisma.StringFieldUpdateOperationsInput | string
   sections?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   narrative?: Prisma.StringFieldUpdateOperationsInput | string
+  narrativeSource?: Prisma.StringFieldUpdateOperationsInput | string
   generatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -511,6 +538,7 @@ export type MonthlyDigestUncheckedUpdateWithoutUserInput = {
   bankRecordId?: Prisma.StringFieldUpdateOperationsInput | string
   sections?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   narrative?: Prisma.StringFieldUpdateOperationsInput | string
+  narrativeSource?: Prisma.StringFieldUpdateOperationsInput | string
   generatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -521,6 +549,7 @@ export type MonthlyDigestUncheckedUpdateManyWithoutUserInput = {
   bankRecordId?: Prisma.StringFieldUpdateOperationsInput | string
   sections?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   narrative?: Prisma.StringFieldUpdateOperationsInput | string
+  narrativeSource?: Prisma.StringFieldUpdateOperationsInput | string
   generatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -534,6 +563,7 @@ export type MonthlyDigestSelect<ExtArgs extends runtime.Types.Extensions.Interna
   bankRecordId?: boolean
   sections?: boolean
   narrative?: boolean
+  narrativeSource?: boolean
   generatedAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -546,6 +576,7 @@ export type MonthlyDigestSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   bankRecordId?: boolean
   sections?: boolean
   narrative?: boolean
+  narrativeSource?: boolean
   generatedAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -558,6 +589,7 @@ export type MonthlyDigestSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   bankRecordId?: boolean
   sections?: boolean
   narrative?: boolean
+  narrativeSource?: boolean
   generatedAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -570,11 +602,12 @@ export type MonthlyDigestSelectScalar = {
   bankRecordId?: boolean
   sections?: boolean
   narrative?: boolean
+  narrativeSource?: boolean
   generatedAt?: boolean
   updatedAt?: boolean
 }
 
-export type MonthlyDigestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "month" | "bankRecordId" | "sections" | "narrative" | "generatedAt" | "updatedAt", ExtArgs["result"]["monthlyDigest"]>
+export type MonthlyDigestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "month" | "bankRecordId" | "sections" | "narrative" | "narrativeSource" | "generatedAt" | "updatedAt", ExtArgs["result"]["monthlyDigest"]>
 export type MonthlyDigestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -597,6 +630,7 @@ export type $MonthlyDigestPayload<ExtArgs extends runtime.Types.Extensions.Inter
     bankRecordId: string
     sections: runtime.JsonValue
     narrative: string
+    narrativeSource: string
     generatedAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["monthlyDigest"]>
@@ -1029,6 +1063,7 @@ export interface MonthlyDigestFieldRefs {
   readonly bankRecordId: Prisma.FieldRef<"MonthlyDigest", 'String'>
   readonly sections: Prisma.FieldRef<"MonthlyDigest", 'Json'>
   readonly narrative: Prisma.FieldRef<"MonthlyDigest", 'String'>
+  readonly narrativeSource: Prisma.FieldRef<"MonthlyDigest", 'String'>
   readonly generatedAt: Prisma.FieldRef<"MonthlyDigest", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"MonthlyDigest", 'DateTime'>
 }

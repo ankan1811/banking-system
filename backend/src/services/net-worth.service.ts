@@ -220,15 +220,22 @@ async function getNetWorthInsight(
   if (useAi) await redisDel(cacheKey);
 
   const raw = await redisGet(cacheKey);
-  if (raw) return { text: raw, source: 'formula' };
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed.text === 'string') return parsed as { text: string; source: 'ai' | 'formula' };
+    } catch { /* old format: plain text string */ }
+    return { text: raw, source: 'formula' };
+  }
 
   const last6 = history.slice(-6);
 
   // useAi=false: skip Gemini, use formula fallback
   if (!useAi) {
     const fallback = computeNetWorthFallback(last6);
-    await redisSet(cacheKey, fallback, 5 * 60);
-    return { text: fallback, source: 'formula' };
+    const cached = { text: fallback, source: 'formula' as const };
+    await redisSet(cacheKey, JSON.stringify(cached), 5 * 60);
+    return cached;
   }
 
   // useAi=true: call Gemini
@@ -240,13 +247,15 @@ Snapshots: ${JSON.stringify(last6.map((s: any) => ({ month: s.month, netWorth: s
     const result = await geminiModel.generateContent(prompt);
     const text = result.response.text().trim();
 
-    await redisSet(cacheKey, text, INSIGHT_TTL_S);
-    return { text, source: 'ai' };
+    const cached = { text, source: 'ai' as const };
+    await redisSet(cacheKey, JSON.stringify(cached), INSIGHT_TTL_S);
+    return cached;
   } catch (err) {
     console.error('Gemini net worth insight error:', err);
     const fallback = computeNetWorthFallback(last6);
-    await redisSet(cacheKey, fallback, 5 * 60);
-    return { text: fallback, source: 'formula' };
+    const cached = { text: fallback, source: 'formula' as const };
+    await redisSet(cacheKey, JSON.stringify(cached), 5 * 60);
+    return cached;
   }
 }
 

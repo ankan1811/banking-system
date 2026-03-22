@@ -1,10 +1,10 @@
 import { apiRequest } from './client';
 import type { FinancialPlan } from '@shared/types';
 
-export async function getInsights(bankRecordId: string, currentMonth: string) {
+export async function getInsights(bankRecordId: string, currentMonth: string, useAi: boolean = false) {
   return apiRequest<{ insights: any }>('/api/ai/insights', {
     method: 'POST',
-    body: JSON.stringify({ bankRecordId, currentMonth }),
+    body: JSON.stringify({ bankRecordId, currentMonth, useAi }),
   });
 }
 

@@ -2335,6 +2335,7 @@ export const FinancialHealthScoreScalarFieldEnum = {
   score: 'score',
   breakdown: 'breakdown',
   tips: 'tips',
+  source: 'source',
   generatedAt: 'generatedAt',
   updatedAt: 'updatedAt'
 } as const
@@ -2349,6 +2350,7 @@ export const MonthlyDigestScalarFieldEnum = {
   bankRecordId: 'bankRecordId',
   sections: 'sections',
   narrative: 'narrative',
+  narrativeSource: 'narrativeSource',
   generatedAt: 'generatedAt',
   updatedAt: 'updatedAt'
 } as const
