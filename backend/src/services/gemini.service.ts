@@ -4,6 +4,7 @@ import { getAccounts, getAccount, getAllUserTransactions } from './bank.service.
 import { getGoals } from './goals.service.js';
 import { redisGet, redisSet, redisDel } from '../lib/redis.js';
 import type { AICategory, SpendingInsight, ChatMessage, FinancialPlan, PlanMilestone } from '@shared/types';
+import { AI_CATEGORIES } from '@shared/types';
 
 // ─── Helpers ────────────────────────────────────────────────
 
@@ -35,7 +36,7 @@ function mapCategory(name: string, plaidCategory: string): AICategory {
   if (/health|medical|pharmacy|doctor|hospital|dental|gym|fitness|apollo|medplus|pharmeasy|netmeds|practo|1mg/.test(text))                                 return 'Health';
   if (/education|school|university|tuition|course|book|learning|byju|unacademy|upgrad|coursera|udemy/.test(text))                                   return 'Education';
   if (/income|payroll|salary|direct deposit|dividend|interest income|credited|int\.cr|interest.*credited/.test(text))                              return 'Income';
-  if (/transfer|payment|zelle|venmo|paypal|wire|upi|neft|rtgs|imps|nach|ecs|mandate|fund.*transfer/.test(text))                                                   return 'Transfers';
+  if (/\btransfer\b|zelle|venmo|paypal|wire|upi|neft|rtgs|imps|nach|ecs|mandate|fund.*transfer/.test(text))                                                   return 'Transfers';
   return 'Other';
 }
 
@@ -44,8 +45,54 @@ export function categorizeTransactions(
 ): (RawTransaction & { aiCategory: AICategory })[] {
   return transactions.map((t) => ({
     ...t,
-    aiCategory: mapCategory(t.merchantName || t.name, t.category || ''),
+    aiCategory: (t.category && AI_CATEGORIES.includes(t.category as AICategory))
+      ? t.category as AICategory
+      : mapCategory(t.merchantName || t.name, t.category || ''),
   }));
+}
+
+// ─── AI-powered categorization (Gemini Flash, used at upload time) ─
+
+export async function aiCategorizeTransactions(
+  transactions: { name: string; amount: number }[]
+): Promise<AICategory[]> {
+  const BATCH_SIZE = 50;
+  const results: AICategory[] = [];
+
+  for (let i = 0; i < transactions.length; i += BATCH_SIZE) {
+    const batch = transactions.slice(i, i + BATCH_SIZE);
+    const prompt = `Categorize each bank transaction into exactly one category.
+
+Categories: ${AI_CATEGORIES.join(', ')}
+
+Transactions:
+${batch.map((t, j) => `${j + 1}. "${t.name}" (${t.amount > 0 ? 'debit' : 'credit'} ₹${Math.abs(t.amount)})`).join('\n')}
+
+Return ONLY a JSON array of category strings in the same order, no explanation.
+Example: ["Food & Dining","Transfers","Bills & Utilities"]`;
+
+    try {
+      const result = await geminiModel.generateContent(prompt);
+      const text = result.response.text();
+      const parsed = JSON.parse(extractJSON(text)) as string[];
+
+      for (let j = 0; j < batch.length; j++) {
+        const cat = parsed[j];
+        if (cat && AI_CATEGORIES.includes(cat as AICategory)) {
+          results.push(cat as AICategory);
+        } else {
+          results.push(mapCategory(batch[j].name, ''));
+        }
+      }
+    } catch (err) {
+      console.error('[Gemini categorization] Batch failed, falling back to regex:', err);
+      for (const t of batch) {
+        results.push(mapCategory(t.name, ''));
+      }
+    }
+  }
+
+  return results;
 }
 
 // ─── 2. Spending Insights ───────────────────────────────────

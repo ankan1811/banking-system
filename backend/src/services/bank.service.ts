@@ -6,7 +6,7 @@ import { getTransactionsByBankId, getTransferAdjustments } from './transaction.s
 import { categorizeTransactions } from './gemini.service.js';
 import { evaluateAlerts } from './alerts.service.js';
 import { prisma } from '../lib/db.js';
-import { redisGet, redisSet, redisDel } from '../lib/redis.js';
+import { redisGet, redisSet, redisDel, redisDelByPrefix } from '../lib/redis.js';
 
 // ─── Constants ──────────────────────────────────────────────
 
@@ -281,9 +281,30 @@ function fireAlerts(userId: string, allTransactions: any[]) {
 
 // ─── Cache invalidation (called after transfers & disconnects) ─
 
-export async function clearAccountCache(bankRecordId: string, _userId?: string) {
+export async function clearAccountCache(bankRecordId: string, userId?: string) {
   // Delete Redis sync key so next request triggers a fresh Plaid sync
   await redisDel(`plaid-sync:${bankRecordId}`);
+
+  // Clear all user-level analytics caches so pages reflect the change
+  if (userId) {
+    await Promise.all([
+      redisDelByPrefix(`merchants:${userId}:`),
+      redisDelByPrefix(`trends:${userId}:`),
+      redisDelByPrefix(`recurring:${userId}`),
+      redisDelByPrefix(`income-expense:${userId}:`),
+      redisDelByPrefix(`budget-status:${userId}:`),
+      redisDelByPrefix(`challenge-progress:${userId}`),
+      redisDelByPrefix(`health:${userId}:`),
+      redisDelByPrefix(`insights:${userId}:`),
+      redisDelByPrefix(`chat-context:${userId}`),
+      redisDelByPrefix(`fin-plan:${userId}:`),
+      redisDelByPrefix(`health-score:${userId}`),
+      redisDelByPrefix(`digest:${userId}`),
+      redisDelByPrefix(`challenges:${userId}:`),
+      redisDelByPrefix(`net-worth:${userId}`),
+      redisDelByPrefix(`budget:${userId}:`),
+    ]);
+  }
 }
 
 // ─── getInstitution (cached in-memory, static data) ──────────

@@ -3,7 +3,7 @@ import multer from 'multer';
 import { randomUUID } from 'crypto';
 import { prisma } from '../lib/db.js';
 import { parseStatement } from '../services/statement-parser.service.js';
-import { categorizeTransactions } from '../services/gemini.service.js';
+import { aiCategorizeTransactions } from '../services/gemini.service.js';
 import { hashTransaction } from '../services/bank.service.js';
 import { encryptId } from '../lib/utils.js';
 import { redisDelByPrefix } from '../lib/redis.js';
@@ -203,30 +203,23 @@ async function insertTransactions(
   accountId: string,
   parsed: ReturnType<typeof parseStatement>
 ): Promise<number> {
-  // Categorize transactions using rule-based regex
-  const withCategory = categorizeTransactions(
-    parsed.map((t) => ({
-      id: randomUUID(),
-      name: t.name,
-      merchantName: t.name,
-      amount: t.amount,
-      date: t.date,
-      category: '',
-    }))
+  // Categorize transactions using Gemini AI (falls back to regex on failure)
+  const aiCategories = await aiCategorizeTransactions(
+    parsed.map((t) => ({ name: t.name, amount: t.amount }))
   );
 
   // Build DB rows, using hash to deduplicate
-  const rows = withCategory.map((t) => ({
+  const rows = parsed.map((t, i) => ({
     id: hashTransaction(t.name, t.amount, t.date), // deterministic ID for dedup
     bankId,
     name: t.name,
-    merchantName: t.merchantName || t.name,
+    merchantName: t.name,
     paymentChannel: 'branch',
     type: t.amount > 0 ? 'debit' : 'credit',
     accountId,
     amount: Math.abs(t.amount),
     pending: false,
-    category: t.aiCategory || '',
+    category: aiCategories[i] || '',
     date: t.date,
     image: null,
     syncedAt: new Date(),

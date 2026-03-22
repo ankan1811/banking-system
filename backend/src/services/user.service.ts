@@ -150,7 +150,7 @@ export const disconnectBank = async (userId: string, bankId: string) => {
 
   await prisma.bank.delete({ where: { id: bankId } });
   await clearAccountCache(bankId, userId);
-  await clearSuggestionsCache(bankId);
+  await clearSuggestionsCache(userId);
 };
 
 export const deleteUser = async (userId: string) => {
