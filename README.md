@@ -56,7 +56,7 @@ Built with **Next.js 14**, **Express.js**, **Prisma**, **PostgreSQL**, **Upstash
 - **Spending insights** — Dedicated `/insights` page with: AI-generated natural language summary, month-over-month category comparison, top spending categories with progress bars, anomaly detection, and personalized savings tips. Results cached for 5 minutes.
 - **AI chatbot** — Floating chat panel (bottom-right) powered by Gemini. Has full context of your accounts, balances, and recent transactions. Supports quick-prompt shortcuts. Rate-limited to 10 messages/minute per user.
 - **Category breakdown chart** — Doughnut chart on the dashboard visualizing spending by AI category with a color-coded legend.
-- **Financial health score** — AI-generated 0-100 score based on budget adherence, savings rate, spending trends, and goal progress. Uses a 3-layer cache (in-memory 1hr + DB persistence + local rule-based fallback) to minimize Gemini calls to at most 1 per user per hour.
+- **Financial health score** — AI-generated 0-100 score based on budget adherence, savings rate, spending trends, and goal progress. Uses a 3-layer cache (Redis + DB persistence + local rule-based fallback). Gemini is only called when the user clicks "Generate with AI"; otherwise a formula-based score is computed locally.
 - **AI financial plan generator** — Describe a financial goal in plain text (e.g., "Save $10,000 for a down payment in 2 years") and Gemini creates a step-by-step savings plan with milestones, monthly savings needed, feasibility rating, and actionable tips. Includes a "Create Goal from Plan" button to instantly convert the plan into a tracked savings goal.
 - **On-demand AI generation** — All AI features (insights, health score, digest, challenges, net worth insight) follow a strict two-mode pattern:
   1. **Default (page load):** Cache hit → return cached data. Cache miss → formula-based fallback (predefined calculations), cached for 5 minutes. Gemini is **never** called.
@@ -76,7 +76,7 @@ Built with **Next.js 14**, **Express.js**, **Prisma**, **PostgreSQL**, **Upstash
 - **Merchant insights** — Top 50 merchants ranked by total spend. Shows transaction count, average amount, category badge, month-over-month trend arrows, and a client-side search filter.
 - **Recurring transaction detection** — Algorithm detects subscriptions by grouping transactions with similar names/amounts at regular intervals (weekly, monthly, quarterly). Shows on dashboard with next expected date.
 - **Bill calendar** — Visual monthly calendar grid showing projected recurring charges on their expected dates. Color-coded by AI category, click-to-expand daily details, monthly committed total. Zero new API calls — reuses existing recurring detection data.
-- **AI monthly digest** — Comprehensive monthly report page aggregating health score, budget adherence, goal progress, top merchants, and income vs expenses into one view. AI-generated narrative summary (1 Gemini call per user per month, cached in DB). One-click PDF export.
+- **AI monthly digest** — Comprehensive monthly report page aggregating health score, budget adherence, goal progress, top merchants, and income vs expenses into one view. Narrative summary defaults to a formula-based local narrative; Gemini is only called when the user clicks "Generate with AI". Cached in both Redis and DB with source tracking. One-click PDF export.
 - **Transaction export** — Export any date range to CSV (for spreadsheets/accountants) or a formatted PDF bank statement with account info, transaction table, and debit/credit totals.
 
 ### Profile & Settings
@@ -108,10 +108,10 @@ Built with **Next.js 14**, **Express.js**, **Prisma**, **PostgreSQL**, **Upstash
 - **Monthly snapshots** — Current month's net worth is auto-saved to the database. Historical snapshots power the trends chart.
 - **Line chart** — Track total assets, total liabilities, and net worth over 6/12/24 months with Chart.js Line chart (emerald/rose/violet).
 - **Summary cards** — Total assets, total liabilities, net worth, and monthly change (with percent).
-- **AI insight** — Optional Gemini-generated 2-sentence trend analysis and actionable tip (1-hour in-memory cache).
+- **AI insight** — Gemini-generated 2-sentence trend analysis and actionable tip, only when the user clicks "Generate with AI". Default view shows a formula-based trend summary. Source badge indicates whether the insight is AI or formula-generated.
 
 ### Spending Challenges / Gamification
-- **AI-powered suggestions** — Gemini analyzes your top spending categories and suggests 3 personalized challenges. Accept with one click. 10-minute cache per user.
+- **AI-powered suggestions** — Gemini analyzes your top spending categories and suggests 3 personalized challenges when the user clicks "Generate with AI". Default view shows formula-based suggestions. Accept with one click. 30-day cache for AI suggestions, 5 min for formula.
 - **Custom challenges** — Create your own with 3 types: category spending limit, no-spend days, or savings target. Set weekly or monthly duration.
 - **Real-time progress** — Progress bars tracked against live transaction data. Category limit shows spent vs budget. No-spend shows days hit vs target. Savings shows amount saved vs goal.
 - **Auto-completion** — Challenges automatically complete or fail when their end date passes, based on actual performance.
@@ -154,12 +154,14 @@ Rate limits per user per minute:
 | Endpoint Group | Limit | Reason |
 |---------------|-------|--------|
 | Accounts | 30/min | Triggers Plaid API calls |
-| AI Insights | 5/min | Triggers Gemini API calls |
+| AI Insights | 5/min | Dedicated Gemini insights endpoint |
 | Chat | 10/min | Triggers Gemini API calls |
 | Export (CSV/PDF) | 5/min | Triggers Plaid API calls |
 | Analytics | 15/min | Triggers Plaid via getAccount |
+| Health Score | 15/min | Formula by default, Gemini only on explicit AI request |
+| Reports/Digest | 15/min | Formula by default, Gemini only on explicit AI request |
+| Challenges | 15/min | Formula by default, Gemini only on explicit AI request |
 | Net Worth | 30/min | Triggers Plaid via getAccounts |
-| Challenges | 5/min | Suggestions trigger Gemini |
 
 ### Design
 - **Glassmorphic dark theme** — Frosted glass cards, animated gradients
@@ -196,7 +198,7 @@ bank/
 │   │   ├── SpendingInsightsCard.tsx  # AI insights display
 │   │   ├── BudgetProgressCard.tsx    # Budget progress bars
 │   │   ├── GoalCard.tsx              # Savings goal progress ring
-│   │   ├── GoalsManager.tsx          # Goals CRUD manager + AI financial planner
+│   │   ├── GoalsManager.tsx          # Goals CRUD + AI financial planner (text → plan → goal)
 │   │   ├── SpendingTrendsChart.tsx   # Multi-month trends chart
 │   │   ├── RecurringTransactionsCard.tsx  # Subscriptions card
 │   │   ├── AlertsManager.tsx         # Alert rules manager
@@ -214,7 +216,7 @@ bank/
 │   │   ├── ChallengeProgressCard.tsx # Challenge progress bar + stats
 │   │   └── BadgeIcon.tsx             # Badge display with colors/labels
 │   ├── lib/api/                      # API client (fetch wrappers)
-│   │   ├── ai.api.ts                 # Insights API
+│   │   ├── ai.api.ts                 # Insights (useAi) + Financial Plan API
 │   │   ├── chat.api.ts               # Chat API
 │   │   ├── budgets.api.ts            # Budgets + Export API
 │   │   ├── goals.api.ts              # Goals API
@@ -230,8 +232,8 @@ bank/
 │
 ├── backend/                          # Express API (port 8787)
 │   ├── src/
-│   │   ├── routes/                   # 16 route files
-│   │   │   ├── ai.routes.ts          # POST /api/ai/insights
+│   │   ├── routes/                   # 17 route files
+│   │   │   ├── ai.routes.ts          # POST /api/ai/insights, POST /api/ai/financial-plan
 │   │   │   ├── chat.routes.ts        # POST /api/chat
 │   │   │   ├── budgets.routes.ts     # CRUD /api/budgets + status
 │   │   │   ├── goals.routes.ts       # CRUD /api/goals + contribute
@@ -245,23 +247,23 @@ bank/
 │   │   │   ├── net-worth.routes.ts  # /api/net-worth + assets + liabilities
 │   │   │   └── challenges.routes.ts # /api/challenges + overview + suggestions
 │   │   ├── services/                 # 13 service files
-│   │   │   ├── gemini.service.ts     # categorize, insights, chat (cached)
+│   │   │   ├── gemini.service.ts     # categorize, insights (useAi), financial plan, chat
 │   │   │   ├── bank.service.ts       # Plaid calls (5-min + 24-hr caches)
 │   │   │   ├── budget.service.ts     # Budget CRUD + status
 │   │   │   ├── goals.service.ts      # Goals CRUD + contributions
 │   │   │   ├── analytics.service.ts  # trends, recurring, income/expense, merchants
 │   │   │   ├── alerts.service.ts     # Alert evaluation + email
 │   │   │   ├── export.service.ts     # CSV/PDF generation
-│   │   │   ├── health-score.service.ts  # 3-layer cached health score
+│   │   │   ├── health-score.service.ts  # 3-layer cache + useAi + source tracking
 │   │   │   ├── search.service.ts     # Transaction search/filter
 │   │   │   ├── notes.service.ts      # Transaction notes/tags CRUD
 │   │   │   ├── splits.service.ts    # Split expenses CRUD + auto-settle
-│   │   │   ├── net-worth.service.ts # Assets/liabilities + net worth + AI insight
-│   │   │   └── challenges.service.ts # Challenges + progress + AI suggestions + streaks
+│   │   │   ├── net-worth.service.ts # Assets/liabilities + net worth + insight (useAi)
+│   │   │   └── challenges.service.ts # Challenges + progress + suggestions (useAi) + streaks
 │   │   ├── middleware/               # JWT auth + rate limiter factory
 │   │   └── lib/                      # Prisma, Plaid, Gemini, Redis clients
 │   └── prisma/
-│       └── schema.prisma             # Database schema (20 tables)
+│       └── schema.prisma             # Database schema (23 tables)
 │
 ├── shared/                           # Shared between frontend & backend
 │   ├── types.ts                      # TypeScript types (35+ types)
@@ -379,7 +381,7 @@ cd backend
 npx prisma migrate dev --name init
 ```
 
-This creates 20 tables: `users`, `banks`, `transactions`, `otp_codes`, `cached_categories`, `budgets`, `savings_goals`, `goal_contributions`, `alert_rules`, `alert_trigger_logs`, `transaction_notes`, `financial_health_scores`, `monthly_digests`, `split_groups`, `split_participants`, `spending_challenges`, `challenge_streaks`, `badges`, `manual_assets`, `manual_liabilities`, `net_worth_snapshots`.
+This creates 23 tables: `users`, `banks`, `transactions`, `otp_codes`, `cached_categories`, `budgets`, `savings_goals`, `goal_contributions`, `alert_rules`, `alert_trigger_logs`, `transaction_notes`, `financial_health_scores`, `monthly_digests`, `split_groups`, `split_participants`, `spending_challenges`, `challenge_streaks`, `badges`, `manual_assets`, `manual_liabilities`, `net_worth_snapshots`, `challenge_suggestion_cache`, `plaid_transactions`.
 
 ### 5. Start the app
 
@@ -467,7 +469,8 @@ Open [http://localhost:3003](http://localhost:3003).
 ### AI (Protected)
 | Method | Path | Description |
 |--------|------|-------------|
-| POST | `/api/ai/insights` | Generate spending insights for an account + month |
+| POST | `/api/ai/insights` | Generate spending insights for an account + month (supports `useAi` flag) |
+| POST | `/api/ai/financial-plan` | Generate a step-by-step financial plan from a text description |
 | POST | `/api/chat` | Send a message to the AI financial assistant |
 
 ### Budgets (Protected)
@@ -526,7 +529,13 @@ Open [http://localhost:3003](http://localhost:3003).
 ### Health Score (Protected)
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/api/health-score?bankRecordId=x&month=YYYY-MM` | AI-generated financial health score |
+| GET | `/api/health-score?bankRecordId=x&month=YYYY-MM&ai=true` | Financial health score (formula by default, AI with `ai=true`) |
+
+### Reports (Protected)
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/reports/digest?bankRecordId=x&month=YYYY-MM&ai=true` | Monthly digest (formula narrative by default, AI with `ai=true`) |
+| GET | `/api/reports/digest/pdf?bankRecordId=x&month=YYYY-MM` | PDF export of monthly digest (uses cached data) |
 
 ### Split Expenses (Protected)
 | Method | Path | Description |
@@ -541,7 +550,7 @@ Open [http://localhost:3003](http://localhost:3003).
 ### Net Worth (Protected)
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/api/net-worth?months=12` | Get net worth data with history and AI insight |
+| GET | `/api/net-worth?months=12&ai=true` | Get net worth data with history and insight (formula by default, AI with `ai=true`) |
 | GET | `/api/net-worth/assets` | List manual assets |
 | POST | `/api/net-worth/assets` | Add a manual asset |
 | PATCH | `/api/net-worth/assets/:id` | Update a manual asset |
@@ -556,7 +565,7 @@ Open [http://localhost:3003](http://localhost:3003).
 |--------|------|-------------|
 | GET | `/api/challenges` | List all challenges (optional `?status=active\|completed\|failed`) |
 | GET | `/api/challenges/overview?bankRecordId=x` | Bundled progress + streak + badges |
-| GET | `/api/challenges/suggestions?bankRecordId=x` | AI-generated challenge suggestions |
+| GET | `/api/challenges/suggestions?bankRecordId=x&ai=true` | Challenge suggestions (formula by default, AI with `ai=true`) |
 | POST | `/api/challenges` | Create a new challenge |
 | PATCH | `/api/challenges/:id/abandon` | Abandon an active challenge |
 
@@ -581,8 +590,8 @@ Open [http://localhost:3003](http://localhost:3003).
 | Table | Purpose |
 |-------|---------|
 | `cached_categories` | Gemini category decisions keyed by SHA-256 hash of `(name, amount, date)` |
-| `financial_health_scores` | AI health score cache per user/month (survives server restart) |
-| `monthly_digests` | AI monthly report cache per user/month |
+| `financial_health_scores` | Health score cache per user/month with `source` column ('ai' or 'formula') |
+| `monthly_digests` | Monthly report cache per user/month with `narrativeSource` column ('ai' or 'formula') |
 
 ### Financial Planning Tables
 | Table | Purpose |
@@ -617,6 +626,12 @@ Open [http://localhost:3003](http://localhost:3003).
 | `manual_assets` | User-added assets (property, vehicle, investment, cash) |
 | `manual_liabilities` | User-added liabilities (mortgage, auto loan, student loan, credit card) |
 | `net_worth_snapshots` | Monthly net worth snapshots with breakdown. Unique on `(userId, month)` |
+
+### Plaid Tables
+| Table | Purpose |
+|-------|---------|
+| `plaid_transactions` | Synced Plaid transactions linked to bank records |
+| `challenge_suggestion_cache` | AI/formula challenge suggestions cache per user/bank/month with source tracking |
 
 ---
 

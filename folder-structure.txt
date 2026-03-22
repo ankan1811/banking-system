@@ -20,10 +20,11 @@ bank/
 │   │                                 #   - AICategory, AI_CATEGORIES[] (10 spending categories)
 │   │                                 #   - Budget, BudgetStatus (budget tracking)
 │   │                                 #   - SavingsGoal, GoalContribution (savings goals)
-│   │                                 #   - SpendingInsight (AI insights response)
+│   │                                 #   - SpendingInsight (AI insights response, source: 'ai'|'formula')
 │   │                                 #   - TrendsData, RecurringPattern (analytics)
 │   │                                 #   - IncomeExpenseData, MerchantInsight (reports)
-│   │                                 #   - HealthScore (AI health score)
+│   │                                 #   - HealthScore (health score, source: 'ai'|'formula')
+│   │                                 #   - MonthlyDigest (digest, narrativeSource: 'ai'|'formula')
 │   │                                 #   - AlertRule (spending alerts)
 │   │                                 #   - TransactionNote (notes & tags)
 │   │                                 #   - ChatMessage, ChatResponse (AI chatbot)
@@ -32,14 +33,15 @@ bank/
 │   │                                 #   - SpendingChallenge, ChallengeProgress, ChallengeStreak (challenges)
 │   │                                 #   - Badge, BadgeType, ChallengesOverview, AiChallengeSuggestion
 │   │                                 #   - ManualAsset, ManualLiability, NetWorthSnapshot (net worth)
-│   │                                 #   - NetWorthBreakdown, NetWorthData, AssetCategory, LiabilityCategory
+│   │                                 #   - NetWorthData (aiInsightSource: 'ai'|'formula'|null)
+│   │                                 #   - PlanMilestone, FinancialPlan (AI financial planner)
 │   │
 │   └── validators.ts                 # Zod validation schemas and shared utility functions
 │
 │
 ├── prisma/                           # ── DATABASE SCHEMA ──
 │   │
-│   └── schema.prisma                 # Prisma schema defining 20 PostgreSQL tables:
+│   └── schema.prisma                 # Prisma schema defining 23 PostgreSQL tables:
 │                                     #   CORE:
 │                                     #     users              — User profiles, auth fields, relations
 │                                     #     banks              — Linked Plaid bank accounts + access tokens
@@ -47,8 +49,9 @@ bank/
 │                                     #     otp_codes          — Passwordless auth OTP codes (hashed)
 │                                     #   AI & CACHING:
 │                                     #     cached_categories  — Gemini category cache (SHA-256 hash key)
-│                                     #     financial_health_scores — AI health score cache per user/month
-│                                     #     monthly_digests    — AI monthly report cache per user/month
+│                                     #     financial_health_scores — Health score cache per user/month (source column)
+│                                     #     monthly_digests    — Monthly report cache per user/month (narrativeSource column)
+│                                     #     challenge_suggestion_cache — AI/formula challenge suggestions per user/bank/month
 │                                     #   FINANCIAL PLANNING:
 │                                     #     budgets            — Monthly spending limits per category
 │                                     #     savings_goals      — Named goals with target amounts
@@ -68,6 +71,8 @@ bank/
 │                                     #     manual_assets      — User-added assets (property, vehicle, etc.)
 │                                     #     manual_liabilities — User-added liabilities (mortgage, loan, etc.)
 │                                     #     net_worth_snapshots — Monthly net worth snapshots with breakdown
+│                                     #   PLAID:
+│                                     #     plaid_transactions — Synced Plaid transactions linked to bank records
 │
 │
 ├── backend/                          # ══════════════════════════════════════════════════
@@ -88,7 +93,9 @@ bank/
 │       ├── index.ts                  # Express app entry point:
 │       │                             #   - Registers all 19 route modules
 │       │                             #   - Applies CORS, cookie parser, JSON middleware
-│       │                             #   - Applies rate limiters per route group
+│       │                             #   - Rate limiters: aiRateLimit (5/min) for /api/ai only;
+│       │                             #     analyticsRateLimit (15/min) for health-score, reports,
+│       │                             #     challenges (formula by default, no Gemini calls)
 │       │                             #   - Health check endpoint at GET /health
 │       │
 │       ├── lib/                      # ── CLIENT LIBRARIES ──
@@ -150,7 +157,8 @@ bank/
 │       │   │                         #   Clears account cache for sender + receiver after transfer
 │       │   │                         #   so the new transaction appears on dashboard immediately
 │       │   │
-│       │   ├── ai.routes.ts          # POST /api/ai/insights — AI spending insights
+│       │   ├── ai.routes.ts          # POST /api/ai/insights — spending insights (useAi flag)
+│       │   │                         # POST /api/ai/financial-plan — AI financial plan generator
 │       │   │
 │       │   ├── chat.routes.ts        # POST /api/chat — AI financial assistant
 │       │   │
@@ -179,7 +187,7 @@ bank/
 │       │   │                         # PATCH  /api/alerts/:id — enable/disable
 │       │   │                         # DELETE /api/alerts/:id
 │       │   │
-│       │   ├── health-score.routes.ts # GET /api/health-score?bankRecordId&month
+│       │   ├── health-score.routes.ts # GET /api/health-score?bankRecordId&month&ai=true
 │       │   │
 │       │   ├── search.routes.ts      # GET /api/search?bankRecordId&q&category&amountMin&...
 │       │   │
@@ -188,8 +196,8 @@ bank/
 │       │   │                         # GET    /api/notes/batch?hashes=h1,h2,...
 │       │   │                         # GET    /api/notes/tags — user's tags (autocomplete)
 │       │   │
-│       │   ├── reports.routes.ts     # GET /api/reports/digest?bankRecordId&month — monthly digest
-│       │   │                         # GET /api/reports/digest/pdf — PDF export of digest
+│       │   ├── reports.routes.ts     # GET /api/reports/digest?bankRecordId&month&ai=true — monthly digest
+│       │   │                         # GET /api/reports/digest/pdf — PDF export (uses cached data)
 │       │   │
 │       │   ├── splits.routes.ts     # GET    /api/splits — list splits (optional ?status=)
 │       │   │                         # GET    /api/splits/summary — owed to you, pending, settled
@@ -198,7 +206,7 @@ bank/
 │       │   │                         # PATCH  /api/splits/:id/participants/:pid — toggle paid
 │       │   │                         # DELETE /api/splits/:id
 │       │   │
-│       │   ├── net-worth.routes.ts  # GET    /api/net-worth?months=12 — net worth + history + AI
+│       │   ├── net-worth.routes.ts  # GET    /api/net-worth?months=12&ai=true — net worth + history
 │       │   │                         # GET    /api/net-worth/assets — list manual assets
 │       │   │                         # POST   /api/net-worth/assets — add asset
 │       │   │                         # PATCH  /api/net-worth/assets/:id — update asset
@@ -210,11 +218,11 @@ bank/
 │       │   │
 │       │   └── challenges.routes.ts # GET    /api/challenges — list challenges
 │       │                             # GET    /api/challenges/overview?bankRecordId — progress+streak+badges
-│       │                             # GET    /api/challenges/suggestions?bankRecordId — AI suggestions
+│       │                             # GET    /api/challenges/suggestions?bankRecordId&ai=true — suggestions
 │       │                             # POST   /api/challenges — create challenge
 │       │                             # PATCH  /api/challenges/:id/abandon
 │       │
-│       └── services/                 # ── BUSINESS LOGIC (20 files) ──
+│       └── services/                 # ── BUSINESS LOGIC (21 files) ──
 │           │
 │           ├── auth.service.ts       # JWT creation, verification, token versioning
 │           │
@@ -233,7 +241,8 @@ bank/
 │           │
 │           ├── gemini.service.ts     # AI SERVICE — Google Gemini integration:
 │           │                         #   categorizeTransactions() — batch 50/call, DB-cached
-│           │                         #   generateSpendingInsights() — 24-hr Redis cache
+│           │                         #   generateSpendingInsights(useAi) — formula by default, Gemini on request
+│           │                         #   generateFinancialPlan() — step-by-step plan from text description
 │           │                         #   buildFinancialContext() — 24-hr Redis cache
 │           │                         #   chat() — Gemini chat with financial context
 │           │
@@ -262,11 +271,11 @@ bank/
 │           │                         #   exportCSV() — csv-stringify, streams as download
 │           │                         #   exportPDF() — PDFKit, formatted bank statement
 │           │
-│           ├── health-score.service.ts # AI financial health score (3-layer cache):
-│           │                         #   Layer 1: Redis (24-hr TTL)
-│           │                         #   Layer 2: DB (FinancialHealthScore table)
-│           │                         #   Layer 3: Gemini call (pre-aggregated ~200 bytes)
-│           │                         #   Fallback: Local rule-based score if Gemini fails
+│           ├── health-score.service.ts # Financial health score (3-layer cache + useAi):
+│           │                         #   Layer 1: Redis (24-hr TTL, preserves source)
+│           │                         #   Layer 2: DB (FinancialHealthScore table, source column)
+│           │                         #   Layer 3: Formula fallback (useAi=false) or Gemini (useAi=true)
+│           │                         #   Source tracking: 'ai' or 'formula' persisted through all layers
 │           │
 │           ├── search.service.ts     # Transaction search/filter:
 │           │                         #   searchTransactions() — text, category, amount, date
@@ -277,12 +286,12 @@ bank/
 │           │                         #   upsertNote()     — create/update with Redis invalidation
 │           │                         #   getUserTags()    — 24-hr Redis, distinct tags
 │           │
-│           ├── digest.service.ts    # Monthly Digest (3-layer cache like health score):
-│           │                         #   Layer 1: Redis (24-hr TTL)
-│           │                         #   Layer 2: DB (MonthlyDigest table, permanent for past months)
-│           │                         #   Layer 3: Aggregates all services + single Gemini narrative call
+│           ├── digest.service.ts    # Monthly Digest (3-layer cache + useAi):
+│           │                         #   Layer 1: Redis (24-hr TTL, preserves narrativeSource)
+│           │                         #   Layer 2: DB (MonthlyDigest table, narrativeSource column)
+│           │                         #   Layer 3: Local narrative (useAi=false) or Gemini (useAi=true)
 │           │                         #   generateDigestPDF() — PDFKit full report export
-│           │                         #   Local fallback narrative if Gemini fails
+│           │                         #   Source tracking persisted through Redis + DB cache layers
 │           │
 │           ├── otp.service.ts        # OTP generation, hashing, verification:
 │           │                         #   sendOtp() — generates 6-digit code, sends via Resend
@@ -313,13 +322,15 @@ bank/
 │           │
 │           ├── net-worth.service.ts # Net worth tracker:
 │           │                         #   Manual assets/liabilities CRUD (6 functions)
-│           │                         #   getNetWorth() — aggregate Plaid + manual, snapshot, AI insight
-│           │                         #   getNetWorthInsight() — Gemini trend analysis (24-hr Redis)
+│           │                         #   getNetWorth(useAi) — aggregate Plaid + manual, snapshot, insight
+│           │                         #   getNetWorthInsight(useAi) — formula or Gemini trend analysis
+│           │                         #   Source tracking: {text, source} cached as JSON in Redis
 │           │
 │           └── challenges.service.ts # Spending challenges + gamification:
 │                                     #   getChallenges(), createChallenge(), abandonChallenge()
 │                                     #   getChallengeProgress() — 1-hr Redis cache
-│                                     #   getAiSuggestions() — 30-day Redis + DB cache
+│                                     #   getAiSuggestions(useAi) — formula defaults, Gemini on request
+│                                     #     30-day Redis + DB cache with source tracking
 │                                     #   getStreakAndBadges() — streak + 8 badge types
 │                                     #   getChallengesOverview() — bundled endpoint
 │
@@ -447,16 +458,19 @@ bank/
 │   │   │                             #   — Gemini-powered, full financial context
 │   │   │                             #   — Quick-prompt shortcuts, message history
 │   │   ├── CategoryBreakdownChart.tsx # Doughnut chart: spending by AI category (Chart.js)
-│   │   ├── SpendingInsightsCard.tsx  # AI insights: summary, categories, anomalies, tips
+│   │   ├── SpendingInsightsCard.tsx  # Spending insights: summary, categories, anomalies, tips
+│   │   │                             #   — "Generate with AI" button + source badge
 │   │   ├── SpendingTrendsChart.tsx   # Multi-month bar chart with category toggles (Chart.js)
 │   │   ├── IncomeExpenseChart.tsx    # Income vs expense grouped bars + net savings line
 │   │   ├── MerchantInsightsCard.tsx  # Ranked merchant list with spend, count, trend arrows
 │   │   ├── HealthScoreCard.tsx       # SVG circular gauge (0-100), breakdown bars, tips
+│   │   │                               #   — "Generate with AI" button + source badge
 │   │   ├── RecurringTransactionsCard.tsx  # Auto-detected subscriptions (expandable card)
 │   │   ├── BillCalendar.tsx            # Monthly calendar grid with projected recurring bills
 │   │   │                               #   — date projection, click-to-expand, category colors
-│   │   ├── MonthlyDigestView.tsx       # Full monthly report: AI narrative, health score gauge,
+│   │   ├── MonthlyDigestView.tsx       # Full monthly report: narrative, health score gauge,
 │   │   │                               #   budget bars, goal progress, top merchants, income/expense
+│   │   │                               #   — "Generate with AI" button + source badge for narrative
 │   │   ├── ProfileSettings.tsx         # Settings page: profile form, bank management,
 │   │   │                               #   logout all devices, delete account with confirmation
 │   │   │
@@ -469,6 +483,7 @@ bank/
 │   │   │  ─── Net Worth ───
 │   │   ├── NetWorthManager.tsx         # Net worth dashboard: summary cards, line chart, tabs
 │   │   │                               #   (overview/assets/liabilities), CRUD forms, AI insight
+│   │   │                               #   — "Generate with AI" button + source badge for insight
 │   │   ├── NetWorthChart.tsx           # Line chart: assets (emerald), liabilities (rose),
 │   │   │                               #   net worth (violet filled), 6/12/24mo toggles
 │   │   ├── AssetLiabilityRow.tsx       # Reusable row: inline edit, category badge, delete
@@ -476,7 +491,8 @@ bank/
 │   │   │
 │   │   │  ─── Spending Challenges ───
 │   │   ├── ChallengesManager.tsx       # Challenges overview: streak/badges bar, active challenges,
-│   │   │                               #   AI suggestions with accept, custom form, history
+│   │   │                               #   suggestions with accept, custom form, history
+│   │   │                               #   — "Generate with AI" button + source badge for suggestions
 │   │   ├── ChallengeProgressCard.tsx   # Challenge progress: type badge, progress bar, stats,
 │   │   │                               #   days remaining, on-track indicator, abandon button
 │   │   ├── BadgeIcon.tsx               # Badge display: maps badgeType to emoji + label + color
@@ -487,6 +503,7 @@ bank/
 │   │   │                             #   — Inline add/edit/delete budgets
 │   │   ├── GoalCard.tsx              # Individual goal: SVG progress ring, contribute button
 │   │   ├── GoalsManager.tsx          # Goals list + create form (emoji picker, color picker)
+│   │   │                             #   + AI Financial Planner: text → plan → "Create Goal from Plan"
 │   │   ├── AlertsManager.tsx         # Alert rules list + create form with type/category/threshold
 │   │   │
 │   │   │  ─── Transaction Tools ───
@@ -552,7 +569,7 @@ bank/
 │   │   │                             #   removeSpecialCharacters() — clean display names
 │   │   │                             #   cn() — Tailwind class merge (clsx + twMerge)
 │   │   │
-│   │   └── api/                      # ── API CLIENT LAYER (20 files) ──
+│   │   └── api/                      # ── API CLIENT LAYER (22 files) ──
 │   │       │
 │   │       ├── client.ts             # Base client: apiRequest<T>(path, options)
 │   │       │                         #   — credentials: 'include' for cookie auth
@@ -570,19 +587,20 @@ bank/
 │   │       ├── transactions.api.ts   # Transactions: createTransaction, getByBank
 │   │       ├── plaid.api.ts          # Plaid: createLinkToken, exchangeToken
 │   │       ├── transfers.api.ts      # Transfers: createTransfer
-│   │       ├── ai.api.ts             # AI: getInsights
+│   │       ├── ai.api.ts             # AI: getInsights(useAi), generatePlan
 │   │       ├── chat.api.ts           # Chat: sendMessage
 │   │       ├── budgets.api.ts        # Budgets: getBudgets, getBudgetStatus, upsert, delete
 │   │       │                         #   + buildExportUrl() for CSV/PDF download links
 │   │       ├── goals.api.ts          # Goals: getGoals, create, update, delete, contribute
 │   │       ├── analytics.api.ts      # Analytics: trends, recurring, income/expense, merchants
 │   │       ├── alerts.api.ts         # Alerts: getAlerts, create, update, delete
-│   │       ├── health-score.api.ts   # Health: getHealthScore
+│   │       ├── health-score.api.ts   # Health: getHealthScore(useAi)
+│       ├── reports.api.ts        # Reports: getMonthlyDigest(useAi), buildDigestPdfUrl
 │   │       ├── search.api.ts         # Search: searchTransactions with filter params
 │   │       ├── notes.api.ts          # Notes: batchGetNotes, upsertNote, deleteNote, getUserTags
 │   │       ├── splits.api.ts         # Splits: getSplits, createSplit, settleParticipant, delete
-│   │       ├── net-worth.api.ts      # Net Worth: getNetWorth, asset/liability CRUD (9 functions)
-│   │       └── challenges.api.ts     # Challenges: getOverview, getSuggestions, create, abandon
+│   │       ├── net-worth.api.ts      # Net Worth: getNetWorth(useAi), asset/liability CRUD (9 functions)
+│   │       └── challenges.api.ts     # Challenges: getOverview, getSuggestions(useAi), create, abandon
 │   │
 │   ├── types/
 │   │   └── index.d.ts               # Global TypeScript declarations:
