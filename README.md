@@ -16,6 +16,25 @@ Built with **Next.js 14**, **Express.js**, **Prisma**, **PostgreSQL**, **Upstash
 
 ---
 
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| **Frontend** | Next.js 14, React 18, TypeScript, Tailwind CSS, shadcn/ui |
+| **Backend** | Express.js, TypeScript |
+| **ORM** | Prisma |
+| **Database** | PostgreSQL (Local / Neon / Supabase — your choice) |
+| **Cache** | Upstash Redis (free tier) with in-memory fallback via ioredis |
+| **Auth** | Custom JWT + OTP (jose, Resend) + Google OAuth |
+| **Bank Data** | Plaid API (sandbox) |
+| **Payments** | Razorpay (test mode) |
+| **Email** | Resend |
+| **AI** | Google Gemini 2.0 Flash (free tier) |
+| **Charts** | Chart.js (Bar, Doughnut, Line) |
+| **Export** | PDFKit (PDF statements), csv-stringify (CSV) |
+
+---
+
 ## Features
 
 ### Authentication
@@ -142,25 +161,6 @@ Rate limits per user per minute:
 - **Bottom tab bar** on mobile (Revolut-style)
 - **Animated gradient blobs** on auth pages
 - **6-digit OTP input boxes** with auto-focus and auto-submit
-
----
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| **Frontend** | Next.js 14, React 18, TypeScript, Tailwind CSS, shadcn/ui |
-| **Backend** | Express.js, TypeScript |
-| **ORM** | Prisma |
-| **Database** | PostgreSQL (Local / Neon / Supabase — your choice) |
-| **Cache** | Upstash Redis (free tier) with in-memory fallback via ioredis |
-| **Auth** | Custom JWT + OTP (jose, Resend) + Google OAuth |
-| **Bank Data** | Plaid API (sandbox) |
-| **Payments** | Razorpay (test mode) |
-| **Email** | Resend |
-| **AI** | Google Gemini 2.0 Flash (free tier) |
-| **Charts** | Chart.js (Bar, Doughnut, Line) |
-| **Export** | PDFKit (PDF statements), csv-stringify (CSV) |
 
 ---
 
