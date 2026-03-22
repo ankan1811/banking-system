@@ -134,8 +134,8 @@ All external API calls are aggressively cached via **Upstash Redis** (primary) w
 
 | Cache | TTL | Storage | Impact |
 |-------|-----|---------|--------|
-| Plaid sync gate (`plaid-sync:{bankId}`) | 24 hr | Redis + in-memory | 0 Plaid API calls on page load; sync only when TTL expires |
-| Bank balances & transactions | Permanent (until next sync) | PostgreSQL | DB-first reads, Plaid only called during background sync |
+| Plaid sync gate (`plaid-sync:{bankId}`) | 24 hr | Redis + in-memory | **0 Plaid API calls on page load.** Plaid is only called when: (1) user clicks "Resync with bank" button, (2) a fund transfer clears the key, or (3) the 24-hour TTL expires and the next page load triggers a background sync. |
+| Bank balances & transactions | Permanent (until next sync) | PostgreSQL | DB-first reads — all page loads read from DB, never from Plaid directly |
 | `getInstitution()` (Plaid) | 100 hr | In-memory | Static bank info cached long-term |
 | Chat financial context | 100 hr | Redis | 0 Plaid calls per chat message |
 | AI transaction categories | Permanent | DB | Never re-categorize the same transaction |
