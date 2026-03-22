@@ -71,7 +71,10 @@ Built with **Next.js 14**, **Express.js**, **Prisma**, **PostgreSQL**, **Upstash
 ### Budget & Financial Planning
 - **Budget tracker** — Set monthly spending limits per AI category. Real-time progress bars (green < 75%, amber 75-90%, red > 90%). Inline editing and management on the `/budgets` page.
 - **Savings goals** — Create named goals with target amounts, target dates, emoji icons, and color coding. Log manual contributions with an SVG progress ring. Auto-completes when target is reached. Includes AI Financial Planner section to generate goals from natural language descriptions.
-- **Spending alerts** — Set email alert rules for category monthly limits, single transaction thresholds, or low balance. Alerts are evaluated in the background when transactions are fetched and sent via Resend. Deduplication via trigger logs prevents spam.
+- **Spending alerts** — Set email alert rules with two types:
+  - **Category monthly limit** — e.g., "Alert me if Food & Dining exceeds $500 this month." Aggregates debit transactions by AI category for the current month and fires an email when the threshold is crossed. 28-day cooldown prevents repeat alerts.
+  - **Single transaction alert** — e.g., "Alert me if any transaction exceeds $1,000." Monitors recent transactions and emails when a large charge is detected. 1-hour cooldown.
+  - Alerts are evaluated in the background when transactions are fetched, using the same debit detection logic as the spending chart (`type === 'debit'` for CSV banks, `amount < 0` for Plaid). Emails sent via Resend. Toggle alerts on/off, edit thresholds inline. Trigger logs stored in DB for deduplication and audit.
 
 ### Analytics & Reports
 - **Spending trends** — Multi-month stacked bar chart (Chart.js) showing spending per AI category over the last 3/6/12 months. Category toggle pills to show/hide individual categories.
@@ -100,10 +103,11 @@ Built with **Next.js 14**, **Express.js**, **Prisma**, **PostgreSQL**, **Upstash
 - Stored by transaction hash (SHA-256) for consistency across Plaid syncs
 
 ### Split Expenses
-- **Bill splitting** — Create splits from any transaction or a manual amount. Add participants by name and email (they don't need accounts in the app).
+- **Bill splitting** — Create splits from any transaction or a manual amount. Add participants by name and email (they don't need accounts in the app). Completely independent of bank transaction data — purely manual entry.
 - **Equal or custom splits** — Split equally among all participants, or assign custom amounts per person.
 - **Payment tracking** — Toggle each participant as paid/unpaid with one click. Splits auto-settle when all participants have paid.
 - **Summary dashboard** — See total owed to you, pending count, and settled count at a glance. Filter splits by status (all/pending/settled).
+- **Backend** — Full CRUD via `/api/splits` with per-user isolation. Summary endpoint aggregates totals across all splits.
 
 ### Net Worth Tracker
 - **Aggregate net worth** — Automatically pulls balances from all linked Plaid accounts and combines with manually added assets and liabilities.
