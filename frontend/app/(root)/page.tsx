@@ -43,7 +43,11 @@ const Home = async ({ searchParams: { id, page } }: SearchParamProps) => {
         </div>
 
         {account?.transactions?.length > 0 && (
-          <CategoryBreakdownChart transactions={account.transactions} />
+          <CategoryBreakdownChart
+            transactions={account.transactions}
+            accounts={accountsData}
+            bankRecordId={bankRecordId}
+          />
         )}
 
         <RecurringTransactionsCard />
