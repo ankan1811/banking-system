@@ -2,7 +2,7 @@
 
 **AI-powered full-stack fintech app** 🏦
 
-💳 **Banking:** Plaid linking + Razorpay transfers + Real-time balances + Multi-account  
+💳 **Banking:** Plaid linking + Razorpay transfers + CSV statement upload + Real-time balances + Multi-account
 🤖 **AI (Gemini):** Transaction categorization + Spending insights + Financial chatbot + Health score + Monthly digest + Challenge suggestions + Financial plan generator
 📊 **Analytics:** Spending trends + Income/Expense + Merchant insights + Recurring detection + Bill calendar  
 💰 **Planning:** Budgets + Savings goals + Spending alerts + Split expenses + Net worth tracker  
@@ -12,7 +12,7 @@
 
 📈💹🚀✨
 
-Built with **Next.js 14**, **Express.js**, **Prisma**, **PostgreSQL**, **Upstash Redis**, **Plaid**, **Razorpay**, and **Google Gemini**.
+Built with **Next.js 14**, **Express.js**, **Prisma**, **PostgreSQL**, **Upstash Redis**, **Plaid**, **Razorpay**, **Google Gemini**, and **csv-parse**.
 
 ---
 
@@ -32,6 +32,7 @@ Built with **Next.js 14**, **Express.js**, **Prisma**, **PostgreSQL**, **Upstash
 | **AI** | Google Gemini 2.0 Flash (free tier) |
 | **Charts** | Chart.js (Bar, Doughnut, Line) |
 | **Export** | PDFKit (PDF statements), csv-stringify (CSV) |
+| **CSV Import** | csv-parse (multi-bank statement parser), multer (file upload) |
 
 ---
 
@@ -45,14 +46,16 @@ Built with **Next.js 14**, **Express.js**, **Prisma**, **PostgreSQL**, **Upstash
 
 ### Banking Dashboard
 - **Bank account linking** via Plaid (sandbox mode)
-- **Real-time balances** fetched from Plaid on each page load
+- **CSV statement upload** — Import transactions from Indian bank statements (SBI, HDFC, ICICI, Axis, Kotak + generic fallback). Auto-detects CSV format, normalizes dates, categorizes with Indian merchant regex. Creates a "manual bank" with no Plaid dependency.
+- **DB-first architecture** — Balances and transactions are read from PostgreSQL on every page load. Plaid is only called during background sync (controlled by a 24-hour Redis TTL key). Zero Plaid API calls on normal page loads.
+- **Re-sync button** — Manual "Resync with bank" button on the dashboard clears the Redis TTL key and triggers a fresh Plaid sync.
 - **Transaction history** with pagination, category badges, and smart search/filters
-- **Multi-account support** — Link multiple banks, switch between tabs
+- **Multi-account support** — Link multiple banks (Plaid or manual CSV), switch between tabs
 - **Doughnut chart** — Visual breakdown of account balances
 - **Recurring transactions card** — Auto-detected subscriptions and recurring charges on the dashboard
 
 ### AI Features (powered by Google Gemini)
-- **Transaction categorization** — Automatically classifies every Plaid transaction into 10 categories (Food & Dining, Transport, Shopping, Entertainment, Bills & Utilities, Health, Education, Income, Transfers, Other) using Gemini. Results are cached in PostgreSQL so repeat loads are instant and free.
+- **Transaction categorization** — Automatically classifies every transaction (Plaid or CSV-imported) into 10 categories (Food & Dining, Transport, Shopping, Entertainment, Bills & Utilities, Health, Education, Income, Transfers, Other). Uses rule-based regex first (extended with Indian merchants like Swiggy, Zomato, Ola, Flipkart, IRCTC, UPI, NEFT, etc.), then falls back to Gemini for unrecognized merchants. Results are cached in PostgreSQL so repeat loads are instant and free.
 - **Spending insights** — Dedicated `/insights` page with: AI-generated natural language summary, month-over-month category comparison, top spending categories with progress bars, anomaly detection, and personalized savings tips. Results cached for 5 minutes.
 - **AI chatbot** — Floating chat panel (bottom-right) powered by Gemini. Has full context of your accounts, balances, and recent transactions. Supports quick-prompt shortcuts. Rate-limited to 10 messages/minute per user.
 - **Category breakdown chart** — Doughnut chart on the dashboard visualizing spending by AI category with a color-coded legend.
@@ -131,8 +134,8 @@ All external API calls are aggressively cached via **Upstash Redis** (primary) w
 
 | Cache | TTL | Storage | Impact |
 |-------|-----|---------|--------|
-| `getAccount()` (Plaid + Gemini) | 100 hr | In-memory | ~95% fewer Plaid and Gemini calls |
-| `getAccounts()` (Plaid) | 100 hr | In-memory | Dashboard loads instantly on repeat |
+| Plaid sync gate (`plaid-sync:{bankId}`) | 24 hr | Redis + in-memory | 0 Plaid API calls on page load; sync only when TTL expires |
+| Bank balances & transactions | Permanent (until next sync) | PostgreSQL | DB-first reads, Plaid only called during background sync |
 | `getInstitution()` (Plaid) | 100 hr | In-memory | Static bank info cached long-term |
 | Chat financial context | 100 hr | Redis | 0 Plaid calls per chat message |
 | AI transaction categories | Permanent | DB | Never re-categorize the same transaction |
@@ -181,6 +184,7 @@ bank/
 │   ├── app/
 │   │   ├── (auth)/                   # Sign-in / Sign-up pages
 │   │   └── (root)/                   # Protected dashboard pages
+│   │       ├── upload-statement/      # CSV Statement Upload page
 │   │       ├── insights/             # AI Insights page
 │   │       ├── budgets/              # Budget Tracker page
 │   │       ├── goals/                # Savings Goals page
@@ -197,6 +201,8 @@ bank/
 │   │   ├── CategoryBreakdownChart.tsx  # Spending doughnut chart
 │   │   ├── SpendingInsightsCard.tsx  # AI insights display
 │   │   ├── BudgetProgressCard.tsx    # Budget progress bars
+│   │   ├── StatementUpload.tsx       # CSV bank statement upload form
+│   │   ├── ResyncButton.tsx         # Manual Plaid re-sync trigger
 │   │   ├── GoalCard.tsx              # Savings goal progress ring
 │   │   ├── GoalsManager.tsx          # Goals CRUD + AI financial planner (text → plan → goal)
 │   │   ├── SpendingTrendsChart.tsx   # Multi-month trends chart
@@ -232,7 +238,7 @@ bank/
 │
 ├── backend/                          # Express API (port 8787)
 │   ├── src/
-│   │   ├── routes/                   # 17 route files
+│   │   ├── routes/                   # 20 route files
 │   │   │   ├── ai.routes.ts          # POST /api/ai/insights, POST /api/ai/financial-plan
 │   │   │   ├── chat.routes.ts        # POST /api/chat
 │   │   │   ├── budgets.routes.ts     # CRUD /api/budgets + status
@@ -245,10 +251,11 @@ bank/
 │   │   │   ├── notes.routes.ts       # CRUD /api/notes + batch + tags
 │   │   │   ├── splits.routes.ts     # CRUD /api/splits + summary
 │   │   │   ├── net-worth.routes.ts  # /api/net-worth + assets + liabilities
-│   │   │   └── challenges.routes.ts # /api/challenges + overview + suggestions
-│   │   ├── services/                 # 13 service files
+│   │   │   ├── challenges.routes.ts # /api/challenges + overview + suggestions
+│   │   │   └── statement-upload.routes.ts # POST /api/statements/upload (new + append)
+│   │   ├── services/                 # 14 service files
 │   │   │   ├── gemini.service.ts     # categorize, insights (useAi), financial plan, chat
-│   │   │   ├── bank.service.ts       # Plaid calls (5-min + 24-hr caches)
+│   │   │   ├── bank.service.ts       # DB-first reads + Redis TTL Plaid sync
 │   │   │   ├── budget.service.ts     # Budget CRUD + status
 │   │   │   ├── goals.service.ts      # Goals CRUD + contributions
 │   │   │   ├── analytics.service.ts  # trends, recurring, income/expense, merchants
@@ -259,11 +266,12 @@ bank/
 │   │   │   ├── notes.service.ts      # Transaction notes/tags CRUD
 │   │   │   ├── splits.service.ts    # Split expenses CRUD + auto-settle
 │   │   │   ├── net-worth.service.ts # Assets/liabilities + net worth + insight (useAi)
-│   │   │   └── challenges.service.ts # Challenges + progress + suggestions (useAi) + streaks
+│   │   │   ├── challenges.service.ts # Challenges + progress + suggestions (useAi) + streaks
+│   │   │   └── statement-parser.service.ts # CSV parser with multi-bank format auto-detection
 │   │   ├── middleware/               # JWT auth + rate limiter factory
 │   │   └── lib/                      # Prisma, Plaid, Gemini, Redis clients
 │   └── prisma/
-│       └── schema.prisma             # Database schema (23 tables)
+│       └── schema.prisma             # Database schema (23 tables, Bank model supports plaid + manual sources)
 │
 ├── shared/                           # Shared between frontend & backend
 │   ├── types.ts                      # TypeScript types (35+ types)
@@ -416,6 +424,7 @@ Open [http://localhost:3003](http://localhost:3003).
 17. Go to **Split Expenses** — create a split, add participants, toggle paid/unpaid, see auto-settle
 18. Go to **Net Worth** — view linked account balances, add manual assets/liabilities, see the line chart
 19. Go to **Challenges** — accept an AI suggestion or create a custom challenge, track progress, earn badges
+20. Go to **Upload Statement** — select your Indian bank (SBI, HDFC, ICICI, etc.), upload a CSV statement, see transactions imported and categorized
 
 ---
 
@@ -569,6 +578,17 @@ Open [http://localhost:3003](http://localhost:3003).
 | POST | `/api/challenges` | Create a new challenge |
 | PATCH | `/api/challenges/:id/abandon` | Abandon an active challenge |
 
+### Statement Upload (Protected)
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/statements/upload` | Upload CSV statement to create a new manual bank + import transactions |
+| POST | `/api/statements/upload/:bankRecordId` | Append transactions from a new CSV to an existing manual bank |
+
+### Accounts (Protected) — Additional
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/accounts/:bankRecordId/sync` | Force re-sync with Plaid (clears Redis TTL key) |
+
 ### Health
 | Method | Path | Description |
 |--------|------|-------------|
@@ -582,7 +602,7 @@ Open [http://localhost:3003](http://localhost:3003).
 | Table | Purpose |
 |-------|---------|
 | `users` | User profiles with auth fields |
-| `banks` | Linked bank accounts (Plaid access tokens) |
+| `banks` | Linked bank accounts (Plaid access tokens) or manual CSV-imported banks (`source: 'plaid' \| 'manual'`) |
 | `transactions` | In-app transfer records |
 | `otp_codes` | Passwordless auth OTP codes |
 
@@ -630,7 +650,7 @@ Open [http://localhost:3003](http://localhost:3003).
 ### Plaid Tables
 | Table | Purpose |
 |-------|---------|
-| `plaid_transactions` | Synced Plaid transactions linked to bank records |
+| `plaid_transactions` | Synced Plaid transactions and CSV-imported transactions linked to bank records |
 | `challenge_suggestion_cache` | AI/formula challenge suggestions cache per user/bank/month with source tracking |
 
 ---

@@ -91,7 +91,7 @@ bank/
 │   └── src/
 │       │
 │       ├── index.ts                  # Express app entry point:
-│       │                             #   - Registers all 19 route modules
+│       │                             #   - Registers all 20 route modules
 │       │                             #   - Applies CORS, cookie parser, JSON middleware
 │       │                             #   - Rate limiters: aiRateLimit (5/min) for /api/ai only;
 │       │                             #     analyticsRateLimit (15/min) for health-score, reports,
@@ -129,7 +129,7 @@ bank/
 │       │                             #   - analyticsRateLimit — 15 req/min (analytics)
 │       │                             #   - exportRateLimit  — 5 req/min (CSV/PDF export)
 │       │
-│       ├── routes/                   # ── API ROUTES (19 files) ──
+│       ├── routes/                   # ── API ROUTES (20 files) ──
 │       │   │                         #   Each file: Router + Zod validation + service call
 │       │   │
 │       │   ├── auth.routes.ts        # POST /api/auth/request-signin-otp
@@ -216,28 +216,44 @@ bank/
 │       │   │                         # PATCH  /api/net-worth/liabilities/:id — update
 │       │   │                         # DELETE /api/net-worth/liabilities/:id
 │       │   │
-│       │   └── challenges.routes.ts # GET    /api/challenges — list challenges
-│       │                             # GET    /api/challenges/overview?bankRecordId — progress+streak+badges
-│       │                             # GET    /api/challenges/suggestions?bankRecordId&ai=true — suggestions
-│       │                             # POST   /api/challenges — create challenge
-│       │                             # PATCH  /api/challenges/:id/abandon
+│       │   ├── challenges.routes.ts # GET    /api/challenges — list challenges
+│       │   │                         # GET    /api/challenges/overview?bankRecordId — progress+streak+badges
+│       │   │                         # GET    /api/challenges/suggestions?bankRecordId&ai=true — suggestions
+│       │   │                         # POST   /api/challenges — create challenge
+│       │   │                         # PATCH  /api/challenges/:id/abandon
+│       │   │
+│       │   └── statement-upload.routes.ts # POST /api/statements/upload — create manual bank + import CSV
+│       │                             # POST /api/statements/upload/:bankRecordId — append to existing manual bank
+│       │                             # Uses multer for multipart file upload (10MB limit)
+│       │                             # Parses CSV, categorizes with regex, stores in PlaidTransaction table
+│       │                             # Deduplicates by transaction hash (name+amount+date)
 │       │
-│       └── services/                 # ── BUSINESS LOGIC (21 files) ──
+│       └── services/                 # ── BUSINESS LOGIC (22 files) ──
 │           │
 │           ├── auth.service.ts       # JWT creation, verification, token versioning
 │           │
 │           ├── user.service.ts       # User CRUD, bank record lookups
 │           │
-│           ├── bank.service.ts       # CENTRAL SERVICE — Plaid data fetching with caching:
-│           │                         #   getAccounts(userId)     — 5-min cache per userId
-│           │                         #   getAccount(bankRecordId) — 5-min cache per account
-│           │                         #   getInstitution(id)      — 24-hr cache (static data)
-│           │                         #   getTransactions(token)  — Plaid transactionsSync loop
-│           │                         #   hashTransaction()       — SHA-256 hash for note lookups
-│           │                         #   clearAccountCache()     — instant invalidation after transfers
-│           │                         #   Merges Plaid + internal transfers into unified format
-│           │                         #   (both have same fields: merchantName, aiCategory, etc.)
+│           ├── bank.service.ts       # CENTRAL SERVICE — DB-first reads + Redis TTL Plaid sync:
+│           │                         #   getAccounts(userId)      — DB-only read, triggers background sync
+│           │                         #   getAccount(bankRecordId) — DB-only read for balances + transactions
+│           │                         #   syncBankFromPlaid(bank)  — full Plaid sync (balances + transactions)
+│           │                         #   triggerSyncIfNeeded()    — checks Redis TTL key, skips manual banks
+│           │                         #   getInstitution(id)       — 100-hr in-memory cache (static data)
+│           │                         #   getTransactions(token)   — Plaid transactionsSync, persists to DB
+│           │                         #   hashTransaction()        — SHA-256 hash for note lookups + dedup
+│           │                         #   clearAccountCache()      — deletes Redis sync key for re-sync
+│           │                         #   Merges Plaid + CSV + internal transfers into unified format
 │           │                         #   Triggers AI categorization + alert evaluation
+│           │
+│           ├── statement-parser.service.ts # CSV bank statement parser:
+│           │                         #   parseStatement(csvContent) — main entry point
+│           │                         #   Auto-detects bank format from CSV headers:
+│           │                         #     SBI, HDFC, ICICI, Axis, Kotak + generic fallback
+│           │                         #   normalizeDate()  — DD/MM/YYYY, DD-MM-YYYY, DD MMM YYYY → YYYY-MM-DD
+│           │                         #   parseAmount()    — handles ₹, commas, negative numbers
+│           │                         #   detectColumns()  — header pattern matching for column mapping
+│           │                         #   Returns ParsedTransaction[] { name, amount, date, type }
 │           │
 │           ├── gemini.service.ts     # AI SERVICE — Google Gemini integration:
 │           │                         #   categorizeTransactions() — batch 50/call, DB-cached
@@ -393,6 +409,11 @@ bank/
 │   │       ├── payment-transfer/
 │   │       │   └── page.tsx          # PAYMENT TRANSFER — fund transfer form (Razorpay)
 │   │       │
+│   │       ├── upload-statement/
+│   │       │   └── page.tsx          # UPLOAD STATEMENT — CSV bank statement import page
+│   │       │                         #   Select Indian bank (SBI, HDFC, ICICI, Axis, etc.)
+│   │       │                         #   Upload CSV file, auto-detect format, import transactions
+│   │       │
 │   │       ├── insights/
 │   │       │   └── page.tsx          # AI INSIGHTS — category breakdown doughnut chart +
 │   │       │                         #   SpendingInsightsCard (summary, categories,
@@ -529,6 +550,15 @@ bank/
 │   │   ├── BankDropdown.tsx          # Bank account selector dropdown
 │   │   ├── BankInfo.tsx              # Bank account info display
 │   │   ├── BankTabItem.tsx           # Tab item for multi-bank switching
+│   │   ├── StatementUpload.tsx       # CSV statement upload form:
+│   │   │                             #   — Bank selector dropdown (15 Indian banks + Other)
+│   │   │                             #   — File picker with drag zone (accepts .csv)
+│   │   │                             #   — Upload with loading spinner, success/error states
+│   │   │                             #   — Auto-redirect to home on success
+│   │   ├── ResyncButton.tsx          # Manual Plaid re-sync trigger button:
+│   │   │                             #   — Calls POST /api/accounts/:id/sync
+│   │   │                             #   — Clears Redis TTL key, triggers fresh Plaid sync
+│   │   │                             #   — Shown on home page next to TotalBalanceBox
 │   │   ├── PlaidLink.tsx             # Plaid Link integration button
 │   │   ├── PaymentTransferForm.tsx   # Fund transfer form (amount, recipient, bank)
 │   │   ├── AnimatedCounter.tsx       # Animated number counter (for balance display)
@@ -553,7 +583,7 @@ bank/
 │   │
 │   ├── constants/
 │   │   └── index.ts                  # App constants:
-│   │                                 #   sidebarLinks[] — 18 sidebar navigation items
+│   │                                 #   sidebarLinks[] — 19 sidebar navigation items
 │   │                                 #   aiCategoryColors — hex colors for 10 AI categories
 │   │                                 #   aiCategoryStyles — Tailwind classes per category
 │   │                                 #   topCategoryStyles — dashboard category card styles
@@ -647,65 +677,75 @@ bank/
 
   FRONTEND (Next.js 14)          BACKEND (Express.js)           DATABASE (PostgreSQL)
   ─────────────────────          ────────────────────           ──────────────────────
-  Server Components              Routes (Zod validation)         12 Prisma models
+  Server Components              Routes (Zod validation)         23 Prisma tables
        │                              │
        ▼                              ▼
   serverApiRequest()             Services (business logic)
   apiRequest()                        │
-       │                              ├── In-memory caches (5min-24hr TTL)
+       │                              ├── Redis TTL sync control (24hr Plaid gate)
+       │                              ├── In-memory caches (5min-100hr TTL)
+       │                              ├── CSV statement parser (multi-bank auto-detect)
        │                              ├── Rate limiters (5-30 req/min)
        │                              └── External APIs:
-       │                                   ├── Plaid (bank data)
+       │                                   ├── Plaid (bank data, TTL-gated)
        │                                   ├── Gemini (AI categorization, insights, chat, health score)
        │                                   ├── Resend (email alerts, OTP)
        │                                   └── Razorpay (transfers, test mode)
 
-  TRANSACTION SYNC (Plaid ↔ Razorpay):
+  TRANSACTION SYNC (Plaid ↔ CSV ↔ Razorpay):
   ┌─────────────────────────────────────────────────────────────────┐
-  │ Plaid transactions (external bank data) and internal Razorpay  │
-  │ transfers are merged into a SINGLE unified array in            │
-  │ bank.service.ts → getAccount(). Both share identical fields:   │
+  │ Three transaction sources are merged into a SINGLE unified     │
+  │ array in bank.service.ts → getAccount():                       │
+  │   1. Plaid transactions (external bank data, synced via TTL)   │
+  │   2. CSV-imported transactions (manual bank uploads)           │
+  │   3. Internal Razorpay transfers                               │
+  │ All share identical fields:                                     │
   │   id, name, merchantName, amount, date, paymentChannel,        │
   │   category, aiCategory, type, accountId, pending, image, hash  │
   │                                                                 │
-  │ After a transfer, cache is instantly cleared for both sender    │
+  │ After a transfer, Redis sync key is cleared for both sender    │
   │ and receiver so the transaction shows up on dashboard           │
   │ immediately. All analytics, budgets, trends, insights, and     │
-  │ search treat both types identically.                            │
+  │ search treat all three types identically.                       │
   └─────────────────────────────────────────────────────────────────┘
 
   CACHING LAYERS:
   ┌─────────────────────────────────────────────────────────────────┐
-  │ L1: In-memory Maps   │ getAccount (5m), getAccounts (5m),      │
-  │     (per-process)     │ institution (24h), insights (5m),       │
-  │                       │ trends (5m), recurring (1h),            │
+  │ L0: Redis TTL keys   │ plaid-sync:{bankId} (24h) — gates all   │
+  │     (sync control)    │ Plaid API calls. 0 calls on page load.  │
+  │                       │ Cleared by ResyncButton or on expiry.   │
+  ├───────────────────────┼─────────────────────────────────────────┤
+  │ L1: In-memory Maps   │ institution (100h), insights (5m),      │
+  │     (per-process)     │ trends (5m), recurring (1h),            │
   │                       │ income/expense (5m), merchants (5m),    │
   │                       │ health score (1h), chat context (5m),   │
   │                       │ notes (2m), tags (5m),                  │
   │                       │ net worth AI (1h), challenge AI (10m)   │
   ├───────────────────────┼─────────────────────────────────────────┤
-  │ L2: PostgreSQL        │ cached_categories (permanent),          │
-  │     (persistent)      │ financial_health_scores, monthly_digests│
-  │                       │ net_worth_snapshots (monthly)           │
-  │                       │ (survive restarts)                      │
+  │ L2: PostgreSQL        │ banks (balances), plaid_transactions,   │
+  │     (persistent)      │ cached_categories (permanent),          │
+  │                       │ financial_health_scores, monthly_digests│
+  │                       │ net_worth_snapshots, challenge_cache    │
+  │                       │ (all survive restarts)                  │
   ├───────────────────────┼─────────────────────────────────────────┤
-  │ L3: External API      │ Gemini (only on cache miss),            │
-  │     (last resort)     │ Plaid (only on cache miss)              │
+  │ L3: External API      │ Gemini (only on explicit AI request),   │
+  │     (last resort)     │ Plaid (only when TTL expires)           │
   └───────────────────────┴─────────────────────────────────────────┘
 
 ================================================================================
                                     STATS
 ================================================================================
 
-  Frontend Pages ............ 15
-  React Components .......... 45 (+ 10 shadcn/ui primitives)
+  Frontend Pages ............ 16
+  React Components .......... 47 (+ 10 shadcn/ui primitives)
   API Client Files .......... 20
-  Backend Route Files ....... 19
-  Backend Service Files ..... 20
-  Database Tables ........... 20
+  Backend Route Files ....... 20
+  Backend Service Files ..... 22
+  Database Tables ........... 23
   Shared Types .............. 35+
   Public Icons .............. 40+
   In-Memory Caches .......... 14
+  Redis TTL Keys ............ 1 (plaid-sync:{bankId})
   Rate Limit Tiers .......... 7
 
 ================================================================================
