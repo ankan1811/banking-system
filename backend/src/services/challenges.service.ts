@@ -157,7 +157,8 @@ export async function getChallengeProgress(
       let expenses = 0;
       for (const t of periodTxns) {
         const cat = (t as any).aiCategory || (t as any).category || 'Other';
-        if ((t as any).amount < 0 || cat === 'Income') {
+        const isDebit = (t as any).type === 'debit' || ((t as any).type !== 'credit' && (t as any).amount < 0);
+        if (!isDebit || cat === 'Income') {
           income += Math.abs((t as any).amount);
         } else {
           expenses += Math.abs((t as any).amount);

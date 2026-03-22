@@ -118,7 +118,8 @@ async function computeMetrics(userId: string, month: string): Promise<Metrics> {
   for (const t of monthTxns) {
     const cat = (t as any).aiCategory || t.category || 'Other';
     categories.add(cat);
-    if (t.amount < 0 || cat === 'Income') {
+    const isDebit = t.type === 'debit' || (t.type !== 'credit' && t.amount < 0);
+    if (!isDebit || cat === 'Income') {
       totalIncome += Math.abs(t.amount);
     } else {
       totalExpenses += Math.abs(t.amount);

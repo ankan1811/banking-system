@@ -27,7 +27,8 @@ export async function getSpendingTrends(userId: string, months: number): Promise
   const totals: number[] = new Array(months).fill(0);
 
   for (const t of transactions) {
-    if (t.amount <= 0) continue; // skip credits
+    const isDebit = t.type === 'debit' || (t.type !== 'credit' && t.amount < 0);
+    if (!isDebit) continue;
     const date: string = t.date || t.createdAt;
     const monthStr = typeof date === 'string' ? date.slice(0, 7) : new Date(date).toISOString().slice(0, 7);
     const monthIdx = monthLabels.indexOf(monthStr);
@@ -83,7 +84,8 @@ export async function detectRecurring(userId: string): Promise<RecurringPattern[
   const groups = new Map<string, { name: string; amounts: number[]; dates: string[]; category: string }>();
 
   for (const t of transactions) {
-    if (t.amount <= 0) continue; // skip credits
+    const isDebit = t.type === 'debit' || (t.type !== 'credit' && t.amount < 0);
+    if (!isDebit) continue;
     const key = normalizeName((t as any).merchantName || t.name || '');
     if (!key) continue;
 
@@ -185,7 +187,8 @@ export async function getIncomeVsExpense(userId: string, months: number): Promis
     const amt = Math.abs(t.amount);
     const cat: string = (t as any).aiCategory || t.category || 'Other';
 
-    if (t.amount < 0 || cat === 'Income') {
+    const isDebit = t.type === 'debit' || (t.type !== 'credit' && t.amount < 0);
+    if (!isDebit || cat === 'Income') {
       income[monthIdx] = Math.round((income[monthIdx] + amt) * 100) / 100;
     } else {
       expenses[monthIdx] = Math.round((expenses[monthIdx] + amt) * 100) / 100;
@@ -239,7 +242,8 @@ export async function getMerchantInsights(userId: string, months: number): Promi
   }>();
 
   for (const t of transactions) {
-    if (t.amount <= 0) continue; // debits only
+    const isDebit = t.type === 'debit' || (t.type !== 'credit' && t.amount < 0);
+    if (!isDebit) continue;
     const date: string = t.date || t.createdAt;
     const monthStr = typeof date === 'string' ? date.slice(0, 7) : new Date(date).toISOString().slice(0, 7);
     if (!monthLabels.includes(monthStr)) continue;

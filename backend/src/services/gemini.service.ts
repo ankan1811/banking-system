@@ -125,7 +125,8 @@ export async function generateSpendingInsights(
   const aggregate = (txns: CategorizedTransaction[]) => {
     const map: Record<string, { amount: number; count: number }> = {};
     for (const t of txns) {
-      if (t.amount <= 0) continue; // skip credits/income for spending
+      const isDebit = (t as any).type === 'debit' || ((t as any).type !== 'credit' && t.amount < 0);
+      if (!isDebit) continue;
       const cat = t.aiCategory;
       if (!map[cat]) map[cat] = { amount: 0, count: 0 };
       map[cat].amount += Math.abs(t.amount);

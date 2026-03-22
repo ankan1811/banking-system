@@ -85,7 +85,8 @@ export async function evaluateAlerts(
   const monthlySpending: Record<string, number> = {};
   for (const t of transactions) {
     if (!t.date?.startsWith(currentMonth)) continue;
-    if (t.amount <= 0) continue;
+    const isDebit = (t as any).type === 'debit' || ((t as any).type !== 'credit' && t.amount < 0);
+    if (!isDebit) continue;
     const cat = (t as any).aiCategory || t.category || 'Other';
     monthlySpending[cat] = (monthlySpending[cat] || 0) + Math.abs(t.amount);
   }

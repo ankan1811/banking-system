@@ -46,7 +46,8 @@ export async function getBudgetStatus(userId: string, month: string) {
   const spendingMap: Record<string, number> = {};
   for (const t of transactions) {
     if (!t.date?.startsWith(month)) continue;
-    if (t.amount <= 0) continue; // skip credits
+    const isDebit = t.type === 'debit' || (t.type !== 'credit' && t.amount < 0);
+    if (!isDebit) continue;
     const cat = (t as any).aiCategory || t.category || 'Other';
     spendingMap[cat] = (spendingMap[cat] || 0) + Math.abs(t.amount);
   }
