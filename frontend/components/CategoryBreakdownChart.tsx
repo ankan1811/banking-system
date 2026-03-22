@@ -59,7 +59,7 @@ const CategoryBreakdownChart = ({ transactions }: { transactions: Transaction[] 
             }}
           />
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-col gap-2">
           {categories.map((cat, i) => (
             <div key={cat} className="flex items-center gap-1.5 text-xs text-slate-300">
               <div

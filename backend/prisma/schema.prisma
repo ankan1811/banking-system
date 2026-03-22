@@ -52,7 +52,8 @@ model Bank {
   userId                String
   bankId                String
   accountId             String
-  accessToken           String
+  accessToken           String?
+  source                String    @default("plaid")
   razorpayFundAccountId String?
   shareableId           String?
   availableBalance      Decimal?  @db.Decimal(14, 2)

@@ -2201,6 +2201,7 @@ export const BankScalarFieldEnum = {
   bankId: 'bankId',
   accountId: 'accountId',
   accessToken: 'accessToken',
+  source: 'source',
   razorpayFundAccountId: 'razorpayFundAccountId',
   shareableId: 'shareableId',
   availableBalance: 'availableBalance',
