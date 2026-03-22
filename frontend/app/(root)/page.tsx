@@ -1,6 +1,7 @@
 import CategoryBreakdownChart from '@/components/CategoryBreakdownChart';
 import HeaderBox from '@/components/HeaderBox'
 import RecentTransactions from '@/components/RecentTransactions';
+import ResyncButton from '@/components/ResyncButton';
 import RightSidebar from '@/components/RightSidebar';
 import TotalBalanceBox from '@/components/TotalBalanceBox';
 import RecurringTransactionsCard from '@/components/RecurringTransactionsCard';
@@ -32,11 +33,14 @@ const Home = async ({ searchParams: { id, page } }: SearchParamProps) => {
           subtext="Access and manage your account and transactions efficiently."
         />
 
-        <TotalBalanceBox
-          accounts={accountsData}
-          totalBanks={accounts?.totalBanks}
-          totalCurrentBalance={accounts?.totalCurrentBalance}
-        />
+        <div className="flex items-start justify-between gap-4">
+          <TotalBalanceBox
+            accounts={accountsData}
+            totalBanks={accounts?.totalBanks}
+            totalCurrentBalance={accounts?.totalCurrentBalance}
+          />
+          {bankRecordId && <ResyncButton bankRecordId={bankRecordId} />}
+        </div>
 
         {account?.transactions?.length > 0 && (
           <CategoryBreakdownChart transactions={account.transactions} />

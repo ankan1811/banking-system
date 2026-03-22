@@ -6,26 +6,21 @@ import { getTransactionsByBankId } from './transaction.service.js';
 import { categorizeTransactions } from './gemini.service.js';
 import { evaluateAlerts } from './alerts.service.js';
 import { prisma } from '../lib/db.js';
+import { redisGet, redisSet, redisDel } from '../lib/redis.js';
 
-// ─── In-Memory Caches ────────────────────────────────────────
+// ─── Constants ──────────────────────────────────────────────
+
+const PLAID_SYNC_TTL_S = 24 * 60 * 60; // 24 hours in seconds
+
+// ─── Institution Cache (in-memory, static data) ─────────────
 
 type CacheEntry<T> = { data: T; expiresAt: number };
-
-const accountCache = new Map<string, CacheEntry<any>>();
-const ACCOUNT_TTL = 100 * 60 * 60 * 1000; // 100 hours
-
-const accountsCache = new Map<string, CacheEntry<any>>();
-const ACCOUNTS_TTL = 100 * 60 * 60 * 1000; // 100 hours
-
 const institutionCache = new Map<string, CacheEntry<any>>();
 const INSTITUTION_TTL = 100 * 60 * 60 * 1000; // 100 hours
 
 function getCached<T>(cache: Map<string, CacheEntry<T>>, key: string): T | null {
   const entry = cache.get(key);
-  if (entry && entry.expiresAt > Date.now()) {
-    console.log(`[CACHE HIT] ${key}`);
-    return entry.data;
-  }
+  if (entry && entry.expiresAt > Date.now()) return entry.data;
   return null;
 }
 
@@ -39,107 +34,115 @@ export function hashTransaction(name: string, amount: number, date: string): str
   return createHash('sha256').update(`${name}|${amount}|${date}`).digest('hex');
 }
 
-// ─── getAccounts (cached 5 min per userId) ───────────────────
+// ─── syncBankFromPlaid (single function for all Plaid calls) ─
+
+export async function syncBankFromPlaid(bank: { id: string; accessToken: string; accountId: string }) {
+  console.log(`[PLAID SYNC] Starting sync for bank ${bank.id}`);
+
+  // 1. Fetch live balances + account metadata
+  const accountsResponse = await plaidClient.accountsGet({ access_token: bank.accessToken });
+  const raw = accountsResponse.data.accounts[0];
+  const institutionId = accountsResponse.data.item.institution_id;
+
+  let institutionName: string | undefined;
+  if (institutionId) {
+    try {
+      const institution = await getInstitution(institutionId);
+      institutionName = institution.name;
+    } catch {}
+  }
+
+  // 2. Update bank record with fresh balances
+  await prisma.bank.update({
+    where: { id: bank.id },
+    data: {
+      availableBalance: raw.balances.available,
+      currentBalance: raw.balances.current,
+      institutionName,
+      institutionId: institutionId ?? undefined,
+      accountName: raw.name,
+      officialName: raw.official_name,
+      mask: raw.mask,
+      accountType: raw.type as string,
+      accountSubtype: raw.subtype as string ?? undefined,
+      lastSyncedAt: new Date(),
+    },
+  });
+
+  // 3. Sync transactions
+  await getTransactions(bank.accessToken, bank.id);
+
+  // 4. Set Redis TTL key — no Plaid calls until this expires
+  await redisSet(`plaid-sync:${bank.id}`, '1', PLAID_SYNC_TTL_S);
+
+  console.log(`[PLAID SYNC] Completed for bank ${bank.id}, next sync in 24h`);
+}
+
+// ─── Background sync trigger (non-blocking) ─────────────────
+
+async function triggerSyncIfNeeded(bank: { id: string; accessToken: string; accountId: string }) {
+  const syncKey = `plaid-sync:${bank.id}`;
+  const exists = await redisGet(syncKey);
+  if (exists) return; // still fresh
+
+  // Fire in background, don't block the response
+  syncBankFromPlaid(bank).catch((err) =>
+    console.error(`Background Plaid sync failed for bank ${bank.id}:`, err)
+  );
+}
+
+// ─── getAccounts (DB-only reads) ─────────────────────────────
 
 export const getAccounts = async (userId: string) => {
-  const cached = getCached(accountsCache, userId);
-  if (cached) return cached;
-
   const banks = await getBanksFromDb(userId);
 
-  const accounts = await Promise.all(
-    banks.map(async (bank) => {
-      const accountsResponse = await plaidClient.accountsGet({
-        access_token: bank.accessToken,
-      });
-      const accountData = accountsResponse.data.accounts[0];
-
-      const institution = await getInstitution(
-        accountsResponse.data.item.institution_id!
-      );
-
-      const account = {
-        id: accountData.account_id,
-        availableBalance: accountData.balances.available!,
-        currentBalance: accountData.balances.current!,
-        institutionId: institution.institution_id,
-        name: accountData.name,
-        officialName: accountData.official_name,
-        mask: accountData.mask!,
-        type: accountData.type as string,
-        subtype: accountData.subtype! as string,
-        bankRecordId: bank.id,
-        shareableId: bank.shareableId,
-      };
-
-      return account;
-    })
-  );
+  const accounts = banks.map((bank) => ({
+    id: bank.accountId,
+    availableBalance: bank.availableBalance ? parseFloat(bank.availableBalance.toString()) : 0,
+    currentBalance: bank.currentBalance ? parseFloat(bank.currentBalance.toString()) : 0,
+    institutionId: bank.institutionId || '',
+    name: bank.accountName || bank.accountId,
+    officialName: bank.officialName,
+    mask: bank.mask || '',
+    type: bank.accountType || 'depository',
+    subtype: bank.accountSubtype || 'checking',
+    bankRecordId: bank.id,
+    shareableId: bank.shareableId,
+  }));
 
   const totalBanks = accounts.length;
-  const totalCurrentBalance = accounts.reduce((total, account) => {
-    return total + account.currentBalance;
-  }, 0);
+  const totalCurrentBalance = accounts.reduce((sum, a) => sum + a.currentBalance, 0);
 
-  const result = { data: accounts, totalBanks, totalCurrentBalance };
-  setCache(accountsCache, userId, result, ACCOUNTS_TTL);
-
-  // Background: pre-warm full account cache for all banks so tab switches are instant
+  // Trigger background syncs for any banks with expired TTL
   for (const bank of banks) {
-    if (!getCached(accountCache, bank.id)) {
-      getAccount(bank.id, userId).catch((err) =>
-        console.error(`Background pre-warm failed for bank ${bank.id}:`, err)
-      );
-    }
+    triggerSyncIfNeeded(bank);
   }
 
-  return result;
+  return { data: accounts, totalBanks, totalCurrentBalance };
 };
 
-// ─── getAccount (cached 5 min per bankRecordId) ──────────────
+// ─── getAccount (DB-only reads) ──────────────────────────────
 
 export const getAccount = async (bankRecordId: string, userId?: string) => {
-  const cached = getCached(accountCache, bankRecordId);
-  if (cached) {
-    // Still evaluate alerts in background even on cache hit
-    if (userId) fireAlerts(userId, cached.transactions);
-    return cached;
-  }
-
   const bank = await getBankFromDb(bankRecordId);
-
   if (!bank) throw new Error('Bank not found');
 
-  // Reuse accountsCache to skip a redundant Plaid call (it was just fetched by getAccounts())
-  let accountData: any = null;
-  if (userId) {
-    const cachedAccounts = getCached(accountsCache, userId);
-    if (cachedAccounts) {
-      accountData = cachedAccounts.data.find((a: any) => a.bankRecordId === bankRecordId) ?? null;
-    }
-  }
+  // Build account data from DB columns
+  const account = {
+    id: bank.accountId,
+    availableBalance: bank.availableBalance ? parseFloat(bank.availableBalance.toString()) : 0,
+    currentBalance: bank.currentBalance ? parseFloat(bank.currentBalance.toString()) : 0,
+    institutionId: bank.institutionId || '',
+    name: bank.accountName || bank.accountId,
+    officialName: bank.officialName,
+    mask: bank.mask || '',
+    type: bank.accountType || 'depository',
+    subtype: bank.accountSubtype || 'checking',
+    bankRecordId: bank.id,
+  };
 
-  if (!accountData) {
-    const accountsResponse = await plaidClient.accountsGet({ access_token: bank.accessToken });
-    const raw = accountsResponse.data.accounts[0];
-    const institution = await getInstitution(accountsResponse.data.item.institution_id!);
-    accountData = {
-      id: raw.account_id,
-      availableBalance: raw.balances.available!,
-      currentBalance: raw.balances.current!,
-      institutionId: institution.institution_id,
-      name: raw.name,
-      officialName: raw.official_name,
-      mask: raw.mask!,
-      type: raw.type as string,
-      subtype: raw.subtype! as string,
-      bankRecordId: bank.id,
-    };
-  }
-
+  // Get Razorpay transfers
   const transferTransactionsData = await getTransactionsByBankId(bank.id);
-
-  // Map internal transfers to Plaid-like shape for seamless UI merge
   const transferTransactions = transferTransactionsData.documents.map(
     (transferData: any) => ({
       id: transferData.id,
@@ -160,7 +163,7 @@ export const getAccount = async (bankRecordId: string, userId?: string) => {
     })
   );
 
-  // DB-first: serve persisted transactions, fall back to Plaid on first load
+  // Get Plaid transactions from DB
   let rawTransactions: any[];
   const dbRows = await prisma.plaidTransaction.findMany({
     where: { bankId: bank.id },
@@ -182,34 +185,17 @@ export const getAccount = async (bankRecordId: string, userId?: string) => {
       image: t.image,
     }));
     console.log(`[DB] Loaded ${rawTransactions.length} plaid txns for bank ${bank.id}`);
-    // Background re-sync from Plaid if data is stale (>1 hour)
-    const staleThreshold = 60 * 60 * 1000;
-    if (dbRows[0]?.syncedAt && Date.now() - dbRows[0].syncedAt.getTime() > staleThreshold) {
-      getTransactions(bank.accessToken, bank.id).catch((err) =>
-        console.error('Background Plaid re-sync failed:', err)
-      );
-    }
-  } else {
-    console.log(`[PLAID] No cached txns for bank ${bank.id}, fetching from Plaid`);
+  } else if (!bank.lastSyncedAt) {
+    // First ever load — no DB data yet, must fetch from Plaid synchronously
+    console.log(`[PLAID] First load for bank ${bank.id}, fetching from Plaid`);
     rawTransactions = await getTransactions(bank.accessToken, bank.id);
+  } else {
+    rawTransactions = [];
   }
 
   const transactions = categorizeTransactions(rawTransactions);
 
-  const account = {
-    id: accountData.id,
-    availableBalance: accountData.availableBalance,
-    currentBalance: accountData.currentBalance,
-    institutionId: accountData.institutionId,
-    name: accountData.name,
-    officialName: accountData.officialName,
-    mask: accountData.mask,
-    type: accountData.type,
-    subtype: accountData.subtype,
-    bankRecordId: bank.id,
-  };
-
-  // Add hash to each transaction for note lookups
+  // Merge, hash, and sort all transactions
   const allTransactions = [...transactions, ...transferTransactions]
     .map((t: any) => ({
       ...t,
@@ -219,10 +205,10 @@ export const getAccount = async (bankRecordId: string, userId?: string) => {
 
   const result = { data: account, transactions: allTransactions };
 
-  // Cache the result
-  setCache(accountCache, bankRecordId, result, ACCOUNT_TTL);
+  // Trigger background Plaid sync if TTL expired
+  triggerSyncIfNeeded(bank);
 
-  // Evaluate spending alerts in the background (non-blocking)
+  // Evaluate spending alerts in the background
   if (userId) fireAlerts(userId, allTransactions);
 
   return result;
@@ -241,14 +227,14 @@ function fireAlerts(userId: string, allTransactions: any[]) {
   }).catch(() => {});
 }
 
-// ─── Cache invalidation (called after transfers) ────────────
+// ─── Cache invalidation (called after transfers & disconnects) ─
 
-export function clearAccountCache(bankRecordId: string, userId?: string) {
-  accountCache.delete(bankRecordId);
-  if (userId) accountsCache.delete(userId);
+export async function clearAccountCache(bankRecordId: string, _userId?: string) {
+  // Delete Redis sync key so next request triggers a fresh Plaid sync
+  await redisDel(`plaid-sync:${bankRecordId}`);
 }
 
-// ─── getInstitution (cached 24 hours) ────────────────────────
+// ─── getInstitution (cached in-memory, static data) ──────────
 
 export const getInstitution = async (institutionId: string) => {
   const cached = getCached(institutionCache, institutionId);
@@ -264,7 +250,7 @@ export const getInstitution = async (institutionId: string) => {
   return result;
 };
 
-// ─── getTransactions (no separate cache — covered by getAccount cache) ─
+// ─── getTransactions (persists to DB) ────────────────────────
 
 export const getTransactions = async (accessToken: string, bankId: string) => {
   let hasMore = true;

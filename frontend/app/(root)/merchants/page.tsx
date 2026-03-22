@@ -11,7 +11,7 @@ const MerchantsPage = async ({ searchParams: { id } }: SearchParamProps) => {
 
   return (
     <section className="home">
-      <div className="home-content max-w-3xl">
+      <div className="home-content">
         <HeaderBox
           type="title"
           title="Merchant Insights"

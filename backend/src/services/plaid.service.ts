@@ -43,6 +43,17 @@ export const exchangePublicToken = async (
   });
 
   const accountData = accountsResponse.data.accounts[0];
+  const institutionId = accountsResponse.data.item.institution_id;
+
+  // Fetch institution name
+  let institutionName: string | undefined;
+  if (institutionId) {
+    try {
+      const { getInstitution } = await import('./bank.service.js');
+      const institution = await getInstitution(institutionId);
+      institutionName = institution.name;
+    } catch {}
+  }
 
   await createBankAccount({
     userId: user.id,
@@ -50,6 +61,15 @@ export const exchangePublicToken = async (
     accountId: accountData.account_id,
     accessToken,
     shareableId: encryptId(accountData.account_id),
+    availableBalance: accountData.balances.available ?? undefined,
+    currentBalance: accountData.balances.current ?? undefined,
+    institutionName,
+    institutionId: institutionId ?? undefined,
+    accountName: accountData.name,
+    officialName: accountData.official_name ?? undefined,
+    mask: accountData.mask ?? undefined,
+    accountType: accountData.type as string,
+    accountSubtype: accountData.subtype as string ?? undefined,
   });
 
   return { publicTokenExchange: 'complete' };

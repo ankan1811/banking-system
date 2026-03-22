@@ -1,3 +1,5 @@
+Loaded Prisma config from prisma.config.ts.
+
 -- CreateSchema
 CREATE SCHEMA IF NOT EXISTS "public";
 
@@ -8,6 +10,7 @@ CREATE TABLE "users" (
     "firstName" TEXT NOT NULL,
     "lastName" TEXT NOT NULL,
     "address1" TEXT NOT NULL,
+    "country" TEXT NOT NULL DEFAULT 'US',
     "city" TEXT NOT NULL,
     "state" TEXT NOT NULL,
     "postalCode" TEXT NOT NULL,
@@ -31,6 +34,16 @@ CREATE TABLE "banks" (
     "accessToken" TEXT NOT NULL,
     "razorpayFundAccountId" TEXT,
     "shareableId" TEXT,
+    "availableBalance" DECIMAL(14,2),
+    "currentBalance" DECIMAL(14,2),
+    "institutionName" TEXT,
+    "institutionId" TEXT,
+    "accountName" TEXT,
+    "officialName" TEXT,
+    "mask" TEXT,
+    "accountType" TEXT,
+    "accountSubtype" TEXT,
+    "lastSyncedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "banks_pkey" PRIMARY KEY ("id")
@@ -163,6 +176,7 @@ CREATE TABLE "financial_health_scores" (
     "score" INTEGER NOT NULL,
     "breakdown" JSONB NOT NULL,
     "tips" JSONB NOT NULL,
+    "source" TEXT NOT NULL DEFAULT 'formula',
     "generatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -177,6 +191,7 @@ CREATE TABLE "monthly_digests" (
     "bankRecordId" TEXT NOT NULL,
     "sections" JSONB NOT NULL,
     "narrative" TEXT NOT NULL,
+    "narrativeSource" TEXT NOT NULL DEFAULT 'formula',
     "generatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -300,6 +315,37 @@ CREATE TABLE "net_worth_snapshots" (
     CONSTRAINT "net_worth_snapshots_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "challenge_suggestion_cache" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "bankRecordId" TEXT NOT NULL,
+    "month" TEXT NOT NULL,
+    "suggestions" JSONB NOT NULL,
+    "generatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "challenge_suggestion_cache_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "plaid_transactions" (
+    "id" TEXT NOT NULL,
+    "bankId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "merchantName" TEXT NOT NULL,
+    "paymentChannel" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "accountId" TEXT NOT NULL,
+    "amount" DECIMAL(12,2) NOT NULL,
+    "pending" BOOLEAN NOT NULL DEFAULT false,
+    "category" TEXT NOT NULL DEFAULT '',
+    "date" TEXT NOT NULL,
+    "image" TEXT,
+    "syncedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "plaid_transactions_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
@@ -402,6 +448,18 @@ CREATE INDEX "net_worth_snapshots_userId_month_idx" ON "net_worth_snapshots"("us
 -- CreateIndex
 CREATE UNIQUE INDEX "net_worth_snapshots_userId_month_key" ON "net_worth_snapshots"("userId", "month");
 
+-- CreateIndex
+CREATE INDEX "challenge_suggestion_cache_userId_bankRecordId_idx" ON "challenge_suggestion_cache"("userId", "bankRecordId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "challenge_suggestion_cache_userId_bankRecordId_month_key" ON "challenge_suggestion_cache"("userId", "bankRecordId", "month");
+
+-- CreateIndex
+CREATE INDEX "plaid_transactions_bankId_idx" ON "plaid_transactions"("bankId");
+
+-- CreateIndex
+CREATE INDEX "plaid_transactions_bankId_date_idx" ON "plaid_transactions"("bankId", "date");
+
 -- AddForeignKey
 ALTER TABLE "banks" ADD CONSTRAINT "banks_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -409,13 +467,13 @@ ALTER TABLE "banks" ADD CONSTRAINT "banks_userId_fkey" FOREIGN KEY ("userId") RE
 ALTER TABLE "transactions" ADD CONSTRAINT "transactions_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "transactions" ADD CONSTRAINT "transactions_senderBankId_fkey" FOREIGN KEY ("senderBankId") REFERENCES "banks"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "transactions" ADD CONSTRAINT "transactions_senderBankId_fkey" FOREIGN KEY ("senderBankId") REFERENCES "banks"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "transactions" ADD CONSTRAINT "transactions_receiverId_fkey" FOREIGN KEY ("receiverId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "transactions" ADD CONSTRAINT "transactions_receiverBankId_fkey" FOREIGN KEY ("receiverBankId") REFERENCES "banks"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "transactions" ADD CONSTRAINT "transactions_receiverBankId_fkey" FOREIGN KEY ("receiverBankId") REFERENCES "banks"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "budgets" ADD CONSTRAINT "budgets_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -464,4 +522,7 @@ ALTER TABLE "manual_liabilities" ADD CONSTRAINT "manual_liabilities_userId_fkey"
 
 -- AddForeignKey
 ALTER TABLE "net_worth_snapshots" ADD CONSTRAINT "net_worth_snapshots_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "plaid_transactions" ADD CONSTRAINT "plaid_transactions_bankId_fkey" FOREIGN KEY ("bankId") REFERENCES "banks"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 

@@ -15,9 +15,9 @@ router.post('/', async (req: Request, res: Response) => {
       name: name || 'Transfer',
     });
 
-    // Invalidate account cache so the transfer shows up immediately
-    clearAccountCache(senderBankId);
-    clearAccountCache(receiverBankId);
+    // Invalidate cache so the transfer shows up and next request triggers Plaid sync
+    await clearAccountCache(senderBankId);
+    await clearAccountCache(receiverBankId);
 
     res.json(result);
   } catch (error) {

@@ -48,14 +48,24 @@ model User {
 }
 
 model Bank {
-  id                    String   @id @default(uuid())
+  id                    String    @id @default(uuid())
   userId                String
   bankId                String
   accountId             String
   accessToken           String
   razorpayFundAccountId String?
   shareableId           String?
-  createdAt             DateTime @default(now())
+  availableBalance      Decimal?  @db.Decimal(14, 2)
+  currentBalance        Decimal?  @db.Decimal(14, 2)
+  institutionName       String?
+  institutionId         String?
+  accountName           String?
+  officialName          String?
+  mask                  String?
+  accountType           String?
+  accountSubtype        String?
+  lastSyncedAt          DateTime?
+  createdAt             DateTime  @default(now())
 
   user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   sentTransactions     Transaction[]      @relation("senderBank")

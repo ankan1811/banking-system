@@ -1,5 +1,6 @@
 import { Router, type Request, type Response } from 'express';
-import { getAccounts, getAccount } from '../services/bank.service.js';
+import { getAccounts, getAccount, syncBankFromPlaid } from '../services/bank.service.js';
+import { getBank } from '../services/user.service.js';
 
 const router = Router();
 
@@ -49,6 +50,27 @@ router.get('/:bankRecordId', async (req: Request, res: Response) => {
     }
     console.error('Error getting account:', error);
     res.status(500).json({ error: 'Failed to get account' });
+  }
+});
+
+// POST /api/accounts/:bankRecordId/sync — manual resync with bank
+router.post('/:bankRecordId/sync', async (req: Request, res: Response) => {
+  try {
+    const bank = await getBank(req.params.bankRecordId as string);
+    if (!bank) {
+      res.status(404).json({ error: 'Bank not found' });
+      return;
+    }
+
+    // Synchronous Plaid call — user clicked resync, they want fresh data
+    await syncBankFromPlaid(bank);
+
+    // Return updated account data
+    const result = await getAccount(bank.id, req.userId);
+    res.json(result);
+  } catch (error) {
+    console.error('Error syncing account:', error);
+    res.status(500).json({ error: 'Failed to sync account' });
   }
 });
 

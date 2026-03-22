@@ -44,6 +44,13 @@ export default function MerchantInsightsCard({ bankRecordId }: Props) {
 
   const totalSpent = merchants.reduce((s, m) => s + m.totalSpent, 0);
 
+  const categoryTotals = merchants.reduce<Record<string, number>>((acc, m) => {
+    acc[m.category] = (acc[m.category] || 0) + m.totalSpent;
+    return acc;
+  }, {});
+  const sortedCategories = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1]);
+  const maxCategoryAmount = sortedCategories[0]?.[1] ?? 1;
+
   return (
     <div className="glass-card p-6 space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-2">
@@ -77,48 +84,88 @@ export default function MerchantInsightsCard({ bankRecordId }: Props) {
         className="w-full px-3 py-1.5 bg-slate-700/30 border border-slate-600/30 rounded-lg text-white text-xs placeholder-slate-500 focus:outline-none focus:border-violet-500/50"
       />
 
-      {/* Merchant list */}
-      <div className="space-y-1 max-h-[400px] overflow-y-auto">
-        {filtered.map((m, i) => {
-          const color = aiCategoryColors[m.category] || '#78716c';
-          const pct = totalSpent > 0 ? (m.totalSpent / totalSpent) * 100 : 0;
-          return (
-            <div key={i} className="flex items-center gap-3 py-2.5 border-b border-slate-700/30 last:border-0">
-              {/* Rank */}
-              <span className="text-xs text-slate-600 w-5 text-right shrink-0">{i + 1}</span>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Merchant list */}
+        <div className="space-y-1 max-h-[520px] overflow-y-auto">
+          {filtered.map((m, i) => {
+            const color = aiCategoryColors[m.category] || '#78716c';
+            const pct = totalSpent > 0 ? (m.totalSpent / totalSpent) * 100 : 0;
+            return (
+              <div key={i} className="flex items-center gap-3 py-2.5 border-b border-slate-700/30 last:border-0">
+                {/* Rank */}
+                <span className="text-xs text-slate-600 w-5 text-right shrink-0">{i + 1}</span>
 
-              {/* Category dot */}
-              <span
-                className="inline-block w-2 h-2 rounded-full shrink-0"
-                style={{ backgroundColor: color }}
-              />
+                {/* Category dot */}
+                <span
+                  className="inline-block w-2 h-2 rounded-full shrink-0"
+                  style={{ backgroundColor: color }}
+                />
 
-              {/* Name + category */}
-              <div className="flex-1 min-w-0">
-                <p className="text-xs text-white font-medium truncate">{m.name}</p>
-                <p className="text-[10px] text-slate-500">
-                  {m.category} · {m.transactionCount} txns · avg ${m.avgAmount.toFixed(2)}
-                </p>
-              </div>
+                {/* Name + category */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-white font-medium truncate">{m.name}</p>
+                  <p className="text-[10px] text-slate-500">
+                    {m.category} · {m.transactionCount} txns · avg ${m.avgAmount.toFixed(2)}
+                  </p>
+                </div>
 
-              {/* Amount + trend */}
-              <div className="text-right shrink-0">
-                <p className="text-xs text-white font-medium">${m.totalSpent.toFixed(2)}</p>
-                <div className="flex items-center justify-end gap-1">
-                  <span className="text-[10px] text-slate-600">{pct.toFixed(1)}%</span>
-                  {m.trend !== 0 && (
-                    <span className={`text-[10px] ${m.trend > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
-                      {m.trend > 0 ? '↑' : '↓'}{Math.abs(m.trend).toFixed(0)}%
-                    </span>
-                  )}
+                {/* Amount + trend */}
+                <div className="text-right shrink-0">
+                  <p className="text-xs text-white font-medium">${m.totalSpent.toFixed(2)}</p>
+                  <div className="flex items-center justify-end gap-1">
+                    <span className="text-[10px] text-slate-600">{pct.toFixed(1)}%</span>
+                    {m.trend !== 0 && (
+                      <span className={`text-[10px] ${m.trend > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
+                        {m.trend > 0 ? '↑' : '↓'}{Math.abs(m.trend).toFixed(0)}%
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-        {filtered.length === 0 && (
-          <p className="text-xs text-slate-500 text-center py-4">No merchants found</p>
-        )}
+            );
+          })}
+          {filtered.length === 0 && (
+            <p className="text-xs text-slate-500 text-center py-4">No merchants found</p>
+          )}
+        </div>
+
+        {/* Category breakdown */}
+        <div className="space-y-3">
+          <div>
+            <h3 className="text-sm font-semibold text-white">Spending by Category</h3>
+            <p className="text-xs text-slate-500 mt-0.5">{sortedCategories.length} categories · last {months}mo</p>
+          </div>
+          <div className="space-y-2">
+            {sortedCategories.map(([category, amount]) => {
+              const color = aiCategoryColors[category] || '#78716c';
+              const pct = totalSpent > 0 ? (amount / totalSpent) * 100 : 0;
+              const barWidth = (amount / maxCategoryAmount) * 100;
+              return (
+                <div key={category} className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="inline-block w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
+                      <span className="text-xs text-slate-300">{category}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-slate-500">{pct.toFixed(1)}%</span>
+                      <span className="text-xs text-white font-medium">${amount.toFixed(2)}</span>
+                    </div>
+                  </div>
+                  <div className="h-1.5 rounded-full bg-slate-700/40 overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{ width: `${barWidth}%`, backgroundColor: color }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+            {sortedCategories.length === 0 && (
+              <p className="text-xs text-slate-500 text-center py-4">No category data</p>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

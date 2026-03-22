@@ -59,6 +59,15 @@ export const createBankAccount = async (data: {
   accountId: string;
   accessToken: string;
   shareableId: string;
+  availableBalance?: number;
+  currentBalance?: number;
+  institutionName?: string;
+  institutionId?: string;
+  accountName?: string;
+  officialName?: string;
+  mask?: string;
+  accountType?: string;
+  accountSubtype?: string;
 }) => {
   const bankAccount = await prisma.bank.create({
     data: {
@@ -67,6 +76,16 @@ export const createBankAccount = async (data: {
       accountId: data.accountId,
       accessToken: data.accessToken,
       shareableId: data.shareableId,
+      availableBalance: data.availableBalance,
+      currentBalance: data.currentBalance,
+      institutionName: data.institutionName,
+      institutionId: data.institutionId,
+      accountName: data.accountName,
+      officialName: data.officialName,
+      mask: data.mask,
+      accountType: data.accountType,
+      accountSubtype: data.accountSubtype,
+      lastSyncedAt: new Date(),
     },
   });
 
@@ -130,8 +149,8 @@ export const disconnectBank = async (userId: string, bankId: string) => {
   }
 
   await prisma.bank.delete({ where: { id: bankId } });
-  clearAccountCache(bankId, userId);
-  clearSuggestionsCache(bankId);
+  await clearAccountCache(bankId, userId);
+  await clearSuggestionsCache(bankId);
 };
 
 export const deleteUser = async (userId: string) => {

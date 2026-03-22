@@ -2203,6 +2203,16 @@ export const BankScalarFieldEnum = {
   accessToken: 'accessToken',
   razorpayFundAccountId: 'razorpayFundAccountId',
   shareableId: 'shareableId',
+  availableBalance: 'availableBalance',
+  currentBalance: 'currentBalance',
+  institutionName: 'institutionName',
+  institutionId: 'institutionId',
+  accountName: 'accountName',
+  officialName: 'officialName',
+  mask: 'mask',
+  accountType: 'accountType',
+  accountSubtype: 'accountSubtype',
+  lastSyncedAt: 'lastSyncedAt',
   createdAt: 'createdAt'
 } as const
 

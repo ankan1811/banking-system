@@ -20,8 +20,20 @@ export type BankModel = runtime.Types.Result.DefaultSelection<Prisma.$BankPayloa
 
 export type AggregateBank = {
   _count: BankCountAggregateOutputType | null
+  _avg: BankAvgAggregateOutputType | null
+  _sum: BankSumAggregateOutputType | null
   _min: BankMinAggregateOutputType | null
   _max: BankMaxAggregateOutputType | null
+}
+
+export type BankAvgAggregateOutputType = {
+  availableBalance: runtime.Decimal | null
+  currentBalance: runtime.Decimal | null
+}
+
+export type BankSumAggregateOutputType = {
+  availableBalance: runtime.Decimal | null
+  currentBalance: runtime.Decimal | null
 }
 
 export type BankMinAggregateOutputType = {
@@ -32,6 +44,16 @@ export type BankMinAggregateOutputType = {
   accessToken: string | null
   razorpayFundAccountId: string | null
   shareableId: string | null
+  availableBalance: runtime.Decimal | null
+  currentBalance: runtime.Decimal | null
+  institutionName: string | null
+  institutionId: string | null
+  accountName: string | null
+  officialName: string | null
+  mask: string | null
+  accountType: string | null
+  accountSubtype: string | null
+  lastSyncedAt: Date | null
   createdAt: Date | null
 }
 
@@ -43,6 +65,16 @@ export type BankMaxAggregateOutputType = {
   accessToken: string | null
   razorpayFundAccountId: string | null
   shareableId: string | null
+  availableBalance: runtime.Decimal | null
+  currentBalance: runtime.Decimal | null
+  institutionName: string | null
+  institutionId: string | null
+  accountName: string | null
+  officialName: string | null
+  mask: string | null
+  accountType: string | null
+  accountSubtype: string | null
+  lastSyncedAt: Date | null
   createdAt: Date | null
 }
 
@@ -54,10 +86,30 @@ export type BankCountAggregateOutputType = {
   accessToken: number
   razorpayFundAccountId: number
   shareableId: number
+  availableBalance: number
+  currentBalance: number
+  institutionName: number
+  institutionId: number
+  accountName: number
+  officialName: number
+  mask: number
+  accountType: number
+  accountSubtype: number
+  lastSyncedAt: number
   createdAt: number
   _all: number
 }
 
+
+export type BankAvgAggregateInputType = {
+  availableBalance?: true
+  currentBalance?: true
+}
+
+export type BankSumAggregateInputType = {
+  availableBalance?: true
+  currentBalance?: true
+}
 
 export type BankMinAggregateInputType = {
   id?: true
@@ -67,6 +119,16 @@ export type BankMinAggregateInputType = {
   accessToken?: true
   razorpayFundAccountId?: true
   shareableId?: true
+  availableBalance?: true
+  currentBalance?: true
+  institutionName?: true
+  institutionId?: true
+  accountName?: true
+  officialName?: true
+  mask?: true
+  accountType?: true
+  accountSubtype?: true
+  lastSyncedAt?: true
   createdAt?: true
 }
 
@@ -78,6 +140,16 @@ export type BankMaxAggregateInputType = {
   accessToken?: true
   razorpayFundAccountId?: true
   shareableId?: true
+  availableBalance?: true
+  currentBalance?: true
+  institutionName?: true
+  institutionId?: true
+  accountName?: true
+  officialName?: true
+  mask?: true
+  accountType?: true
+  accountSubtype?: true
+  lastSyncedAt?: true
   createdAt?: true
 }
 
@@ -89,6 +161,16 @@ export type BankCountAggregateInputType = {
   accessToken?: true
   razorpayFundAccountId?: true
   shareableId?: true
+  availableBalance?: true
+  currentBalance?: true
+  institutionName?: true
+  institutionId?: true
+  accountName?: true
+  officialName?: true
+  mask?: true
+  accountType?: true
+  accountSubtype?: true
+  lastSyncedAt?: true
   createdAt?: true
   _all?: true
 }
@@ -131,6 +213,18 @@ export type BankAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: BankAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: BankSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: BankMinAggregateInputType
@@ -161,6 +255,8 @@ export type BankGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   _count?: BankCountAggregateInputType | true
+  _avg?: BankAvgAggregateInputType
+  _sum?: BankSumAggregateInputType
   _min?: BankMinAggregateInputType
   _max?: BankMaxAggregateInputType
 }
@@ -173,8 +269,20 @@ export type BankGroupByOutputType = {
   accessToken: string
   razorpayFundAccountId: string | null
   shareableId: string | null
+  availableBalance: runtime.Decimal | null
+  currentBalance: runtime.Decimal | null
+  institutionName: string | null
+  institutionId: string | null
+  accountName: string | null
+  officialName: string | null
+  mask: string | null
+  accountType: string | null
+  accountSubtype: string | null
+  lastSyncedAt: Date | null
   createdAt: Date
   _count: BankCountAggregateOutputType | null
+  _avg: BankAvgAggregateOutputType | null
+  _sum: BankSumAggregateOutputType | null
   _min: BankMinAggregateOutputType | null
   _max: BankMaxAggregateOutputType | null
 }
@@ -205,6 +313,16 @@ export type BankWhereInput = {
   accessToken?: Prisma.StringFilter<"Bank"> | string
   razorpayFundAccountId?: Prisma.StringNullableFilter<"Bank"> | string | null
   shareableId?: Prisma.StringNullableFilter<"Bank"> | string | null
+  availableBalance?: Prisma.DecimalNullableFilter<"Bank"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: Prisma.DecimalNullableFilter<"Bank"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: Prisma.StringNullableFilter<"Bank"> | string | null
+  institutionId?: Prisma.StringNullableFilter<"Bank"> | string | null
+  accountName?: Prisma.StringNullableFilter<"Bank"> | string | null
+  officialName?: Prisma.StringNullableFilter<"Bank"> | string | null
+  mask?: Prisma.StringNullableFilter<"Bank"> | string | null
+  accountType?: Prisma.StringNullableFilter<"Bank"> | string | null
+  accountSubtype?: Prisma.StringNullableFilter<"Bank"> | string | null
+  lastSyncedAt?: Prisma.DateTimeNullableFilter<"Bank"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Bank"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   sentTransactions?: Prisma.TransactionListRelationFilter
@@ -220,6 +338,16 @@ export type BankOrderByWithRelationInput = {
   accessToken?: Prisma.SortOrder
   razorpayFundAccountId?: Prisma.SortOrderInput | Prisma.SortOrder
   shareableId?: Prisma.SortOrderInput | Prisma.SortOrder
+  availableBalance?: Prisma.SortOrderInput | Prisma.SortOrder
+  currentBalance?: Prisma.SortOrderInput | Prisma.SortOrder
+  institutionName?: Prisma.SortOrderInput | Prisma.SortOrder
+  institutionId?: Prisma.SortOrderInput | Prisma.SortOrder
+  accountName?: Prisma.SortOrderInput | Prisma.SortOrder
+  officialName?: Prisma.SortOrderInput | Prisma.SortOrder
+  mask?: Prisma.SortOrderInput | Prisma.SortOrder
+  accountType?: Prisma.SortOrderInput | Prisma.SortOrder
+  accountSubtype?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastSyncedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   sentTransactions?: Prisma.TransactionOrderByRelationAggregateInput
@@ -238,6 +366,16 @@ export type BankWhereUniqueInput = Prisma.AtLeast<{
   accessToken?: Prisma.StringFilter<"Bank"> | string
   razorpayFundAccountId?: Prisma.StringNullableFilter<"Bank"> | string | null
   shareableId?: Prisma.StringNullableFilter<"Bank"> | string | null
+  availableBalance?: Prisma.DecimalNullableFilter<"Bank"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: Prisma.DecimalNullableFilter<"Bank"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: Prisma.StringNullableFilter<"Bank"> | string | null
+  institutionId?: Prisma.StringNullableFilter<"Bank"> | string | null
+  accountName?: Prisma.StringNullableFilter<"Bank"> | string | null
+  officialName?: Prisma.StringNullableFilter<"Bank"> | string | null
+  mask?: Prisma.StringNullableFilter<"Bank"> | string | null
+  accountType?: Prisma.StringNullableFilter<"Bank"> | string | null
+  accountSubtype?: Prisma.StringNullableFilter<"Bank"> | string | null
+  lastSyncedAt?: Prisma.DateTimeNullableFilter<"Bank"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Bank"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   sentTransactions?: Prisma.TransactionListRelationFilter
@@ -253,10 +391,22 @@ export type BankOrderByWithAggregationInput = {
   accessToken?: Prisma.SortOrder
   razorpayFundAccountId?: Prisma.SortOrderInput | Prisma.SortOrder
   shareableId?: Prisma.SortOrderInput | Prisma.SortOrder
+  availableBalance?: Prisma.SortOrderInput | Prisma.SortOrder
+  currentBalance?: Prisma.SortOrderInput | Prisma.SortOrder
+  institutionName?: Prisma.SortOrderInput | Prisma.SortOrder
+  institutionId?: Prisma.SortOrderInput | Prisma.SortOrder
+  accountName?: Prisma.SortOrderInput | Prisma.SortOrder
+  officialName?: Prisma.SortOrderInput | Prisma.SortOrder
+  mask?: Prisma.SortOrderInput | Prisma.SortOrder
+  accountType?: Prisma.SortOrderInput | Prisma.SortOrder
+  accountSubtype?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastSyncedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.BankCountOrderByAggregateInput
+  _avg?: Prisma.BankAvgOrderByAggregateInput
   _max?: Prisma.BankMaxOrderByAggregateInput
   _min?: Prisma.BankMinOrderByAggregateInput
+  _sum?: Prisma.BankSumOrderByAggregateInput
 }
 
 export type BankScalarWhereWithAggregatesInput = {
@@ -270,6 +420,16 @@ export type BankScalarWhereWithAggregatesInput = {
   accessToken?: Prisma.StringWithAggregatesFilter<"Bank"> | string
   razorpayFundAccountId?: Prisma.StringNullableWithAggregatesFilter<"Bank"> | string | null
   shareableId?: Prisma.StringNullableWithAggregatesFilter<"Bank"> | string | null
+  availableBalance?: Prisma.DecimalNullableWithAggregatesFilter<"Bank"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: Prisma.DecimalNullableWithAggregatesFilter<"Bank"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: Prisma.StringNullableWithAggregatesFilter<"Bank"> | string | null
+  institutionId?: Prisma.StringNullableWithAggregatesFilter<"Bank"> | string | null
+  accountName?: Prisma.StringNullableWithAggregatesFilter<"Bank"> | string | null
+  officialName?: Prisma.StringNullableWithAggregatesFilter<"Bank"> | string | null
+  mask?: Prisma.StringNullableWithAggregatesFilter<"Bank"> | string | null
+  accountType?: Prisma.StringNullableWithAggregatesFilter<"Bank"> | string | null
+  accountSubtype?: Prisma.StringNullableWithAggregatesFilter<"Bank"> | string | null
+  lastSyncedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Bank"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Bank"> | Date | string
 }
 
@@ -280,6 +440,16 @@ export type BankCreateInput = {
   accessToken: string
   razorpayFundAccountId?: string | null
   shareableId?: string | null
+  availableBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: string | null
+  institutionId?: string | null
+  accountName?: string | null
+  officialName?: string | null
+  mask?: string | null
+  accountType?: string | null
+  accountSubtype?: string | null
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutBanksInput
   sentTransactions?: Prisma.TransactionCreateNestedManyWithoutSenderBankInput
@@ -295,6 +465,16 @@ export type BankUncheckedCreateInput = {
   accessToken: string
   razorpayFundAccountId?: string | null
   shareableId?: string | null
+  availableBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: string | null
+  institutionId?: string | null
+  accountName?: string | null
+  officialName?: string | null
+  mask?: string | null
+  accountType?: string | null
+  accountSubtype?: string | null
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   sentTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutSenderBankInput
   receivedTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutReceiverBankInput
@@ -308,6 +488,16 @@ export type BankUpdateInput = {
   accessToken?: Prisma.StringFieldUpdateOperationsInput | string
   razorpayFundAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shareableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  availableBalance?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  institutionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  officialName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mask?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountSubtype?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutBanksNestedInput
   sentTransactions?: Prisma.TransactionUpdateManyWithoutSenderBankNestedInput
@@ -323,6 +513,16 @@ export type BankUncheckedUpdateInput = {
   accessToken?: Prisma.StringFieldUpdateOperationsInput | string
   razorpayFundAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shareableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  availableBalance?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  institutionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  officialName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mask?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountSubtype?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sentTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutSenderBankNestedInput
   receivedTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutReceiverBankNestedInput
@@ -337,6 +537,16 @@ export type BankCreateManyInput = {
   accessToken: string
   razorpayFundAccountId?: string | null
   shareableId?: string | null
+  availableBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: string | null
+  institutionId?: string | null
+  accountName?: string | null
+  officialName?: string | null
+  mask?: string | null
+  accountType?: string | null
+  accountSubtype?: string | null
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -347,6 +557,16 @@ export type BankUpdateManyMutationInput = {
   accessToken?: Prisma.StringFieldUpdateOperationsInput | string
   razorpayFundAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shareableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  availableBalance?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  institutionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  officialName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mask?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountSubtype?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -358,6 +578,16 @@ export type BankUncheckedUpdateManyInput = {
   accessToken?: Prisma.StringFieldUpdateOperationsInput | string
   razorpayFundAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shareableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  availableBalance?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  institutionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  officialName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mask?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountSubtype?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -379,7 +609,22 @@ export type BankCountOrderByAggregateInput = {
   accessToken?: Prisma.SortOrder
   razorpayFundAccountId?: Prisma.SortOrder
   shareableId?: Prisma.SortOrder
+  availableBalance?: Prisma.SortOrder
+  currentBalance?: Prisma.SortOrder
+  institutionName?: Prisma.SortOrder
+  institutionId?: Prisma.SortOrder
+  accountName?: Prisma.SortOrder
+  officialName?: Prisma.SortOrder
+  mask?: Prisma.SortOrder
+  accountType?: Prisma.SortOrder
+  accountSubtype?: Prisma.SortOrder
+  lastSyncedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+}
+
+export type BankAvgOrderByAggregateInput = {
+  availableBalance?: Prisma.SortOrder
+  currentBalance?: Prisma.SortOrder
 }
 
 export type BankMaxOrderByAggregateInput = {
@@ -390,6 +635,16 @@ export type BankMaxOrderByAggregateInput = {
   accessToken?: Prisma.SortOrder
   razorpayFundAccountId?: Prisma.SortOrder
   shareableId?: Prisma.SortOrder
+  availableBalance?: Prisma.SortOrder
+  currentBalance?: Prisma.SortOrder
+  institutionName?: Prisma.SortOrder
+  institutionId?: Prisma.SortOrder
+  accountName?: Prisma.SortOrder
+  officialName?: Prisma.SortOrder
+  mask?: Prisma.SortOrder
+  accountType?: Prisma.SortOrder
+  accountSubtype?: Prisma.SortOrder
+  lastSyncedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -401,7 +656,22 @@ export type BankMinOrderByAggregateInput = {
   accessToken?: Prisma.SortOrder
   razorpayFundAccountId?: Prisma.SortOrder
   shareableId?: Prisma.SortOrder
+  availableBalance?: Prisma.SortOrder
+  currentBalance?: Prisma.SortOrder
+  institutionName?: Prisma.SortOrder
+  institutionId?: Prisma.SortOrder
+  accountName?: Prisma.SortOrder
+  officialName?: Prisma.SortOrder
+  mask?: Prisma.SortOrder
+  accountType?: Prisma.SortOrder
+  accountSubtype?: Prisma.SortOrder
+  lastSyncedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+}
+
+export type BankSumOrderByAggregateInput = {
+  availableBalance?: Prisma.SortOrder
+  currentBalance?: Prisma.SortOrder
 }
 
 export type BankScalarRelationFilter = {
@@ -449,6 +719,18 @@ export type BankUncheckedUpdateManyWithoutUserNestedInput = {
   update?: Prisma.BankUpdateWithWhereUniqueWithoutUserInput | Prisma.BankUpdateWithWhereUniqueWithoutUserInput[]
   updateMany?: Prisma.BankUpdateManyWithWhereWithoutUserInput | Prisma.BankUpdateManyWithWhereWithoutUserInput[]
   deleteMany?: Prisma.BankScalarWhereInput | Prisma.BankScalarWhereInput[]
+}
+
+export type NullableDecimalFieldUpdateOperationsInput = {
+  set?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
 }
 
 export type BankCreateNestedOneWithoutSentTransactionsInput = {
@@ -500,6 +782,16 @@ export type BankCreateWithoutUserInput = {
   accessToken: string
   razorpayFundAccountId?: string | null
   shareableId?: string | null
+  availableBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: string | null
+  institutionId?: string | null
+  accountName?: string | null
+  officialName?: string | null
+  mask?: string | null
+  accountType?: string | null
+  accountSubtype?: string | null
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   sentTransactions?: Prisma.TransactionCreateNestedManyWithoutSenderBankInput
   receivedTransactions?: Prisma.TransactionCreateNestedManyWithoutReceiverBankInput
@@ -513,6 +805,16 @@ export type BankUncheckedCreateWithoutUserInput = {
   accessToken: string
   razorpayFundAccountId?: string | null
   shareableId?: string | null
+  availableBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: string | null
+  institutionId?: string | null
+  accountName?: string | null
+  officialName?: string | null
+  mask?: string | null
+  accountType?: string | null
+  accountSubtype?: string | null
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   sentTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutSenderBankInput
   receivedTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutReceiverBankInput
@@ -556,6 +858,16 @@ export type BankScalarWhereInput = {
   accessToken?: Prisma.StringFilter<"Bank"> | string
   razorpayFundAccountId?: Prisma.StringNullableFilter<"Bank"> | string | null
   shareableId?: Prisma.StringNullableFilter<"Bank"> | string | null
+  availableBalance?: Prisma.DecimalNullableFilter<"Bank"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: Prisma.DecimalNullableFilter<"Bank"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: Prisma.StringNullableFilter<"Bank"> | string | null
+  institutionId?: Prisma.StringNullableFilter<"Bank"> | string | null
+  accountName?: Prisma.StringNullableFilter<"Bank"> | string | null
+  officialName?: Prisma.StringNullableFilter<"Bank"> | string | null
+  mask?: Prisma.StringNullableFilter<"Bank"> | string | null
+  accountType?: Prisma.StringNullableFilter<"Bank"> | string | null
+  accountSubtype?: Prisma.StringNullableFilter<"Bank"> | string | null
+  lastSyncedAt?: Prisma.DateTimeNullableFilter<"Bank"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Bank"> | Date | string
 }
 
@@ -566,6 +878,16 @@ export type BankCreateWithoutSentTransactionsInput = {
   accessToken: string
   razorpayFundAccountId?: string | null
   shareableId?: string | null
+  availableBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: string | null
+  institutionId?: string | null
+  accountName?: string | null
+  officialName?: string | null
+  mask?: string | null
+  accountType?: string | null
+  accountSubtype?: string | null
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutBanksInput
   receivedTransactions?: Prisma.TransactionCreateNestedManyWithoutReceiverBankInput
@@ -580,6 +902,16 @@ export type BankUncheckedCreateWithoutSentTransactionsInput = {
   accessToken: string
   razorpayFundAccountId?: string | null
   shareableId?: string | null
+  availableBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: string | null
+  institutionId?: string | null
+  accountName?: string | null
+  officialName?: string | null
+  mask?: string | null
+  accountType?: string | null
+  accountSubtype?: string | null
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   receivedTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutReceiverBankInput
   plaidTransactions?: Prisma.PlaidTransactionUncheckedCreateNestedManyWithoutBankInput
@@ -597,6 +929,16 @@ export type BankCreateWithoutReceivedTransactionsInput = {
   accessToken: string
   razorpayFundAccountId?: string | null
   shareableId?: string | null
+  availableBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: string | null
+  institutionId?: string | null
+  accountName?: string | null
+  officialName?: string | null
+  mask?: string | null
+  accountType?: string | null
+  accountSubtype?: string | null
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutBanksInput
   sentTransactions?: Prisma.TransactionCreateNestedManyWithoutSenderBankInput
@@ -611,6 +953,16 @@ export type BankUncheckedCreateWithoutReceivedTransactionsInput = {
   accessToken: string
   razorpayFundAccountId?: string | null
   shareableId?: string | null
+  availableBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: string | null
+  institutionId?: string | null
+  accountName?: string | null
+  officialName?: string | null
+  mask?: string | null
+  accountType?: string | null
+  accountSubtype?: string | null
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   sentTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutSenderBankInput
   plaidTransactions?: Prisma.PlaidTransactionUncheckedCreateNestedManyWithoutBankInput
@@ -639,6 +991,16 @@ export type BankUpdateWithoutSentTransactionsInput = {
   accessToken?: Prisma.StringFieldUpdateOperationsInput | string
   razorpayFundAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shareableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  availableBalance?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  institutionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  officialName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mask?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountSubtype?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutBanksNestedInput
   receivedTransactions?: Prisma.TransactionUpdateManyWithoutReceiverBankNestedInput
@@ -653,6 +1015,16 @@ export type BankUncheckedUpdateWithoutSentTransactionsInput = {
   accessToken?: Prisma.StringFieldUpdateOperationsInput | string
   razorpayFundAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shareableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  availableBalance?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  institutionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  officialName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mask?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountSubtype?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   receivedTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutReceiverBankNestedInput
   plaidTransactions?: Prisma.PlaidTransactionUncheckedUpdateManyWithoutBankNestedInput
@@ -676,6 +1048,16 @@ export type BankUpdateWithoutReceivedTransactionsInput = {
   accessToken?: Prisma.StringFieldUpdateOperationsInput | string
   razorpayFundAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shareableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  availableBalance?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  institutionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  officialName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mask?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountSubtype?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutBanksNestedInput
   sentTransactions?: Prisma.TransactionUpdateManyWithoutSenderBankNestedInput
@@ -690,6 +1072,16 @@ export type BankUncheckedUpdateWithoutReceivedTransactionsInput = {
   accessToken?: Prisma.StringFieldUpdateOperationsInput | string
   razorpayFundAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shareableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  availableBalance?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  institutionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  officialName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mask?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountSubtype?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sentTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutSenderBankNestedInput
   plaidTransactions?: Prisma.PlaidTransactionUncheckedUpdateManyWithoutBankNestedInput
@@ -702,6 +1094,16 @@ export type BankCreateWithoutPlaidTransactionsInput = {
   accessToken: string
   razorpayFundAccountId?: string | null
   shareableId?: string | null
+  availableBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: string | null
+  institutionId?: string | null
+  accountName?: string | null
+  officialName?: string | null
+  mask?: string | null
+  accountType?: string | null
+  accountSubtype?: string | null
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutBanksInput
   sentTransactions?: Prisma.TransactionCreateNestedManyWithoutSenderBankInput
@@ -716,6 +1118,16 @@ export type BankUncheckedCreateWithoutPlaidTransactionsInput = {
   accessToken: string
   razorpayFundAccountId?: string | null
   shareableId?: string | null
+  availableBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: string | null
+  institutionId?: string | null
+  accountName?: string | null
+  officialName?: string | null
+  mask?: string | null
+  accountType?: string | null
+  accountSubtype?: string | null
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   sentTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutSenderBankInput
   receivedTransactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutReceiverBankInput
@@ -744,6 +1156,16 @@ export type BankUpdateWithoutPlaidTransactionsInput = {
   accessToken?: Prisma.StringFieldUpdateOperationsInput | string
   razorpayFundAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shareableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  availableBalance?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  institutionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  officialName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mask?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountSubtype?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutBanksNestedInput
   sentTransactions?: Prisma.TransactionUpdateManyWithoutSenderBankNestedInput
@@ -758,6 +1180,16 @@ export type BankUncheckedUpdateWithoutPlaidTransactionsInput = {
   accessToken?: Prisma.StringFieldUpdateOperationsInput | string
   razorpayFundAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shareableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  availableBalance?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  institutionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  officialName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mask?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountSubtype?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sentTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutSenderBankNestedInput
   receivedTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutReceiverBankNestedInput
@@ -770,6 +1202,16 @@ export type BankCreateManyUserInput = {
   accessToken: string
   razorpayFundAccountId?: string | null
   shareableId?: string | null
+  availableBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: string | null
+  institutionId?: string | null
+  accountName?: string | null
+  officialName?: string | null
+  mask?: string | null
+  accountType?: string | null
+  accountSubtype?: string | null
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -780,6 +1222,16 @@ export type BankUpdateWithoutUserInput = {
   accessToken?: Prisma.StringFieldUpdateOperationsInput | string
   razorpayFundAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shareableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  availableBalance?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  institutionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  officialName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mask?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountSubtype?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sentTransactions?: Prisma.TransactionUpdateManyWithoutSenderBankNestedInput
   receivedTransactions?: Prisma.TransactionUpdateManyWithoutReceiverBankNestedInput
@@ -793,6 +1245,16 @@ export type BankUncheckedUpdateWithoutUserInput = {
   accessToken?: Prisma.StringFieldUpdateOperationsInput | string
   razorpayFundAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shareableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  availableBalance?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  institutionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  officialName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mask?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountSubtype?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sentTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutSenderBankNestedInput
   receivedTransactions?: Prisma.TransactionUncheckedUpdateManyWithoutReceiverBankNestedInput
@@ -806,6 +1268,16 @@ export type BankUncheckedUpdateManyWithoutUserInput = {
   accessToken?: Prisma.StringFieldUpdateOperationsInput | string
   razorpayFundAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shareableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  availableBalance?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  currentBalance?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institutionName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  institutionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  officialName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mask?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountSubtype?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -866,6 +1338,16 @@ export type BankSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   accessToken?: boolean
   razorpayFundAccountId?: boolean
   shareableId?: boolean
+  availableBalance?: boolean
+  currentBalance?: boolean
+  institutionName?: boolean
+  institutionId?: boolean
+  accountName?: boolean
+  officialName?: boolean
+  mask?: boolean
+  accountType?: boolean
+  accountSubtype?: boolean
+  lastSyncedAt?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   sentTransactions?: boolean | Prisma.Bank$sentTransactionsArgs<ExtArgs>
@@ -882,6 +1364,16 @@ export type BankSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   accessToken?: boolean
   razorpayFundAccountId?: boolean
   shareableId?: boolean
+  availableBalance?: boolean
+  currentBalance?: boolean
+  institutionName?: boolean
+  institutionId?: boolean
+  accountName?: boolean
+  officialName?: boolean
+  mask?: boolean
+  accountType?: boolean
+  accountSubtype?: boolean
+  lastSyncedAt?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["bank"]>
@@ -894,6 +1386,16 @@ export type BankSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   accessToken?: boolean
   razorpayFundAccountId?: boolean
   shareableId?: boolean
+  availableBalance?: boolean
+  currentBalance?: boolean
+  institutionName?: boolean
+  institutionId?: boolean
+  accountName?: boolean
+  officialName?: boolean
+  mask?: boolean
+  accountType?: boolean
+  accountSubtype?: boolean
+  lastSyncedAt?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["bank"]>
@@ -906,10 +1408,20 @@ export type BankSelectScalar = {
   accessToken?: boolean
   razorpayFundAccountId?: boolean
   shareableId?: boolean
+  availableBalance?: boolean
+  currentBalance?: boolean
+  institutionName?: boolean
+  institutionId?: boolean
+  accountName?: boolean
+  officialName?: boolean
+  mask?: boolean
+  accountType?: boolean
+  accountSubtype?: boolean
+  lastSyncedAt?: boolean
   createdAt?: boolean
 }
 
-export type BankOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "bankId" | "accountId" | "accessToken" | "razorpayFundAccountId" | "shareableId" | "createdAt", ExtArgs["result"]["bank"]>
+export type BankOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "bankId" | "accountId" | "accessToken" | "razorpayFundAccountId" | "shareableId" | "availableBalance" | "currentBalance" | "institutionName" | "institutionId" | "accountName" | "officialName" | "mask" | "accountType" | "accountSubtype" | "lastSyncedAt" | "createdAt", ExtArgs["result"]["bank"]>
 export type BankInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   sentTransactions?: boolean | Prisma.Bank$sentTransactionsArgs<ExtArgs>
@@ -940,6 +1452,16 @@ export type $BankPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     accessToken: string
     razorpayFundAccountId: string | null
     shareableId: string | null
+    availableBalance: runtime.Decimal | null
+    currentBalance: runtime.Decimal | null
+    institutionName: string | null
+    institutionId: string | null
+    accountName: string | null
+    officialName: string | null
+    mask: string | null
+    accountType: string | null
+    accountSubtype: string | null
+    lastSyncedAt: Date | null
     createdAt: Date
   }, ExtArgs["result"]["bank"]>
   composites: {}
@@ -1375,6 +1897,16 @@ export interface BankFieldRefs {
   readonly accessToken: Prisma.FieldRef<"Bank", 'String'>
   readonly razorpayFundAccountId: Prisma.FieldRef<"Bank", 'String'>
   readonly shareableId: Prisma.FieldRef<"Bank", 'String'>
+  readonly availableBalance: Prisma.FieldRef<"Bank", 'Decimal'>
+  readonly currentBalance: Prisma.FieldRef<"Bank", 'Decimal'>
+  readonly institutionName: Prisma.FieldRef<"Bank", 'String'>
+  readonly institutionId: Prisma.FieldRef<"Bank", 'String'>
+  readonly accountName: Prisma.FieldRef<"Bank", 'String'>
+  readonly officialName: Prisma.FieldRef<"Bank", 'String'>
+  readonly mask: Prisma.FieldRef<"Bank", 'String'>
+  readonly accountType: Prisma.FieldRef<"Bank", 'String'>
+  readonly accountSubtype: Prisma.FieldRef<"Bank", 'String'>
+  readonly lastSyncedAt: Prisma.FieldRef<"Bank", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Bank", 'DateTime'>
 }
     
