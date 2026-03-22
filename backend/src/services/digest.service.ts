@@ -8,7 +8,7 @@ import { redisGet, redisSet } from '../lib/redis.js';
 import type { DigestSection, MonthlyDigest } from '@shared/types';
 import PDFDocument from 'pdfkit';
 
-const DIGEST_TTL_S = 24 * 60 * 60; // 24 hours in seconds
+const DIGEST_TTL_S = 100 * 60 * 60; // 100 hours in seconds
 
 function extractJSON(text: string): string {
   const match = text.match(/```(?:json)?\s*([\s\S]*?)```/);

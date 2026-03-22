@@ -16,8 +16,8 @@ router.post('/', async (req: Request, res: Response) => {
     });
 
     // Invalidate account cache so the transfer shows up immediately
-    clearAccountCache(senderBankId);
-    clearAccountCache(receiverBankId);
+    await clearAccountCache(senderBankId);
+    await clearAccountCache(receiverBankId);
 
     res.json(result);
   } catch (error) {

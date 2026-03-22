@@ -124,20 +124,20 @@ All external API calls are aggressively cached via **Upstash Redis** (primary) w
 
 | Cache | TTL | Storage | Impact |
 |-------|-----|---------|--------|
-| `getAccount()` (Plaid + Gemini) | 5 min | In-memory | ~80% fewer Plaid and Gemini calls |
-| `getAccounts()` (Plaid) | 5 min | In-memory | Dashboard loads instantly on repeat |
-| `getInstitution()` (Plaid) | 24 hr | In-memory | Static bank info cached long-term |
-| Chat financial context | 24 hr | Redis | 0 Plaid calls per chat message |
+| `getAccount()` (Plaid + Gemini) | 100 hr | In-memory | ~95% fewer Plaid and Gemini calls |
+| `getAccounts()` (Plaid) | 100 hr | In-memory | Dashboard loads instantly on repeat |
+| `getInstitution()` (Plaid) | 100 hr | In-memory | Static bank info cached long-term |
+| Chat financial context | 100 hr | Redis | 0 Plaid calls per chat message |
 | AI transaction categories | Permanent | DB | Never re-categorize the same transaction |
-| Spending insights | 24 hr | Redis | Gemini called once per user per day |
-| Analytics (trends, recurring, income/expense, merchants) | 24 hr | Redis | Pure aggregation on cached data |
-| Financial health score | 24 hr | Redis + DB | At most 1 Gemini call per user per day |
-| Monthly digest | 24 hr | Redis + DB | At most 1 Gemini call per user per month |
-| Net worth AI insight | 24 hr | Redis | At most 1 Gemini call per user per day |
+| Spending insights | 100 hr | Redis | Gemini called once per user per ~4 days |
+| Analytics (trends, recurring, income/expense, merchants) | 100 hr | Redis | Pure aggregation on cached data |
+| Financial health score | 100 hr | Redis + DB | At most 1 Gemini call per user per ~4 days |
+| Monthly digest | 100 hr | Redis + DB | At most 1 Gemini call per user per month |
+| Net worth AI insight | 100 hr | Redis | At most 1 Gemini call per user per ~4 days |
 | Challenge AI suggestions | 30 days | Redis + DB | At most 1 Gemini call per user per month |
-| Budget status | 1 hr | Redis | Aggregation cached per user/month |
-| Challenge progress | 1 hr | Redis | Progress calculation cached per user |
-| Transaction notes & tags | 24 hr | Redis | Batch notes cached, invalidated on write |
+| Budget status | 24 hr | Redis | Aggregation cached per user/month |
+| Challenge progress | 24 hr | Redis | Progress calculation cached per user |
+| Transaction notes & tags | 100 hr | Redis | Batch notes cached, invalidated on write |
 | Net worth snapshots | Permanent | DB | Monthly snapshots stored for historical charts |
 
 **Resilience:** If Redis is unavailable (quota exceeded or connection error), all cache operations silently fall back to an in-memory Map. The app never breaks — it just degrades to pre-Redis behavior.

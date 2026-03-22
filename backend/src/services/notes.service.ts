@@ -1,7 +1,7 @@
 import { prisma } from '../lib/db.js';
 import { redisGet, redisSet, redisDel, redisDelByPrefix } from '../lib/redis.js';
 
-const NOTES_TTL_S = 24 * 60 * 60; // 24 hours in seconds
+const NOTES_TTL_S = 100 * 60 * 60; // 100 hours in seconds
 
 async function invalidateNotesCache(userId: string) {
   await redisDelByPrefix(`notes:${userId}:`);

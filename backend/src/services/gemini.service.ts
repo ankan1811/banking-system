@@ -50,7 +50,7 @@ export function categorizeTransactions(
 
 type CategorizedTransaction = RawTransaction & { aiCategory: AICategory };
 
-const INSIGHTS_TTL_S = 24 * 60 * 60; // 24 hours in seconds
+const INSIGHTS_TTL_S = 100 * 60 * 60; // 100 hours in seconds
 
 export async function generateSpendingInsights(
   transactions: CategorizedTransaction[],
@@ -149,7 +149,7 @@ Total transactions this month: ${currentTxns.length}`;
 
 // ─── 3. AI Chatbot ──────────────────────────────────────────
 
-const CHAT_CONTEXT_TTL_S = 24 * 60 * 60; // 24 hours in seconds
+const CHAT_CONTEXT_TTL_S = 100 * 60 * 60; // 100 hours in seconds
 
 async function buildFinancialContext(userId: string): Promise<string> {
   const cacheKey = `chat-context:${userId}`;

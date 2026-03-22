@@ -4,7 +4,7 @@ import { redisGet, redisSet } from '../lib/redis.js';
 import type { AICategory } from '@shared/types';
 import { AI_CATEGORIES } from '@shared/types';
 
-const BUDGET_STATUS_TTL_S = 60 * 60; // 1 hour in seconds
+const BUDGET_STATUS_TTL_S = 24 * 60 * 60; // 24 hours in seconds
 
 export async function getBudgets(userId: string, month: string) {
   return prisma.budget.findMany({

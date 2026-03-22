@@ -1,9 +1,8 @@
 import { prisma } from '../lib/db.js';
-import { geminiModel } from '../lib/gemini.js';
 import { getAccounts } from './bank.service.js';
 import { redisGet, redisSet } from '../lib/redis.js';
 
-const INSIGHT_TTL_S = 24 * 60 * 60; // 24 hours in seconds
+const INSIGHT_TTL_S = 100 * 60 * 60; // 100 hours in seconds
 
 function extractJSON(text: string): string {
   const match = text.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -212,21 +211,23 @@ async function getNetWorthInsight(userId: string, history: any[]): Promise<strin
   if (raw) return raw;
 
   const last6 = history.slice(-6);
-  const prompt = `Given these monthly net worth snapshots for a user, provide a 2-sentence insight about the trend and one actionable tip. Return plain text only, no JSON.
+  const earliest = last6[0];
+  const latest = last6[last6.length - 1];
+  const change = latest.netWorth - earliest.netWorth;
+  const pctChange = earliest.netWorth !== 0
+    ? Math.round(Math.abs(change / earliest.netWorth) * 1000) / 10
+    : 0;
+  const months = last6.length;
 
-Snapshots: ${JSON.stringify(last6.map((s: any) => ({ month: s.month, netWorth: s.netWorth, assets: s.totalAssets, liabilities: s.totalLiabilities })))}`;
-
-  try {
-    const result = await geminiModel.generateContent(prompt);
-    const text = result.response.text().trim();
-
-    await redisSet(cacheKey, text, INSIGHT_TTL_S);
-    return text;
-  } catch (err) {
-    console.error('Gemini net worth insight error:', err);
-    // Cache a fallback so we stop retrying while rate-limited (5 min cooldown)
-    const fallback = 'Net worth insight is temporarily unavailable. Please check back later.';
-    await redisSet(cacheKey, fallback, 5 * 60);
-    return fallback;
+  let insight: string;
+  if (pctChange < 2) {
+    insight = `Your net worth has been stable over the last ${months} months. Look for opportunities to grow through additional savings or investments.`;
+  } else if (change > 0) {
+    insight = `Your net worth grew ${pctChange}% over the last ${months} months. Keep building momentum by maintaining your savings rate.`;
+  } else {
+    insight = `Your net worth decreased ${pctChange}% over the last ${months} months. Consider reviewing recurring expenses and increasing savings contributions.`;
   }
+
+  await redisSet(cacheKey, insight, INSIGHT_TTL_S);
+  return insight;
 }

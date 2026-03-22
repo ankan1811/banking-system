@@ -3,7 +3,7 @@ import { redisGet, redisSet } from '../lib/redis.js';
 import type { AICategory, TrendsData, RecurringPattern, IncomeExpenseData, MerchantInsight } from '@shared/types';
 import { AI_CATEGORIES } from '@shared/types';
 
-const ANALYTICS_TTL_S = 24 * 60 * 60; // 24 hours in seconds
+const ANALYTICS_TTL_S = 100 * 60 * 60; // 100 hours in seconds
 
 // ─── Spending Trends ─────────────────────────────────────────
 

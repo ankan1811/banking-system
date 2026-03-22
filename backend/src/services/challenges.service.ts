@@ -1,22 +1,16 @@
 import { prisma } from '../lib/db.js';
-import { geminiModel } from '../lib/gemini.js';
 import { getAccount } from './bank.service.js';
 import { redisGet, redisSet, redisDelByPattern } from '../lib/redis.js';
 import { AI_CATEGORIES } from '@shared/types';
 import type { AiChallengeSuggestion, ChallengeProgress, ChallengeStreak, Badge } from '@shared/types';
 
 const SUGGESTIONS_TTL_S = 30 * 24 * 60 * 60; // 30 days in seconds
-const CHALLENGE_PROGRESS_TTL_S = 60 * 60;      // 1 hour in seconds
+const CHALLENGE_PROGRESS_TTL_S = 24 * 60 * 60;  // 24 hours in seconds
 
 export async function clearSuggestionsCache(bankRecordId: string) {
   await redisDelByPattern(`challenges:*:${bankRecordId}:*`);
   // Also clear from DB
   prisma.challengeSuggestionCache.deleteMany({ where: { bankRecordId } }).catch(() => {});
-}
-
-function extractJSON(text: string): string {
-  const match = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-  return match ? match[1].trim() : text.trim();
 }
 
 // ─── CRUD ───────────────────────────────────────────────────
@@ -259,56 +253,66 @@ export async function getAiSuggestions(
     }
   }
 
-  // Layer 3: Gemini call
-  try {
-    const { transactions } = await getAccount(bankRecordId);
-    const monthTxns = transactions.filter((t: any) => (t.date || '').startsWith(currentMonth) && t.amount > 0);
+  // Layer 3: Formula-based suggestions from top spending categories
+  const { transactions } = await getAccount(bankRecordId);
+  const monthTxns = transactions.filter((t: any) => (t.date || '').startsWith(currentMonth) && t.amount > 0);
 
-    const byCategory: Record<string, number> = {};
-    for (const t of monthTxns) {
-      const cat = (t as any).aiCategory || (t as any).category || 'Other';
-      byCategory[cat] = (byCategory[cat] || 0) + Math.abs((t as any).amount);
-    }
-
-    const topCategories = Object.entries(byCategory)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3);
-
-    const prompt = `You are a financial wellness coach. Based on this user's top spending categories this month, suggest 3 personalized spending challenges to help them save money. Each challenge should be achievable and motivating.
-
-Top spending categories: ${JSON.stringify(topCategories.map(([cat, amount]) => ({ category: cat, spent: Math.round(amount) })))}
-
-Respond ONLY with a valid JSON array:
-[{ "title": "string", "description": "string", "type": "category_limit" | "no_spend" | "savings_target", "category": "string or null", "targetAmount": number or null, "duration": "weekly" | "monthly" }]`;
-
-    const result = await geminiModel.generateContent(prompt);
-    const text = result.response.text();
-    const parsed = JSON.parse(extractJSON(text));
-
-    const suggestions: AiChallengeSuggestion[] = Array.isArray(parsed) ? parsed.slice(0, 3).map((s: any) => ({
-      title: String(s.title || ''),
-      description: String(s.description || ''),
-      type: ['category_limit', 'no_spend', 'savings_target'].includes(s.type) ? s.type : 'category_limit',
-      category: s.category && AI_CATEGORIES.includes(s.category) ? s.category : null,
-      targetAmount: typeof s.targetAmount === 'number' ? s.targetAmount : null,
-      duration: s.duration === 'weekly' ? 'weekly' : 'monthly',
-    })) : getDefaultSuggestions();
-
-    // Persist to DB + Redis
-    await prisma.challengeSuggestionCache.upsert({
-      where: { userId_bankRecordId_month: { userId, bankRecordId, month: currentMonth } },
-      update: { suggestions: suggestions as any, generatedAt: new Date() },
-      create: { userId, bankRecordId, month: currentMonth, suggestions: suggestions as any },
-    });
-    await redisSet(cacheKey, JSON.stringify(suggestions), SUGGESTIONS_TTL_S);
-    return suggestions;
-  } catch (err) {
-    console.error('AI suggestions error:', err);
-    // Cache defaults for 5 min (cooldown) so we don't hammer Gemini
-    const defaults = getDefaultSuggestions();
-    await redisSet(cacheKey, JSON.stringify(defaults), 5 * 60);
-    return defaults;
+  const byCategory: Record<string, number> = {};
+  for (const t of monthTxns) {
+    const cat = (t as any).aiCategory || (t as any).category || 'Other';
+    byCategory[cat] = (byCategory[cat] || 0) + Math.abs((t as any).amount);
   }
+
+  const topCategories = Object.entries(byCategory)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3);
+
+  const suggestions: AiChallengeSuggestion[] = topCategories.length >= 2
+    ? generateSmartSuggestions(topCategories)
+    : getDefaultSuggestions();
+
+  // Persist to DB + Redis
+  await prisma.challengeSuggestionCache.upsert({
+    where: { userId_bankRecordId_month: { userId, bankRecordId, month: currentMonth } },
+    update: { suggestions: suggestions as any, generatedAt: new Date() },
+    create: { userId, bankRecordId, month: currentMonth, suggestions: suggestions as any },
+  });
+  await redisSet(cacheKey, JSON.stringify(suggestions), SUGGESTIONS_TTL_S);
+  return suggestions;
+}
+
+function generateSmartSuggestions(topCategories: [string, number][]): AiChallengeSuggestion[] {
+  const [top, second] = topCategories;
+  const totalSpend = topCategories.reduce((sum, [, amount]) => sum + amount, 0);
+  const limitTarget = Math.round(top[1] * 0.7);
+  const savingsTarget = Math.round(totalSpend * 0.2);
+
+  return [
+    {
+      title: `Cut ${top[0]} Spending`,
+      description: `Limit ${top[0]} spending to $${limitTarget} this month (30% reduction).`,
+      type: 'category_limit',
+      category: AI_CATEGORIES.includes(top[0] as any) ? top[0] : null,
+      targetAmount: limitTarget,
+      duration: 'monthly',
+    },
+    {
+      title: `No-Spend Days: ${second[0]}`,
+      description: `Go 3 days this week without spending on ${second[0]}.`,
+      type: 'no_spend',
+      category: AI_CATEGORIES.includes(second[0] as any) ? second[0] : null,
+      targetAmount: 3,
+      duration: 'weekly',
+    },
+    {
+      title: `Save $${savingsTarget} This Month`,
+      description: `Put away $${savingsTarget} in savings by reducing your top spending categories.`,
+      type: 'savings_target',
+      category: null,
+      targetAmount: savingsTarget,
+      duration: 'monthly',
+    },
+  ];
 }
 
 function getDefaultSuggestions(): AiChallengeSuggestion[] {

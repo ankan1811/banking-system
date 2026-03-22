@@ -6,32 +6,13 @@ import { getTransactionsByBankId } from './transaction.service.js';
 import { categorizeTransactions } from './gemini.service.js';
 import { evaluateAlerts } from './alerts.service.js';
 import { prisma } from '../lib/db.js';
+import { redisGet, redisSet, redisDel } from '../lib/redis.js';
 
-// ─── In-Memory Caches ────────────────────────────────────────
+// ─── Redis Cache TTLs (seconds) ─────────────────────────────
 
-type CacheEntry<T> = { data: T; expiresAt: number };
-
-const accountCache = new Map<string, CacheEntry<any>>();
-const ACCOUNT_TTL = 24 * 60 * 60 * 1000; // 24 hours
-
-const accountsCache = new Map<string, CacheEntry<any>>();
-const ACCOUNTS_TTL = 24 * 60 * 60 * 1000; // 24 hours
-
-const institutionCache = new Map<string, CacheEntry<any>>();
-const INSTITUTION_TTL = 24 * 60 * 60 * 1000; // 24 hours
-
-function getCached<T>(cache: Map<string, CacheEntry<T>>, key: string): T | null {
-  const entry = cache.get(key);
-  if (entry && entry.expiresAt > Date.now()) {
-    console.log(`[CACHE HIT] ${key}`);
-    return entry.data;
-  }
-  return null;
-}
-
-function setCache<T>(cache: Map<string, CacheEntry<T>>, key: string, data: T, ttl: number): void {
-  cache.set(key, { data, expiresAt: Date.now() + ttl });
-}
+const ACCOUNT_TTL_S = 100 * 60 * 60; // 100 hours
+const ACCOUNTS_TTL_S = 100 * 60 * 60; // 100 hours
+const INSTITUTION_TTL_S = 100 * 60 * 60; // 100 hours
 
 // ─── Transaction Hash (shared with gemini.service for note lookups) ───
 
@@ -39,11 +20,14 @@ export function hashTransaction(name: string, amount: number, date: string): str
   return createHash('sha256').update(`${name}|${amount}|${date}`).digest('hex');
 }
 
-// ─── getAccounts (cached 5 min per userId) ───────────────────
+// ─── getAccounts (cached per userId) ─────────────────────────
 
 export const getAccounts = async (userId: string) => {
-  const cached = getCached(accountsCache, userId);
-  if (cached) return cached;
+  const cachedRaw = await redisGet('accounts:' + userId);
+  if (cachedRaw) {
+    console.log(`[CACHE HIT] accounts:${userId}`);
+    return JSON.parse(cachedRaw);
+  }
 
   const banks = await getBanksFromDb(userId);
 
@@ -82,25 +66,28 @@ export const getAccounts = async (userId: string) => {
   }, 0);
 
   const result = { data: accounts, totalBanks, totalCurrentBalance };
-  setCache(accountsCache, userId, result, ACCOUNTS_TTL);
+  await redisSet('accounts:' + userId, JSON.stringify(result), ACCOUNTS_TTL_S);
 
   // Background: pre-warm full account cache for all banks so tab switches are instant
   for (const bank of banks) {
-    if (!getCached(accountCache, bank.id)) {
-      getAccount(bank.id, userId).catch((err) =>
-        console.error(`Background pre-warm failed for bank ${bank.id}:`, err)
-      );
-    }
-  }
+    redisGet('account:' + bank.id).then((cached) => {
+      if (!cached) {
+        getAccount(bank.id, userId).catch((err) =>
+          console.error(`Background pre-warm failed for bank ${bank.id}:`, err)
+        );
+      }
+    }).catch(() => {});
 
   return result;
 };
 
-// ─── getAccount (cached 5 min per bankRecordId) ──────────────
+// ─── getAccount (cached per bankRecordId) ────────────────────
 
 export const getAccount = async (bankRecordId: string, userId?: string) => {
-  const cached = getCached(accountCache, bankRecordId);
-  if (cached) {
+  const cachedRaw = await redisGet('account:' + bankRecordId);
+  if (cachedRaw) {
+    console.log(`[CACHE HIT] account:${bankRecordId}`);
+    const cached = JSON.parse(cachedRaw);
     // Still evaluate alerts in background even on cache hit
     if (userId) fireAlerts(userId, cached.transactions);
     return cached;
@@ -110,12 +97,13 @@ export const getAccount = async (bankRecordId: string, userId?: string) => {
 
   if (!bank) throw new Error('Bank not found');
 
-  // Reuse accountsCache to skip a redundant Plaid call (it was just fetched by getAccounts())
+  // Reuse accounts cache to skip a redundant Plaid call (it was just fetched by getAccounts())
   let accountData: any = null;
   if (userId) {
-    const cachedAccounts = getCached(accountsCache, userId);
+    const cachedAccounts = await redisGet('accounts:' + userId);
     if (cachedAccounts) {
-      accountData = cachedAccounts.data.find((a: any) => a.bankRecordId === bankRecordId) ?? null;
+      const parsed = JSON.parse(cachedAccounts);
+      accountData = parsed.data.find((a: any) => a.bankRecordId === bankRecordId) ?? null;
     }
   }
 
@@ -220,7 +208,7 @@ export const getAccount = async (bankRecordId: string, userId?: string) => {
   const result = { data: account, transactions: allTransactions };
 
   // Cache the result
-  setCache(accountCache, bankRecordId, result, ACCOUNT_TTL);
+  await redisSet('account:' + bankRecordId, JSON.stringify(result), ACCOUNT_TTL_S);
 
   // Evaluate spending alerts in the background (non-blocking)
   if (userId) fireAlerts(userId, allTransactions);
@@ -243,16 +231,19 @@ function fireAlerts(userId: string, allTransactions: any[]) {
 
 // ─── Cache invalidation (called after transfers) ────────────
 
-export function clearAccountCache(bankRecordId: string, userId?: string) {
-  accountCache.delete(bankRecordId);
-  if (userId) accountsCache.delete(userId);
+export async function clearAccountCache(bankRecordId: string, userId?: string) {
+  await redisDel('account:' + bankRecordId);
+  if (userId) await redisDel('accounts:' + userId);
 }
 
-// ─── getInstitution (cached 24 hours) ────────────────────────
+// ─── getInstitution (cached 100 hours) ───────────────────────
 
 export const getInstitution = async (institutionId: string) => {
-  const cached = getCached(institutionCache, institutionId);
-  if (cached) return cached;
+  const cachedRaw = await redisGet('institution:' + institutionId);
+  if (cachedRaw) {
+    console.log(`[CACHE HIT] institution:${institutionId}`);
+    return JSON.parse(cachedRaw);
+  }
 
   const institutionResponse = await plaidClient.institutionsGetById({
     institution_id: institutionId,
@@ -260,7 +251,7 @@ export const getInstitution = async (institutionId: string) => {
   });
 
   const result = institutionResponse.data.institution;
-  setCache(institutionCache, institutionId, result, INSTITUTION_TTL);
+  await redisSet('institution:' + institutionId, JSON.stringify(result), INSTITUTION_TTL_S);
   return result;
 };
 
