@@ -18,7 +18,7 @@ router.get('/', async (req: Request, res: Response) => {
 // GET /api/accounts/:bankRecordId
 router.get('/:bankRecordId', async (req: Request, res: Response) => {
   try {
-    const bankRecordId = req.params.bankRecordId;
+    const bankRecordId = req.params.bankRecordId as string;
     if (!bankRecordId || bankRecordId === 'undefined') {
       res.status(404).json({ error: 'No bank specified' });
       return;
@@ -27,7 +27,7 @@ router.get('/:bankRecordId', async (req: Request, res: Response) => {
     const page  = parseInt(req.query.page  as string) || 0;
     const limit = parseInt(req.query.limit as string) || 0;
 
-    const result = await getAccount(bankRecordId, req.userId);
+    const result = await getAccount(bankRecordId, req.userId!);
 
     if (page > 0 && limit > 0) {
       const start      = (page - 1) * limit;
@@ -63,7 +63,7 @@ router.post('/:bankRecordId/sync', async (req: Request, res: Response) => {
     }
 
     // Synchronous Plaid call — user clicked resync, they want fresh data
-    await syncBankFromPlaid(bank);
+    await syncBankFromPlaid(bank as { id: string; accessToken: string; accountId: string });
 
     // Return updated account data
     const result = await getAccount(bank.id, req.userId);

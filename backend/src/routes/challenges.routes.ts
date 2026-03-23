@@ -72,7 +72,7 @@ router.post('/', async (req: Request, res: Response) => {
 router.patch('/:id/abandon', async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId as string;
-    const challenge = await abandonChallenge(userId, req.params.id);
+    const challenge = await abandonChallenge(userId, req.params.id as string);
     res.json({ challenge });
   } catch (error) {
     if ((error as Error).message === 'Challenge not found') {

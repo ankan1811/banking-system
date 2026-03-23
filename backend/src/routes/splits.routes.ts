@@ -50,7 +50,7 @@ router.get('/summary', async (req: Request, res: Response) => {
 router.get('/:id', async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId as string;
-    const split = await getSplitById(userId, req.params.id);
+    const split = await getSplitById(userId, req.params.id as string);
     res.json({ split });
   } catch (error) {
     if ((error as Error).message === 'Split not found') {
@@ -82,7 +82,7 @@ router.patch('/:id/participants/:pid', async (req: Request, res: Response) => {
   try {
     const { isPaid } = settleSchema.parse(req.body);
     const userId = (req as any).userId as string;
-    const split = await updateParticipantStatus(userId, req.params.id, req.params.pid, isPaid);
+    const split = await updateParticipantStatus(userId, req.params.id as string, req.params.pid as string, isPaid);
     res.json({ split });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -101,7 +101,7 @@ router.patch('/:id/participants/:pid', async (req: Request, res: Response) => {
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId as string;
-    await deleteSplit(userId, req.params.id);
+    await deleteSplit(userId, req.params.id as string);
     res.json({ success: true });
   } catch (error) {
     if ((error as Error).message === 'Split not found') {

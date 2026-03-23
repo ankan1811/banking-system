@@ -53,7 +53,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 // DELETE /api/banks/:id
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
-    await disconnectBank(req.userId!, req.params.id);
+    await disconnectBank(req.userId!, req.params.id as string);
     res.json({ success: true });
   } catch (error) {
     if ((error as Error).message === 'Bank not found') {

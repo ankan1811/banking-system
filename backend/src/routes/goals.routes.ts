@@ -61,7 +61,7 @@ router.patch('/:id', async (req: Request, res: Response) => {
   try {
     const data = updateSchema.parse(req.body);
     const userId = (req as any).userId as string;
-    const goal = await updateGoal(userId, req.params.id, data);
+    const goal = await updateGoal(userId, req.params.id as string, data);
     res.json({ goal });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -80,7 +80,7 @@ router.patch('/:id', async (req: Request, res: Response) => {
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId as string;
-    await deleteGoal(userId, req.params.id);
+    await deleteGoal(userId, req.params.id as string);
     res.json({ success: true });
   } catch (error) {
     if ((error as Error).message === 'Goal not found') {
@@ -96,7 +96,7 @@ router.post('/:id/contribute', async (req: Request, res: Response) => {
   try {
     const { amount, note } = contributeSchema.parse(req.body);
     const userId = (req as any).userId as string;
-    const result = await addContribution(userId, req.params.id, amount, note);
+    const result = await addContribution(userId, req.params.id as string, amount, note);
     res.json(result);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -115,7 +115,7 @@ router.post('/:id/contribute', async (req: Request, res: Response) => {
 router.get('/:id/contributions', async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId as string;
-    const contributions = await getContributions(userId, req.params.id);
+    const contributions = await getContributions(userId, req.params.id as string);
     res.json({ contributions });
   } catch (error) {
     if ((error as Error).message === 'Goal not found') {

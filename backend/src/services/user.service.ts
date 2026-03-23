@@ -143,7 +143,7 @@ export const disconnectBank = async (userId: string, bankId: string) => {
 
   // Revoke Plaid access token (best-effort)
   try {
-    await plaidClient.itemRemove({ access_token: bank.accessToken });
+    await plaidClient.itemRemove({ access_token: bank.accessToken! });
   } catch (err) {
     console.error('Plaid itemRemove error (continuing):', err);
   }
@@ -158,7 +158,7 @@ export const deleteUser = async (userId: string) => {
   const banks = await getBanks(userId);
   for (const bank of banks) {
     try {
-      await plaidClient.itemRemove({ access_token: bank.accessToken });
+      await plaidClient.itemRemove({ access_token: bank.accessToken! });
     } catch {
       // continue even if Plaid cleanup fails
     }

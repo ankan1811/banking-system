@@ -80,7 +80,7 @@ router.patch('/assets/:id', async (req: Request, res: Response) => {
   try {
     const data = assetUpdateSchema.parse(req.body);
     const userId = (req as any).userId as string;
-    const asset = await updateManualAsset(userId, req.params.id, data);
+    const asset = await updateManualAsset(userId, req.params.id as string, data);
     res.json({ asset });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -98,7 +98,7 @@ router.patch('/assets/:id', async (req: Request, res: Response) => {
 router.delete('/assets/:id', async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId as string;
-    await deleteManualAsset(userId, req.params.id);
+    await deleteManualAsset(userId, req.params.id as string);
     res.json({ success: true });
   } catch (error) {
     if ((error as Error).message === 'Asset not found') {
@@ -140,7 +140,7 @@ router.patch('/liabilities/:id', async (req: Request, res: Response) => {
   try {
     const data = liabilityUpdateSchema.parse(req.body);
     const userId = (req as any).userId as string;
-    const liability = await updateManualLiability(userId, req.params.id, data);
+    const liability = await updateManualLiability(userId, req.params.id as string, data);
     res.json({ liability });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -158,7 +158,7 @@ router.patch('/liabilities/:id', async (req: Request, res: Response) => {
 router.delete('/liabilities/:id', async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId as string;
-    await deleteManualLiability(userId, req.params.id);
+    await deleteManualLiability(userId, req.params.id as string);
     res.json({ success: true });
   } catch (error) {
     if ((error as Error).message === 'Liability not found') {

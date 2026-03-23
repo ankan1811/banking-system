@@ -68,7 +68,7 @@ router.post('/', async (req: Request, res: Response) => {
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId as string;
-    await deleteBudget(userId, req.params.id);
+    await deleteBudget(userId, req.params.id as string);
     res.json({ success: true });
   } catch (error) {
     if ((error as Error).message === 'Budget not found') {

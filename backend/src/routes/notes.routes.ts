@@ -30,7 +30,7 @@ router.post('/', async (req: Request, res: Response) => {
 router.delete('/:hash', async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId as string;
-    await deleteNote(userId, req.params.hash);
+    await deleteNote(userId, req.params.hash as string);
     res.json({ success: true });
   } catch (error) {
     if ((error as Error).message === 'Note not found') {
