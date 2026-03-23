@@ -262,13 +262,23 @@ const AuthForm = ({ type }: { type: string }) => {
     });
   }, [handleGoogleResponse, type]);
 
-  // Render Google button whenever script is loaded AND we're on the form step
+  // Render Google button whenever script is loaded AND we're on the form step AND backend is ready
   useEffect(() => {
-    if (step === 'form' && googleScriptLoaded) {
-      const timer = setTimeout(renderGoogleButton, 50);
+    if (step === 'form' && googleScriptLoaded && !backendCold) {
+      // Retry until the ref is available (form may still be mounting)
+      let attempts = 0;
+      const tryRender = () => {
+        if (googleBtnRef.current) {
+          renderGoogleButton();
+        } else if (attempts < 10) {
+          attempts++;
+          setTimeout(tryRender, 100);
+        }
+      };
+      const timer = setTimeout(tryRender, 100);
       return () => clearTimeout(timer);
     }
-  }, [step, googleScriptLoaded, renderGoogleButton]);
+  }, [step, googleScriptLoaded, renderGoogleButton, backendCold]);
 
   // Step 2: Verify OTP
   const onSubmitOtp = async (data: z.infer<typeof otpSchema>) => {
