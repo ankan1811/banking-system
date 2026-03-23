@@ -13,10 +13,22 @@ const ibmPlexSerif = IBM_Plex_Serif({
 
 export const metadata: Metadata = {
   title: "Ankan's Bank",
-  description: "Ankan's Bank is a modern banking platform for everyone.",
+  description: "A modern banking platform for managing your finances, tracking spending, and achieving your goals.",
   icons: {
     icon: '/icons/logo.svg'
-  }
+  },
+  openGraph: {
+    title: "Ankan's Bank",
+    description: "A modern banking platform for managing your finances, tracking spending, and achieving your goals.",
+    type: 'website',
+    images: [{ url: '/icons/og.png', width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Ankan's Bank",
+    description: "A modern banking platform for managing your finances, tracking spending, and achieving your goals.",
+    images: ['/icons/og.png'],
+  },
 };
 
 export default function RootLayout({
