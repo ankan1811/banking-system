@@ -12,6 +12,7 @@ const ibmPlexSerif = IBM_Plex_Serif({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://bank.ankanpal.com'),
   title: "Ankan's Bank",
   description: "A modern banking platform for managing your finances, tracking spending, and achieving your goals.",
   icons: {

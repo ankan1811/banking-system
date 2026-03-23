@@ -21,10 +21,15 @@ export default async function RootLayout({
     try { loggedIn = JSON.parse(raw); } catch {}
   }
   if (!loggedIn) {
-    try {
-      loggedIn = await serverApiRequest('/api/auth/me', { timeout: 3000 });
-    } catch (err: any) {
-      if (err?.message === 'BACKEND_TIMEOUT') backendTimedOut = true;
+    // Only call backend if there's a session token to validate.
+    // No token = definitely not logged in — skip the API call entirely.
+    const hasSession = cookies().get('session-token')?.value;
+    if (hasSession) {
+      try {
+        loggedIn = await serverApiRequest('/api/auth/me', { timeout: 5000 });
+      } catch {
+        backendTimedOut = true;
+      }
     }
   }
 

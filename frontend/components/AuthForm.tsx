@@ -42,6 +42,46 @@ const AuthForm = ({ type }: { type: string }) => {
   const [savedFormData, setSavedFormData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Cold start detection
+  const [backendCold, setBackendCold] = useState(false);
+  const [warmUpSeconds, setWarmUpSeconds] = useState(0);
+
+  // Cold start: ping /health on mount to detect cold backend
+  const API_HEALTH = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8787'}/health`;
+  useEffect(() => {
+    let cancelled = false;
+    let timer: ReturnType<typeof setInterval>;
+    let counter: ReturnType<typeof setInterval>;
+
+    const start = Date.now();
+    const check = async () => {
+      try {
+        const res = await fetch(API_HEALTH, { cache: 'no-store' });
+        if (res.ok && !cancelled) {
+          setBackendCold(false);
+          setWarmUpSeconds(0);
+          clearInterval(timer);
+          clearInterval(counter);
+        }
+      } catch {
+        if (!cancelled) setBackendCold(true);
+      }
+    };
+
+    // Start checking immediately
+    check();
+    timer = setInterval(check, 3000);
+    counter = setInterval(() => {
+      if (!cancelled) setWarmUpSeconds(Math.floor((Date.now() - start) / 1000));
+    }, 1000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+      clearInterval(counter);
+    };
+  }, []);
+
   // OTP input refs and state
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [otpValues, setOtpValues] = useState(['', '', '', '', '', '']);
@@ -208,7 +248,7 @@ const AuthForm = ({ type }: { type: string }) => {
     (window as any).google.accounts.id.renderButton(googleBtnRef.current, {
       theme: 'filled_black',
       size: 'large',
-      width: '100%',
+      width: 400,
       text: type === 'sign-in' ? 'signin_with' : 'signup_with',
     });
   }, [handleGoogleResponse, type]);
@@ -256,6 +296,29 @@ const AuthForm = ({ type }: { type: string }) => {
         src="https://accounts.google.com/gsi/client"
         onLoad={() => setGoogleScriptLoaded(true)}
       />
+
+      {/* Cold start banner */}
+      {backendCold && (
+        <div className="rounded-xl bg-violet-500/10 border border-violet-500/20 px-4 py-3 text-center animate-[slide-up_0.3s_ease-out]">
+          <p className="text-sm text-violet-300 font-medium">
+            Server is waking up
+            <span className="dot-pulse">
+              <span className="inline-block mx-[1px]">.</span>
+              <span className="inline-block mx-[1px]">.</span>
+              <span className="inline-block mx-[1px]">.</span>
+            </span>
+          </p>
+          <p className="text-xs text-slate-500 mt-1">
+            Free hosting sleeps after inactivity. Usually takes 30–60s.
+            {warmUpSeconds > 0 && (
+              <span className="text-slate-400 font-mono ml-1">
+                ({Math.floor(warmUpSeconds / 60)}:{String(warmUpSeconds % 60).padStart(2, '0')})
+              </span>
+            )}
+          </p>
+        </div>
+      )}
+
       <header className='flex flex-col gap-5 md:gap-8'>
           <Link href="/" className="cursor-pointer flex items-center gap-2">
             <Image
