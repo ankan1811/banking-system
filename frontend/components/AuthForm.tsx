@@ -44,7 +44,7 @@ const AuthForm = ({ type }: { type: string }) => {
   const [error, setError] = useState<string | null>(null);
 
   // Cold start detection
-  const [backendCold, setBackendCold] = useState(false);
+  const [backendCold, setBackendCold] = useState(true);
   const [warmUpSeconds, setWarmUpSeconds] = useState(0);
 
   // Cold start: ping /health on mount to detect cold backend
