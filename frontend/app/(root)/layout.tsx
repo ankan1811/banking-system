@@ -1,4 +1,5 @@
 import AIChatbot from "@/components/AIChatbot";
+import ColdStartScreen from "@/components/ColdStartScreen";
 import LandingPreview from "@/components/LandingPreview";
 import MobileNav from "@/components/MobileNav";
 import NavigationProgress from "@/components/NavigationProgress";
@@ -13,14 +14,21 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   let loggedIn: any = null;
+  let backendTimedOut = false;
+
   const raw = cookies().get('user-info')?.value;
   if (raw) {
     try { loggedIn = JSON.parse(raw); } catch {}
   }
   if (!loggedIn) {
-    loggedIn = await serverApiRequest('/api/auth/me').catch(() => null);
+    try {
+      loggedIn = await serverApiRequest('/api/auth/me', { timeout: 3000 });
+    } catch (err: any) {
+      if (err?.message === 'BACKEND_TIMEOUT') backendTimedOut = true;
+    }
   }
 
+  if (backendTimedOut) return <ColdStartScreen />;
   if (!loggedIn) return <LandingPreview />;
 
   return (
