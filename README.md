@@ -1,6 +1,6 @@
 # Ankan's Bank
 
-**AI-powered full-stack fintech app** 🏦
+**Track spending, set budgets, manage goals, and get AI-powered insights — all in one place.** 🏦
 
 💳 **Banking:** Plaid linking + Razorpay transfers + CSV statement upload + Real-time balances + Multi-account
 🤖 **AI (Gemini):** Transaction categorization + Spending insights + Financial chatbot + Health score + Monthly digest + Challenge suggestions + Financial plan generator
