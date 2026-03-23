@@ -33,6 +33,7 @@ import StatementUpload from './StatementUpload';
 import { countries, getStatesForCountry } from '@/lib/countryStateData';
 import { completeProfileSchema } from '@/lib/utils';
 import DatePicker from './DatePicker';
+import SnakeGame from './SnakeGame';
 
 const AuthForm = ({ type }: { type: string }) => {
   const [user, setUser] = useState<any>(null);
@@ -56,7 +57,13 @@ const AuthForm = ({ type }: { type: string }) => {
     const start = Date.now();
     const check = async () => {
       try {
-        const res = await fetch(API_HEALTH, { cache: 'no-store' });
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 3000);
+        const res = await fetch(API_HEALTH, {
+          cache: 'no-store',
+          signal: controller.signal,
+        });
+        clearTimeout(timeout);
         if (res.ok && !cancelled) {
           setBackendCold(false);
           setWarmUpSeconds(0);
@@ -64,11 +71,13 @@ const AuthForm = ({ type }: { type: string }) => {
           clearInterval(counter);
         }
       } catch {
+        // Timeout, network error, or abort — backend is cold
         if (!cancelled) setBackendCold(true);
       }
     };
 
-    // Start checking immediately
+    // Show banner immediately, then verify
+    setBackendCold(true);
     check();
     timer = setInterval(check, 3000);
     counter = setInterval(() => {
@@ -297,28 +306,45 @@ const AuthForm = ({ type }: { type: string }) => {
         onLoad={() => setGoogleScriptLoaded(true)}
       />
 
-      {/* Cold start banner */}
-      {backendCold && (
-        <div className="rounded-xl bg-violet-500/10 border border-violet-500/20 px-4 py-3 text-center animate-[slide-up_0.3s_ease-out]">
-          <p className="text-sm text-violet-300 font-medium">
-            Server is waking up
-            <span className="dot-pulse">
-              <span className="inline-block mx-[1px]">.</span>
-              <span className="inline-block mx-[1px]">.</span>
-              <span className="inline-block mx-[1px]">.</span>
-            </span>
-          </p>
-          <p className="text-xs text-slate-500 mt-1">
-            Free hosting sleeps after inactivity. Usually takes 30–60s.
-            {warmUpSeconds > 0 && (
-              <span className="text-slate-400 font-mono ml-1">
-                ({Math.floor(warmUpSeconds / 60)}:{String(warmUpSeconds % 60).padStart(2, '0')})
+      {/* Cold start: full snake game + timer */}
+      {backendCold ? (
+        <div className="flex flex-col items-center gap-5 animate-[slide-up_0.5s_ease-out]">
+          {/* Status + timer */}
+          <div className="text-center space-y-2">
+            <p className="text-lg text-slate-200 font-medium">
+              Server is waking up
+              <span className="dot-pulse">
+                <span className="inline-block mx-[1px]">.</span>
+                <span className="inline-block mx-[1px]">.</span>
+                <span className="inline-block mx-[1px]">.</span>
               </span>
-            )}
-          </p>
-        </div>
-      )}
+            </p>
+            <p className="text-2xl font-mono font-bold text-white tracking-wider">
+              {String(Math.floor(warmUpSeconds / 60)).padStart(2, '0')}:{String(warmUpSeconds % 60).padStart(2, '0')}
+            </p>
+            <p className="text-xs text-slate-500">
+              Free hosting sleeps after inactivity. Usually takes 30–60s.
+            </p>
+          </div>
 
+          {/* Snake game */}
+          <div className="w-full">
+            <p className="text-sm text-slate-400 text-center mb-2">Play while you wait</p>
+            <SnakeGame />
+          </div>
+
+          {/* Portfolio link */}
+          <a
+            href="https://ankanpal.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-slate-500 hover:text-cyan-400 transition-colors"
+          >
+            Visit my portfolio while you wait &rarr;
+          </a>
+        </div>
+      ) : (
+      <>
       <header className='flex flex-col gap-5 md:gap-8'>
           <Link href="/" className="cursor-pointer flex items-center gap-2">
             <Image
@@ -678,6 +704,8 @@ const AuthForm = ({ type }: { type: string }) => {
             </Link>
           </footer>
         </>
+      )}
+      </>
       )}
     </section>
   )
