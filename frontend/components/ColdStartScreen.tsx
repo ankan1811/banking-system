@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import SnakeGame from './SnakeGame';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8787';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 const STATUS_MESSAGES = [
   { at: 0, text: 'Waking up the server' },

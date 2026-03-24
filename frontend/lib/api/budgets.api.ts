@@ -1,7 +1,7 @@
 import { apiRequest } from './client';
 import type { Budget, BudgetStatus } from '@shared/types';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8787';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
 export async function getBudgets(month: string) {
   return apiRequest<{ budgets: Budget[] }>(`/api/budgets?month=${month}`);

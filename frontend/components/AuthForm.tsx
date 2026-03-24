@@ -48,7 +48,7 @@ const AuthForm = ({ type }: { type: string }) => {
   const [warmUpSeconds, setWarmUpSeconds] = useState(0);
 
   // Cold start: ping /health on mount to detect cold backend
-  const API_HEALTH = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8787'}/health`;
+  const API_HEALTH = `${process.env.NEXT_PUBLIC_API_URL || ''}/health`;
   useEffect(() => {
     let cancelled = false;
     let timer: ReturnType<typeof setInterval>;
@@ -227,7 +227,7 @@ const AuthForm = ({ type }: { type: string }) => {
   };
 
   const [dummyLoading, setDummyLoading] = useState(false);
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8787';
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
   const handleUseDummy = async () => {
     setDummyLoading(true);

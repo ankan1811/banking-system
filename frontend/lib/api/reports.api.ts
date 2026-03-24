@@ -1,7 +1,7 @@
 import { apiRequest } from './client';
 import type { MonthlyDigest } from '@shared/types';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8787';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
 export async function getMonthlyDigest(month: string, useAi: boolean = false) {
   const aiParam = useAi ? '&ai=true' : '';

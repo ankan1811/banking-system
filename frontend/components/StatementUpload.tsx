@@ -10,7 +10,7 @@ const BANKS = [
   'Federal Bank', 'RBL Bank', 'Other Bank',
 ];
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8787';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
 export default function StatementUpload() {
   const router = useRouter();
