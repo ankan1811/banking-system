@@ -40,12 +40,6 @@ app.use(cors({
 app.use(cookieParser());
 app.use(express.json());
 
-// Request logger (temporary — find what's keeping the server alive)
-app.use((req, _res, next) => {
-  console.log(`[REQ] ${req.method} ${req.url} — ${req.headers['user-agent']?.slice(0, 80)}`);
-  next();
-});
-
 // Routes (rate limits applied to external-call-heavy endpoints)
 app.use('/api/auth', authRoutes);
 app.use('/api/accounts', requireAuth, accountsRateLimit, accountsRoutes);

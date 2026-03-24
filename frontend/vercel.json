@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://banking-system-1esa.onrender.com/api/:path*" },
+    { "source": "/health", "destination": "https://banking-system-1esa.onrender.com/health" }
+  ]
+}
