@@ -99,7 +99,7 @@ const LandingPreview = () => {
           <p className="text-slate-400 text-lg mb-2">
             Your smart financial dashboard
           </p>
-          <p className="text-slate-500 text-sm mb-8">
+          <p className="text-slate-400 text-sm mb-8">
             Track spending, set budgets, manage goals, and get AI-powered insights — all in one place.
           </p>
 
