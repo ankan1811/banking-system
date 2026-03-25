@@ -1,16 +1,11 @@
 'use client'
 
+import { useState } from 'react'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
-import { logoutAccount } from '@/lib/api/auth.api'
+import LogoutModal from './LogoutModal'
 
 const Footer = ({ user, type = 'desktop' }: FooterProps) => {
-  const router = useRouter();
-
-  const handleLogOut = async () => {
-    await logoutAccount();
-    router.push('/sign-in');
-  }
+  const [showLogout, setShowLogout] = useState(false);
 
   return (
     <footer className="footer">
@@ -23,9 +18,11 @@ const Footer = ({ user, type = 'desktop' }: FooterProps) => {
           <p className="text-xs text-slate-500 truncate">{user?.email}</p>
         </div>
       </div>
-      <div className="footer_image" onClick={handleLogOut}>
+      <div className="footer_image" onClick={() => setShowLogout(true)}>
         <Image src="/icons/logout.svg" width={18} height={18} alt="logout" />
       </div>
+
+      <LogoutModal open={showLogout} onClose={() => setShowLogout(false)} />
     </footer>
   )
 }

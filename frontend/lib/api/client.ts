@@ -10,6 +10,10 @@ export async function apiRequest<T>(path: string, options?: RequestInit): Promis
     },
   });
   if (!res.ok) {
+    if (res.status === 401) {
+      window.location.href = '/';
+      return new Promise(() => {}) as T;
+    }
     const err = await res.json().catch(() => ({ message: 'Request failed' }));
     throw new Error(err.message || `API error: ${res.status}`);
   }

@@ -33,7 +33,6 @@ import StatementUpload from './StatementUpload';
 import { countries, getStatesForCountry } from '@/lib/countryStateData';
 import { completeProfileSchema } from '@/lib/utils';
 import DatePicker from './DatePicker';
-import SnakeGame from './SnakeGame';
 
 const AuthForm = ({ type }: { type: string }) => {
   const [user, setUser] = useState<any>(null);
@@ -42,54 +41,6 @@ const AuthForm = ({ type }: { type: string }) => {
   const [step, setStep] = useState<'form' | 'otp' | 'complete-profile'>('form');
   const [savedFormData, setSavedFormData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
-
-  // Cold start detection
-  const [backendCold, setBackendCold] = useState(true);
-  const [warmUpSeconds, setWarmUpSeconds] = useState(0);
-
-  // Cold start: ping /health on mount to detect cold backend
-  const API_HEALTH = `${process.env.NEXT_PUBLIC_API_URL || ''}/health`;
-  useEffect(() => {
-    let cancelled = false;
-    let timer: ReturnType<typeof setInterval>;
-    let counter: ReturnType<typeof setInterval>;
-
-    const start = Date.now();
-    const check = async () => {
-      try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 3000);
-        const res = await fetch(API_HEALTH, {
-          cache: 'no-store',
-          signal: controller.signal,
-        });
-        clearTimeout(timeout);
-        if (res.ok && !cancelled) {
-          setBackendCold(false);
-          setWarmUpSeconds(0);
-          clearInterval(timer);
-          clearInterval(counter);
-        }
-      } catch {
-        // Timeout, network error, or abort — backend is cold
-        if (!cancelled) setBackendCold(true);
-      }
-    };
-
-    // Show banner immediately, then verify
-    setBackendCold(true);
-    check();
-    timer = setInterval(check, 3000);
-    counter = setInterval(() => {
-      if (!cancelled) setWarmUpSeconds(Math.floor((Date.now() - start) / 1000));
-    }, 1000);
-
-    return () => {
-      cancelled = true;
-      clearInterval(timer);
-      clearInterval(counter);
-    };
-  }, []);
 
   // OTP input refs and state
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -251,7 +202,7 @@ const AuthForm = ({ type }: { type: string }) => {
 
   // Initialize and render Google button when script loads and form is ready
   useEffect(() => {
-    if (step === 'form' && googleScriptLoaded && !backendCold && !googleInitialized.current) {
+    if (step === 'form' && googleScriptLoaded && !googleInitialized.current) {
       if (typeof window === 'undefined' || !(window as any).google) return;
       if (!googleBtnRef.current) return;
       (window as any).google.accounts.id.initialize({
@@ -268,7 +219,7 @@ const AuthForm = ({ type }: { type: string }) => {
       });
       googleInitialized.current = true;
     }
-  }, [step, googleScriptLoaded, handleGoogleResponse, backendCold, type]);
+  }, [step, googleScriptLoaded, handleGoogleResponse, type]);
 
   // Step 2: Verify OTP
   const onSubmitOtp = async (data: z.infer<typeof otpSchema>) => {
@@ -306,45 +257,6 @@ const AuthForm = ({ type }: { type: string }) => {
         onLoad={() => setGoogleScriptLoaded(true)}
       />
 
-      {/* Cold start: full snake game + timer */}
-      {backendCold ? (
-        <div className="flex flex-col items-center gap-5 animate-[slide-up_0.5s_ease-out]">
-          {/* Status + timer */}
-          <div className="text-center space-y-2">
-            <p className="text-lg text-slate-200 font-medium">
-              Server is waking up
-              <span className="dot-pulse">
-                <span className="inline-block mx-[1px]">.</span>
-                <span className="inline-block mx-[1px]">.</span>
-                <span className="inline-block mx-[1px]">.</span>
-              </span>
-            </p>
-            <p className="text-2xl font-mono font-bold text-white tracking-wider">
-              {String(Math.floor(warmUpSeconds / 60)).padStart(2, '0')}:{String(warmUpSeconds % 60).padStart(2, '0')}
-            </p>
-            <p className="text-xs text-slate-500">
-              Free hosting sleeps after inactivity. Usually takes 30–60s.
-            </p>
-          </div>
-
-          {/* Snake game */}
-          <div className="w-full">
-            <p className="text-sm text-slate-400 text-center mb-2">Play while you wait</p>
-            <SnakeGame />
-          </div>
-
-          {/* Portfolio link */}
-          <a
-            href="https://ankanpal.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-slate-500 hover:text-cyan-400 transition-colors"
-          >
-            Visit my portfolio while you wait &rarr;
-          </a>
-        </div>
-      ) : (
-      <>
       <header className='flex flex-col gap-5 md:gap-8'>
           <Link href="/" className="cursor-pointer flex items-center gap-2">
             <Image
@@ -679,17 +591,11 @@ const AuthForm = ({ type }: { type: string }) => {
           </div>
 
           {/* Google Sign-In button */}
-          {backendCold ? (
-            <div className="w-full h-[44px] flex items-center justify-center gap-3 bg-slate-700/50 text-slate-400 text-sm rounded-xl opacity-50">
-              Waiting for server...
-            </div>
-          ) : (
-            <div
-              ref={googleBtnRef}
-              className="w-full flex items-center justify-center rounded-xl overflow-hidden [&_iframe]:!rounded-xl"
-              style={{ minHeight: '44px' }}
-            />
-          )}
+          <div
+            ref={googleBtnRef}
+            className="w-full flex items-center justify-center rounded-xl overflow-hidden [&_iframe]:!rounded-xl"
+            style={{ minHeight: '44px' }}
+          />
           <footer className="flex justify-center gap-1">
             <p className="text-14 font-normal text-slate-400">
               {type === 'sign-in'
@@ -701,8 +607,6 @@ const AuthForm = ({ type }: { type: string }) => {
             </Link>
           </footer>
         </>
-      )}
-      </>
       )}
     </section>
   )

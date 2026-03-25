@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { updateProfile, deleteAccount, disconnectBank } from '@/lib/api/settings.api';
-import { logoutAccount } from '@/lib/api/auth.api';
+import LogoutModal from './LogoutModal';
 
 interface Props {
   user: any;
@@ -24,6 +24,7 @@ export default function ProfileSettings({ user, accounts }: Props) {
   const [saved, setSaved] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState('');
   const [deleting, setDeleting] = useState(false);
+  const [showLogoutAll, setShowLogoutAll] = useState(false);
 
   const handleSaveProfile = async () => {
     setSaving(true);
@@ -43,18 +44,13 @@ export default function ProfileSettings({ user, accounts }: Props) {
     router.refresh();
   };
 
-  const handleLogoutAll = async () => {
-    if (!confirm('Log out from all devices? You will need to sign in again.')) return;
-    await logoutAccount();
-    router.push('/sign-in');
-  };
 
   const handleDeleteAccount = async () => {
     if (deleteConfirm !== 'DELETE') return;
     setDeleting(true);
     try {
       await deleteAccount();
-      router.push('/sign-in');
+      window.location.href = '/';
     } finally {
       setDeleting(false);
     }
@@ -190,12 +186,14 @@ export default function ProfileSettings({ user, accounts }: Props) {
             <p className="text-xs text-slate-500">Invalidate all active sessions</p>
           </div>
           <button
-            onClick={handleLogoutAll}
+            onClick={() => setShowLogoutAll(true)}
             className="px-3 py-1.5 text-xs text-amber-400 hover:text-amber-300 border border-amber-500/20 hover:border-amber-500/40 rounded-lg transition-colors"
           >
             Logout All
           </button>
         </div>
+
+        <LogoutModal open={showLogoutAll} onClose={() => setShowLogoutAll(false)} allDevices />
 
         {/* Delete Account */}
         <div className="p-4 border border-rose-500/20 bg-rose-500/5 rounded-lg space-y-3">
