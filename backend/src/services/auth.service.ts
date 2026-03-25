@@ -1,5 +1,6 @@
 import { SignJWT, jwtVerify } from 'jose';
 import type { Request, Response } from 'express';
+import { prisma } from '../lib/db.js';
 
 // ─── User-info cookie helpers ─────────────────────────────────
 
@@ -65,6 +66,10 @@ export async function verifySession(req: Request): Promise<{ userId: string; tok
     const userId = payload.userId as string | undefined;
     const tokenVersion = payload.tokenVersion as number | undefined;
     if (!userId || tokenVersion === undefined) return null;
+
+    // Validate tokenVersion against DB to enforce logout-all-devices
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { tokenVersion: true } });
+    if (!user || user.tokenVersion !== tokenVersion) return null;
 
     return { userId, tokenVersion };
   } catch {
