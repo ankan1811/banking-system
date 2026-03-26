@@ -19,6 +19,15 @@ export default async function RootLayout({
   const raw = cookies().get('user-info')?.value;
   if (raw) {
     try { loggedIn = JSON.parse(raw); } catch {}
+    // Cookie gives us user data instantly, but verify backend is reachable
+    // so we don't render a dashboard full of hanging skeleton loaders
+    if (loggedIn) {
+      try {
+        await serverApiRequest('/health', { timeout: 5000 });
+      } catch {
+        backendTimedOut = true;
+      }
+    }
   }
   if (!loggedIn) {
     // Only call backend if there's a session token to validate.
