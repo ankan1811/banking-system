@@ -72,5 +72,9 @@ export const exchangePublicToken = async (
     accountSubtype: accountData.subtype as string ?? undefined,
   });
 
+  // Invalidate all analytics caches so they recompute with the new bank included
+  const { clearAccountCache } = await import('./bank.service.js');
+  await clearAccountCache(itemId, user.id);
+
   return { publicTokenExchange: 'complete' };
 };
