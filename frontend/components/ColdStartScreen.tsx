@@ -124,10 +124,18 @@ export default function ColdStartScreen() {
           {formatTime(elapsed)}
         </div>
 
-        {/* Hint */}
+        {/* Portfolio link */}
         {!ready && !showRetry && (
           <p className="text-sm text-slate-500">
-            Free hosting sleeps after inactivity. This usually takes 30–60 seconds.
+            Visit my portfolio while you wait &rarr;{' '}
+            <a
+              href="https://ankanpal.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-cyan-400 hover:text-cyan-300 font-medium transition-colors"
+            >
+              ankanpal.com
+            </a>
           </p>
         )}
 
@@ -152,15 +160,6 @@ export default function ColdStartScreen() {
         </div>
       )}
 
-      {/* Portfolio link */}
-      <a
-        href="https://ankanpal.com"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-6 text-sm text-slate-500 hover:text-cyan-400 transition-colors duration-200 animate-[fade-in_0.8s_ease-out]"
-      >
-        Visit my portfolio while you wait &rarr; ankanpal.com
-      </a>
     </div>
   );
 }
