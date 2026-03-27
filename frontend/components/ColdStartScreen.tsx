@@ -343,7 +343,7 @@ export default function ColdStartScreen() {
             {/* Right — Snake game */}
             {!ready && (
               <div className="p-5 sm:p-6 lg:p-8 flex flex-col items-center justify-center border-t lg:border-t-0 border-white/[0.06] bg-white/[0.01]">
-                <p className="text-sm font-space-grotesk font-medium tracking-tight text-slate-300 text-center mb-3">
+                <p className="text-sm font-space-grotesk font-semibold tracking-tight text-slate-300 text-center mb-3">
                   While the servers warm up, can you beat the snake? ⚔️
                 </p>
                 <SnakeGame />
