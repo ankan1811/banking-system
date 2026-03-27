@@ -150,6 +150,11 @@ export default function SnakeGame({ className = '' }: { className?: string }) {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = size * dpr;
+    canvas.height = size * dpr;
+    ctx.scale(dpr, dpr);
+
     const draw = () => {
       const c = size / GRID;
 
@@ -239,7 +244,7 @@ export default function SnakeGame({ className = '' }: { className?: string }) {
           ctx.fillStyle = '#e2e8f0';
           ctx.font = `${Math.round(size * 0.04)}px Inter, sans-serif`;
           ctx.fillText(`Score: ${scoreRef.current}`, size / 2, size / 2 + size * 0.03);
-          ctx.fillStyle = '#94a3b8';
+          ctx.fillStyle = '#64748b';
           ctx.font = `${Math.round(size * 0.035)}px Inter, sans-serif`;
           ctx.fillText('Space or Tap to Restart', size / 2, size / 2 + size * 0.09);
         }
@@ -328,11 +333,17 @@ export default function SnakeGame({ className = '' }: { className?: string }) {
       touchStart.current = null;
     };
 
+    const onClick = () => {
+      if (state.current === 'idle' || state.current === 'gameover') startGame();
+    };
+
     canvas.addEventListener('touchstart', onTouchStart, { passive: true });
     canvas.addEventListener('touchend', onTouchEnd, { passive: true });
+    canvas.addEventListener('click', onClick);
     return () => {
       canvas.removeEventListener('touchstart', onTouchStart);
       canvas.removeEventListener('touchend', onTouchEnd);
+      canvas.removeEventListener('click', onClick);
     };
   }, [startGame]);
 
@@ -352,8 +363,6 @@ export default function SnakeGame({ className = '' }: { className?: string }) {
       <div className="rounded-xl overflow-hidden border border-white/[0.08]">
         <canvas
           ref={canvasRef}
-          width={size}
-          height={size}
           style={{ width: size, height: size, display: 'block' }}
         />
       </div>
@@ -362,8 +371,8 @@ export default function SnakeGame({ className = '' }: { className?: string }) {
       <p className="text-xs text-slate-500 text-center mt-2 md:hidden">
         Swipe to move, tap to start
       </p>
-      <p className="text-xs text-slate-500 text-center mt-2 hidden md:block">
-        Arrow keys to move, Space to start
+      <p className="text-xs text-slate-300 text-center mt-2 hidden md:block">
+        Arrow keys to move. Space to start
       </p>
     </div>
   );
