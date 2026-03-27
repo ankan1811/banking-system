@@ -602,6 +602,11 @@ body {
   to   { transform: rotate(360deg); }
 }
 
+@keyframes status-enter {
+  0% { opacity: 0; transform: translateY(12px) scale(0.97); filter: blur(4px); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
 .cold-orbit-ring {
   position: absolute;
   inset: -6px;

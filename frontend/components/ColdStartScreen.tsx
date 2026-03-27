@@ -225,33 +225,26 @@ export default function ColdStartScreen() {
         >
           <div className="grid grid-cols-1 lg:grid-cols-2">
             {/* Left — Status */}
-            <div className="p-6 sm:p-8 lg:p-10 flex flex-col items-center justify-center text-center lg:border-r lg:border-white/[0.06]">
-              {/* Portfolio link — prominent */}
-              {!ready && !showRetry && (
-                <div className="relative z-20 mb-8 space-y-2">
-                  <p className="text-sm text-slate-500 tracking-widest uppercase font-medium">Visit my portfolio</p>
-                  <a
-                    href="https://ankanpal.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="relative z-20 inline-block text-2xl sm:text-3xl font-bold font-ibm-plex-serif text-cyan-400 hover:text-cyan-300 transition-all duration-300 cursor-pointer"
-                    style={{ textShadow: '0 0 20px rgba(34,211,238,0.3)' }}
-                  >
-                    ankanpal.com
-                    <span className="block h-[2px] mt-1 bg-gradient-to-r from-cyan-500 via-cyan-400 to-violet-400 rounded-full opacity-60" />
-                  </a>
-                </div>
-              )}
-
-              {/* Status */}
+            <div className="px-6 pb-6 pt-4 sm:px-8 sm:pb-8 sm:pt-5 lg:px-10 lg:pb-10 lg:pt-6 flex flex-col items-center justify-center text-center lg:border-r lg:border-white/[0.06]">
+              {/* Status — hero position */}
               {ready ? (
-                <div className="flex items-center justify-center gap-2.5 mb-8">
+                <div
+                  className="flex items-center justify-center gap-2.5 mb-6"
+                  style={{ animation: 'status-enter 0.8s cubic-bezier(0.16, 1, 0.3, 1) both' }}
+                >
                   <div className="w-3.5 h-3.5 rounded-full bg-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.7)]" />
-                  <span className="text-emerald-400 font-semibold text-xl font-space-grotesk tracking-tight" style={{ textShadow: '0 0 16px rgba(52,211,153,0.3)' }}>Server is ready!</span>
+                  <span className="text-emerald-400 font-bold text-2xl sm:text-3xl font-space-grotesk tracking-tight" style={{ textShadow: '0 0 20px rgba(52,211,153,0.3)' }}>Server is ready!</span>
                 </div>
               ) : (
-                <p className="text-xl font-space-grotesk font-semibold tracking-tight mb-8">
-                  <span className="bg-gradient-to-r from-slate-100 via-white to-slate-300 bg-clip-text text-transparent">{status.text}</span>
+                <p
+                  key={status.text}
+                  className="text-2xl sm:text-3xl font-space-grotesk font-bold tracking-tight mb-6"
+                  style={{
+                    animation: 'status-enter 0.8s cubic-bezier(0.16, 1, 0.3, 1) both',
+                    textShadow: '0 0 30px rgba(139,92,246,0.2), 0 0 60px rgba(34,211,238,0.1)',
+                  }}
+                >
+                  <span className="bg-gradient-to-r from-violet-300 via-white to-cyan-300 bg-clip-text text-transparent">{status.text}</span>
                   <span className="ml-2">{status.emoji}</span>
                   <span className="dot-pulse">
                     <span className="inline-block mx-[1px]">.</span>
@@ -261,39 +254,55 @@ export default function ColdStartScreen() {
                 </p>
               )}
 
-              {/* Timer with pulse rings */}
-              <div className="relative flex items-center justify-center mb-8">
+              {/* Timer with pulse rings — softened */}
+              <div className="relative flex items-center justify-center mb-6">
                 {!ready && (
                   <>
                     <div
-                      className="absolute w-28 h-28 rounded-full"
+                      className="absolute w-20 h-20 rounded-full"
                       style={{
-                        border: '1.5px solid rgba(139,92,246,0.4)',
+                        border: '1px solid rgba(139,92,246,0.2)',
                         animation: 'pulse-ring 4s ease-out infinite',
                       }}
                     />
                     <div
-                      className="absolute w-28 h-28 rounded-full"
+                      className="absolute w-20 h-20 rounded-full"
                       style={{
-                        border: '1.5px solid rgba(139,92,246,0.3)',
+                        border: '1px solid rgba(139,92,246,0.15)',
                         animation: 'pulse-ring 4s ease-out infinite',
                         animationDelay: '1.3s',
                       }}
                     />
                     <div
-                      className="absolute w-28 h-28 rounded-full"
+                      className="absolute w-20 h-20 rounded-full"
                       style={{
-                        border: '1.5px solid rgba(34,211,238,0.25)',
+                        border: '1px solid rgba(34,211,238,0.12)',
                         animation: 'pulse-ring 4s ease-out infinite',
                         animationDelay: '2.6s',
                       }}
                     />
                   </>
                 )}
-                <span className="relative text-4xl font-mono font-bold text-white tracking-wider py-6">
+                <span className="relative text-2xl font-mono font-medium text-slate-300 tracking-wider py-4">
                   {formatTime(elapsed)}
                 </span>
               </div>
+
+              {/* Portfolio link — demoted */}
+              {!ready && !showRetry && (
+                <div className="relative z-20 mb-4 space-y-1">
+                  <p className="text-xs text-slate-600 tracking-widest uppercase">Visit my portfolio</p>
+                  <a
+                    href="https://ankanpal.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="relative z-20 inline-block text-base sm:text-lg font-semibold font-ibm-plex-serif text-cyan-400/70 hover:text-cyan-300 transition-all duration-300 cursor-pointer"
+                  >
+                    ankanpal.com
+                    <span className="block h-[1px] mt-0.5 bg-gradient-to-r from-cyan-500 via-cyan-400 to-violet-400 rounded-full opacity-30" />
+                  </a>
+                </div>
+              )}
 
               {/* Rotating tips */}
               {!ready && (
