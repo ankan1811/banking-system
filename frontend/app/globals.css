@@ -559,3 +559,56 @@ body {
   0%, 80%, 100% { opacity: 0; }
   40% { opacity: 1; }
 }
+
+/* ===== COLD START SCREEN ===== */
+.cold-particle {
+  position: absolute;
+  pointer-events: none;
+  will-change: transform, opacity;
+  animation: drift var(--duration, 16s) ease-in-out infinite, twinkle var(--twinkle, 3s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+/* 4-point star shape via clip-path */
+.cold-particle-star {
+  clip-path: polygon(
+    50% 0%, 61% 35%, 100% 50%, 61% 65%,
+    50% 100%, 39% 65%, 0% 50%, 39% 35%
+  );
+}
+
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25%      { transform: translate(15px, -35px) rotate(45deg); }
+  50%      { transform: translate(-12px, -65px) rotate(90deg); }
+  75%      { transform: translate(18px, -30px) rotate(135deg); }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: var(--min-opacity, 0.2); }
+  50%      { opacity: var(--max-opacity, 0.8); }
+}
+
+@keyframes pulse-ring {
+  0%   { transform: scale(0.8); opacity: 0.5; }
+  100% { transform: scale(3); opacity: 0; }
+}
+
+@keyframes orbit {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.cold-orbit-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  padding: 2px;
+  background: conic-gradient(from 0deg, #8b5cf6, #22d3ee, transparent 40%, #8b5cf6);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: orbit 8s linear infinite;
+  opacity: 0.7;
+}
