@@ -183,12 +183,12 @@ export default function ColdStartScreen() {
         </div>
       </div>
 
-      {/* Brand + timer on same line */}
-      <div className="w-full max-w-md lg:max-w-4xl flex items-center justify-between mb-6 animate-[slide-up_0.5s_ease-out]">
-        <h1 className="text-2xl font-bold font-ibm-plex-serif text-white">
+      {/* Brand centered, timer top-right — same line */}
+      <div className="relative w-full max-w-md lg:max-w-4xl mb-6 animate-[slide-up_0.5s_ease-out]">
+        <h1 className="text-2xl font-bold font-ibm-plex-serif text-white text-center">
           Ankan&apos;s Bank
         </h1>
-        <span className="text-2xl font-mono font-bold text-white tracking-wider">
+        <span className="absolute right-0 top-1/2 -translate-y-1/2 text-2xl font-mono font-bold text-white tracking-wider">
           {formatTime(elapsed)}
         </span>
       </div>
