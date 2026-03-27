@@ -97,6 +97,7 @@ const config = {
       fontFamily: {
         inter: "var(--font-inter)",
         "ibm-plex-serif": "var(--font-ibm-plex-serif)",
+        "space-grotesk": "var(--font-space-grotesk)",
       },
       keyframes: {
         float: {

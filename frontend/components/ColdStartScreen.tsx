@@ -7,11 +7,11 @@ import SnakeGame from './SnakeGame';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 const STATUS_MESSAGES = [
-  { at: 0, text: 'Waking up the server' },
-  { at: 10, text: 'Still warming up' },
-  { at: 20, text: 'Almost there' },
-  { at: 40, text: 'Taking a bit longer than usual' },
-  { at: 120, text: 'Server seems to be down. Please try again later' },
+  { at: 0, text: 'Waking up the server', emoji: '🚀' },
+  { at: 10, text: 'Still warming', emoji: '🧨' },
+  { at: 20, text: 'Almost there', emoji: '🔥' },
+  { at: 40, text: 'Taking a bit longer than usual', emoji: '🧯' },
+  { at: 120, text: 'Server seems to be down. Please try again later', emoji: '☄️' },
 ];
 
 const TIPS = [
@@ -31,6 +31,12 @@ const PARTICLES = [
   { top: '70%', left: '88%', size: 10, color: '#8b5cf6', duration: 18, delay: -11, twinkle: 2.8, star: true  },
   { top: '85%', left: '35%', size: 8,  color: '#8b5cf6', duration: 19, delay: -5,  twinkle: 4.2, star: true  },
   { top: '30%', left: '50%', size: 9,  color: '#22d3ee', duration: 21, delay: -9,  twinkle: 3.2, star: true  },
+  { top: '58%', left: '48%', size: 10, color: '#8b5cf6', duration: 17, delay: -14, twinkle: 3.8, star: true  },
+  { top: '4%',  left: '68%', size: 8,  color: '#22d3ee', duration: 23, delay: -2,  twinkle: 2.6, star: true  },
+  { top: '78%', left: '15%', size: 9,  color: '#8b5cf6', duration: 20, delay: -8,  twinkle: 3.4, star: true  },
+  { top: '22%', left: '92%', size: 8,  color: '#22d3ee', duration: 18, delay: -13, twinkle: 4.4, star: true  },
+  { top: '90%', left: '72%', size: 10, color: '#8b5cf6', duration: 21, delay: -6,  twinkle: 2.9, star: true  },
+  { top: '42%', left: '25%', size: 9,  color: '#22d3ee', duration: 19, delay: -10, twinkle: 3.7, star: true  },
   // Medium stars
   { top: '5%',  left: '45%', size: 7,  color: '#8b5cf6', duration: 17, delay: -2,  twinkle: 2.5, star: true  },
   { top: '55%', left: '70%', size: 6,  color: '#22d3ee', duration: 15, delay: -8,  twinkle: 3.8, star: true  },
@@ -38,6 +44,12 @@ const PARTICLES = [
   { top: '92%', left: '12%', size: 6,  color: '#22d3ee', duration: 18, delay: -6,  twinkle: 4.5, star: true  },
   { top: '62%', left: '22%', size: 7,  color: '#8b5cf6', duration: 20, delay: -10, twinkle: 3,   star: true  },
   { top: '15%', left: '60%', size: 6,  color: '#22d3ee', duration: 16, delay: -1,  twinkle: 3.6, star: true  },
+  { top: '28%', left: '8%',  size: 7,  color: '#8b5cf6', duration: 19, delay: -13, twinkle: 2.8, star: true  },
+  { top: '72%', left: '55%', size: 6,  color: '#22d3ee', duration: 22, delay: -7,  twinkle: 4.1, star: true  },
+  { top: '48%', left: '78%', size: 7,  color: '#8b5cf6', duration: 15, delay: -3,  twinkle: 3.3, star: true  },
+  { top: '82%', left: '42%', size: 6,  color: '#22d3ee', duration: 21, delay: -11, twinkle: 2.4, star: true  },
+  { top: '10%', left: '22%', size: 7,  color: '#22d3ee', duration: 17, delay: -5,  twinkle: 3.9, star: true  },
+  { top: '65%', left: '95%', size: 6,  color: '#8b5cf6', duration: 20, delay: -9,  twinkle: 2.7, star: true  },
   // Small twinkling dots
   { top: '12%', left: '30%', size: 4,  color: '#a78bfa', duration: 19, delay: -3,  twinkle: 2,   star: false },
   { top: '25%', left: '72%', size: 3,  color: '#67e8f9', duration: 14, delay: -7,  twinkle: 2.8, star: false },
@@ -51,14 +63,26 @@ const PARTICLES = [
   { top: '75%', left: '3%',  size: 3,  color: '#67e8f9', duration: 23, delay: -11, twinkle: 2.2, star: false },
   { top: '33%', left: '35%', size: 3,  color: '#a78bfa', duration: 19, delay: -1,  twinkle: 4,   star: false },
   { top: '95%', left: '65%', size: 4,  color: '#67e8f9', duration: 17, delay: -10, twinkle: 2,   star: false },
+  { top: '7%',  left: '52%', size: 3,  color: '#a78bfa', duration: 18, delay: -13, twinkle: 2.3, star: false },
+  { top: '20%', left: '38%', size: 4,  color: '#67e8f9', duration: 16, delay: -6,  twinkle: 3.1, star: false },
+  { top: '35%', left: '65%', size: 3,  color: '#a78bfa', duration: 22, delay: -9,  twinkle: 1.9, star: false },
+  { top: '50%', left: '8%',  size: 4,  color: '#67e8f9', duration: 19, delay: -2,  twinkle: 3.7, star: false },
+  { top: '60%', left: '32%', size: 3,  color: '#a78bfa', duration: 15, delay: -14, twinkle: 2.6, star: false },
+  { top: '73%', left: '48%', size: 4,  color: '#67e8f9', duration: 21, delay: -4,  twinkle: 3.4, star: false },
+  { top: '83%', left: '82%', size: 3,  color: '#a78bfa', duration: 17, delay: -8,  twinkle: 2.1, star: false },
+  { top: '93%', left: '25%', size: 4,  color: '#67e8f9', duration: 20, delay: -11, twinkle: 3.8, star: false },
+  { top: '16%', left: '5%',  size: 3,  color: '#a78bfa', duration: 23, delay: -7,  twinkle: 2.5, star: false },
+  { top: '55%', left: '88%', size: 4,  color: '#67e8f9', duration: 18, delay: -1,  twinkle: 3.3, star: false },
+  { top: '68%', left: '15%', size: 3,  color: '#a78bfa', duration: 16, delay: -10, twinkle: 4.2, star: false },
+  { top: '43%', left: '72%', size: 4,  color: '#67e8f9', duration: 22, delay: -5,  twinkle: 1.7, star: false },
 ];
 
-function getStatusMessage(seconds: number) {
-  let msg = STATUS_MESSAGES[0].text;
+function getStatus(seconds: number) {
+  let result = STATUS_MESSAGES[0];
   for (const s of STATUS_MESSAGES) {
-    if (seconds >= s.at) msg = s.text;
+    if (seconds >= s.at) result = s;
   }
-  return msg;
+  return result;
 }
 
 function formatTime(seconds: number) {
@@ -132,7 +156,7 @@ export default function ColdStartScreen() {
     return () => clearInterval(interval);
   }, [ready]);
 
-  const statusMessage = ready ? 'Server is ready!' : getStatusMessage(elapsed);
+  const status = getStatus(elapsed);
   const showRetry = !ready && elapsed >= 120;
 
   return (
@@ -199,9 +223,6 @@ export default function ColdStartScreen() {
           className="glass-card overflow-hidden transition-all duration-500 hover:border-white/[0.12] hover:shadow-[0_8px_50px_rgba(0,0,0,0.5),0_0_140px_rgba(139,92,246,0.12),0_0_80px_rgba(34,211,238,0.06)]"
           style={{ boxShadow: '0 8px 40px rgba(0,0,0,0.5), 0 0 120px rgba(139,92,246,0.08), 0 0 60px rgba(34,211,238,0.04)' }}
         >
-          {/* Gradient accent line */}
-          <div className="h-[2px] bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-500" />
-
           <div className="grid grid-cols-1 lg:grid-cols-2">
             {/* Left — Status */}
             <div className="p-6 sm:p-8 lg:p-10 flex flex-col items-center justify-center text-center lg:border-r lg:border-white/[0.06]">
@@ -226,11 +247,12 @@ export default function ColdStartScreen() {
               {ready ? (
                 <div className="flex items-center justify-center gap-2.5 mb-8">
                   <div className="w-3.5 h-3.5 rounded-full bg-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.7)]" />
-                  <span className="text-emerald-400 font-semibold text-lg">{statusMessage}</span>
+                  <span className="text-emerald-400 font-semibold text-xl font-space-grotesk tracking-tight" style={{ textShadow: '0 0 16px rgba(52,211,153,0.3)' }}>Server is ready!</span>
                 </div>
               ) : (
-                <p className="text-slate-200 text-lg font-medium mb-8">
-                  {statusMessage}
+                <p className="text-xl font-space-grotesk font-semibold tracking-tight mb-8">
+                  <span className="bg-gradient-to-r from-slate-100 via-white to-slate-300 bg-clip-text text-transparent">{status.text}</span>
+                  <span className="ml-2">{status.emoji}</span>
                   <span className="dot-pulse">
                     <span className="inline-block mx-[1px]">.</span>
                     <span className="inline-block mx-[1px]">.</span>
@@ -273,16 +295,6 @@ export default function ColdStartScreen() {
                 </span>
               </div>
 
-              {/* Retry */}
-              {showRetry && (
-                <button
-                  onClick={() => window.location.reload()}
-                  className="mb-6 px-6 py-2.5 rounded-xl font-semibold text-white bg-gradient-to-r from-violet-600 to-cyan-500 hover:shadow-glow-violet transition-all duration-300 text-sm"
-                >
-                  Retry
-                </button>
-              )}
-
               {/* Rotating tips */}
               {!ready && (
                 <div className="w-full mt-4 rounded-xl bg-white/[0.04] border border-white/[0.08] px-4 py-3.5 min-h-[52px] flex items-center justify-center">
@@ -301,8 +313,8 @@ export default function ColdStartScreen() {
             {/* Right — Snake game */}
             {!ready && (
               <div className="p-5 sm:p-6 lg:p-8 flex flex-col items-center justify-center border-t lg:border-t-0 border-white/[0.06] bg-white/[0.01]">
-                <p className="text-sm text-slate-400 text-center mb-3">
-                  Play while you wait
+                <p className="text-sm font-ibm-plex-serif italic text-slate-200 text-center mb-3">
+                  While the servers warm up, can you beat the snake?
                 </p>
                 <SnakeGame />
               </div>

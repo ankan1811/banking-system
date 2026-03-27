@@ -287,10 +287,13 @@ body {
   @apply text-18 sm:text-20 font-semibold text-white;
 }
 .recent-transactions-tablist {
-  @apply flex gap-2 overflow-x-auto pb-2;
+  @apply flex gap-2 overflow-x-auto py-2 mt-3;
   scrollbar-width: none;
 }
 .recent-transactions-tablist::-webkit-scrollbar { display: none; }
+.recent-transactions-tablist button[role="tab"] {
+  box-shadow: none !important;
+}
 
 /* ===== TRANSACTION CARD ===== */
 .transaction-card {
@@ -307,7 +310,7 @@ body {
 
 /* ===== BANK TAB (pill style) ===== */
 .banktab-item {
-  @apply px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer border border-transparent;
+  @apply px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 cursor-pointer border border-transparent;
 }
 
 /* ===== BANK INFO ===== */

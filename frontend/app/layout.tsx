@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import type { Metadata } from "next";
-import { Inter, IBM_Plex_Serif } from "next/font/google";
+import { Inter, IBM_Plex_Serif, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
@@ -9,7 +9,12 @@ const ibmPlexSerif = IBM_Plex_Serif({
   subsets: ['latin'],
   weight: ['400', '700'],
   variable: '--font-ibm-plex-serif'
-})
+});
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-space-grotesk'
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://bank.ankanpal.com'),
@@ -39,7 +44,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${ibmPlexSerif.variable} bg-[#0a0e1a] text-slate-200 antialiased`}>{children}</body>
+      <body className={`${inter.variable} ${ibmPlexSerif.variable} ${spaceGrotesk.variable} bg-[#0a0e1a] text-slate-200 antialiased`}>{children}</body>
     </html>
   );
 }

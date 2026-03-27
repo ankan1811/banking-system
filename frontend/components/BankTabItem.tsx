@@ -21,7 +21,7 @@ export const BankTabItem = ({ account, bankRecordId }: BankTabItemProps) => {
     <div
       onClick={handleBankChange}
       className={cn('banktab-item', {
-        'bg-gradient-to-r from-violet-600/20 to-indigo-600/15 border-violet-500/20 text-white': isActive,
+        'bg-gradient-to-r from-violet-500/30 to-cyan-500/20 border-violet-400/30 text-white shadow-[0_0_12px_rgba(139,92,246,0.15)]': isActive,
         'text-slate-400 hover:text-white hover:bg-white/[0.04]': !isActive,
       })}
     >
