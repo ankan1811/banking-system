@@ -291,25 +291,46 @@ export default function ColdStartScreen() {
               {/* Portfolio link — demoted */}
               {!ready && !showRetry && (
                 <div className="relative z-20 mb-4 space-y-1">
-                  <p className="text-xs text-slate-600 tracking-widest uppercase">Visit my portfolio</p>
+                  <p className="text-xs text-slate-400 tracking-widest uppercase">Visit my portfolio</p>
                   <a
                     href="https://ankanpal.com"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="relative z-20 inline-block text-base sm:text-lg font-semibold font-ibm-plex-serif text-cyan-400/70 hover:text-cyan-300 transition-all duration-300 cursor-pointer"
+                    className="relative z-20 inline-block text-base sm:text-lg font-semibold font-ibm-plex-serif text-cyan-400/90 hover:text-cyan-300 transition-all duration-300 cursor-pointer"
                   >
                     ankanpal.com
-                    <span className="block h-[1px] mt-0.5 bg-gradient-to-r from-cyan-500 via-cyan-400 to-violet-400 rounded-full opacity-30" />
+                    <span className="block h-[1px] mt-0.5 bg-gradient-to-r from-cyan-500 via-cyan-400 to-violet-400 rounded-full opacity-20" />
                   </a>
+                </div>
+              )}
+
+              {/* Feature highlights */}
+              {!ready && (
+                <div className="w-full mt-5 grid grid-cols-2 gap-2">
+                  {[
+                    { icon: '📊', label: 'AI Insights' },
+                    { icon: '🎯', label: 'Budgets & Goals' },
+                    { icon: '📈', label: 'Net Worth' },
+                    { icon: '🏆', label: 'Challenges' },
+                  ].map((f, i) => (
+                    <div
+                      key={f.label}
+                      className="feature-pill group/pill flex items-center gap-2 rounded-lg bg-white/[0.03] border border-white/[0.06] px-3 py-2 cursor-default select-none"
+                      style={{ animationDelay: `${i * 0.12}s` }}
+                    >
+                      <span className="text-sm transition-transform duration-300 group-hover/pill:scale-125 group-hover/pill:-rotate-12">{f.icon}</span>
+                      <span className="text-xs font-space-grotesk font-medium text-[#b7c5d6] transition-colors duration-300 group-hover/pill:text-slate-200">{f.label}</span>
+                    </div>
+                  ))}
                 </div>
               )}
 
               {/* Rotating tips */}
               {!ready && (
-                <div className="w-full mt-4 rounded-xl bg-white/[0.04] border border-white/[0.08] px-4 py-3.5 min-h-[52px] flex items-center justify-center">
+                <div className="w-full mt-3 rounded-xl bg-white/[0.04] border border-white/[0.08] px-4 py-3.5 min-h-[52px] flex items-center justify-center">
                   <p
-                    className="text-sm text-slate-400"
-                    style={{ opacity: tipVisible ? 1 : 0, transition: 'opacity 0.4s ease' }}
+                    className="text-sm text-[#b7c5d6]"
+                    style={{ opacity: tipVisible ? 1 : 0, transition: 'opacity 0.2s ease' }}
                   >
                     <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent mr-1.5">&#10024;</span>
                     {TIPS[tipIndex]}
@@ -322,8 +343,8 @@ export default function ColdStartScreen() {
             {/* Right — Snake game */}
             {!ready && (
               <div className="p-5 sm:p-6 lg:p-8 flex flex-col items-center justify-center border-t lg:border-t-0 border-white/[0.06] bg-white/[0.01]">
-                <p className="text-sm font-ibm-plex-serif italic text-slate-200 text-center mb-3">
-                  While the servers warm up, can you beat the snake?
+                <p className="text-sm font-space-grotesk font-medium tracking-tight text-slate-300 text-center mb-3">
+                  While the servers warm up, can you beat the snake? ⚔️
                 </p>
                 <SnakeGame />
               </div>
