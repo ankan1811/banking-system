@@ -110,9 +110,34 @@ export default function AlertsManager() {
   return (
     <div className="space-y-4">
       {alerts.length === 0 && !creating && (
-        <div className="glass-card p-6 text-center">
-          <p className="text-sm text-slate-500 mb-1">No alert rules yet.</p>
-          <p className="text-xs text-slate-600">Get notified by email when spending thresholds are reached.</p>
+        <div className="glass-card p-6 space-y-5">
+          <div className="text-center space-y-2">
+            <div className="mx-auto w-12 h-12 rounded-full bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
+              <svg className="w-5 h-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+            </div>
+            <h3 className="text-sm font-semibold text-white">No alerts set up yet</h3>
+            <p className="text-xs text-slate-500">Get email notifications when your spending crosses a threshold.</p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <div className="p-3 bg-slate-800/30 border border-slate-700/30 rounded-lg text-center">
+              <span className="text-lg">📊</span>
+              <p className="text-[11px] text-slate-400 mt-1">Monthly category limit</p>
+              <p className="text-[10px] text-slate-500">e.g. Food & Dining over $200</p>
+            </div>
+            <div className="p-3 bg-slate-800/30 border border-slate-700/30 rounded-lg text-center">
+              <span className="text-lg">💳</span>
+              <p className="text-[11px] text-slate-400 mt-1">Large transaction</p>
+              <p className="text-[10px] text-slate-500">e.g. Any charge over $500</p>
+            </div>
+            <div className="p-3 bg-slate-800/30 border border-slate-700/30 rounded-lg text-center">
+              <span className="text-lg">🏦</span>
+              <p className="text-[11px] text-slate-400 mt-1">Low balance</p>
+              <p className="text-[10px] text-slate-500">e.g. Balance below $1,000</p>
+            </div>
+          </div>
         </div>
       )}
 

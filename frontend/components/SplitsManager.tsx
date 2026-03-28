@@ -144,8 +144,34 @@ export default function SplitsManager({ initialSplits = [], initialSummary = nul
         </div>
       ) : (
         !creating && (
-          <div className="glass-card p-6 text-center">
-            <p className="text-sm text-slate-500 mb-3">No splits yet. Create one to start splitting expenses!</p>
+          <div className="glass-card p-6 space-y-5">
+            <div className="text-center space-y-2">
+              <div className="mx-auto w-12 h-12 rounded-full bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
+                <svg className="w-5 h-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <h3 className="text-sm font-semibold text-white">No splits yet</h3>
+              <p className="text-xs text-slate-500">Split bills with friends and family, then track who has paid.</p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div className="p-3 bg-slate-800/30 border border-slate-700/30 rounded-lg text-center">
+                <span className="text-lg">🍽</span>
+                <p className="text-[11px] text-slate-400 mt-1">Split a dinner</p>
+                <p className="text-[10px] text-slate-500">Divide equally or custom</p>
+              </div>
+              <div className="p-3 bg-slate-800/30 border border-slate-700/30 rounded-lg text-center">
+                <span className="text-lg">🏠</span>
+                <p className="text-[11px] text-slate-400 mt-1">Share rent</p>
+                <p className="text-[10px] text-slate-500">Custom amounts per person</p>
+              </div>
+              <div className="p-3 bg-slate-800/30 border border-slate-700/30 rounded-lg text-center">
+                <span className="text-lg">✅</span>
+                <p className="text-[11px] text-slate-400 mt-1">Track payments</p>
+                <p className="text-[10px] text-slate-500">Mark who has paid back</p>
+              </div>
+            </div>
           </div>
         )
       )}

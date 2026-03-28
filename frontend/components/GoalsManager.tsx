@@ -299,8 +299,34 @@ export default function GoalsManager() {
       )}
 
       {active.length === 0 && !creating && (
-        <div className="glass-card p-6 text-center">
-          <p className="text-sm text-slate-500 mb-3">No active goals yet. Create your first savings goal!</p>
+        <div className="glass-card p-6 space-y-5">
+          <div className="text-center space-y-2">
+            <div className="mx-auto w-12 h-12 rounded-full bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
+              <svg className="w-5 h-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="text-sm font-semibold text-white">No savings goals yet</h3>
+            <p className="text-xs text-slate-500">Set a target, contribute over time, and watch your progress grow.</p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <div className="p-3 bg-slate-800/30 border border-slate-700/30 rounded-lg text-center">
+              <span className="text-lg">🎯</span>
+              <p className="text-[11px] text-slate-400 mt-1">Set a target</p>
+              <p className="text-[10px] text-slate-500">e.g. Save $5,000 for a trip</p>
+            </div>
+            <div className="p-3 bg-slate-800/30 border border-slate-700/30 rounded-lg text-center">
+              <span className="text-lg">💰</span>
+              <p className="text-[11px] text-slate-400 mt-1">Track contributions</p>
+              <p className="text-[10px] text-slate-500">Add savings as you go</p>
+            </div>
+            <div className="p-3 bg-slate-800/30 border border-slate-700/30 rounded-lg text-center">
+              <span className="text-lg">🤖</span>
+              <p className="text-[11px] text-slate-400 mt-1">AI financial plan</p>
+              <p className="text-[10px] text-slate-500">Get a personalized roadmap</p>
+            </div>
+          </div>
         </div>
       )}
 
