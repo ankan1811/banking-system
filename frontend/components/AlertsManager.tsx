@@ -35,17 +35,27 @@ export default function AlertsManager() {
 
   useEffect(() => { load(); }, []);
 
+  const [creatingAlert, setCreatingAlert] = useState(false);
+  const [deletingAlertId, setDeletingAlertId] = useState<string | null>(null);
+
   const handleCreate = async () => {
     const threshold = parseFloat(form.threshold);
     if (!threshold || threshold <= 0) return;
-    await createAlert({
-      type: form.type,
-      threshold,
-      category: form.type === 'category_monthly_limit' ? form.category : undefined,
-    });
-    setCreating(false);
-    setForm({ type: 'category_monthly_limit', threshold: '', category: AI_CATEGORIES[0] });
-    load();
+    setCreatingAlert(true);
+    try {
+      await createAlert({
+        type: form.type,
+        threshold,
+        category: form.type === 'category_monthly_limit' ? form.category : undefined,
+      });
+      setCreating(false);
+      setForm({ type: 'category_monthly_limit', threshold: '', category: AI_CATEGORIES[0] });
+      load();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setCreatingAlert(false);
+    }
   };
 
   const handleToggle = async (id: string, enabled: boolean) => {
@@ -65,8 +75,15 @@ export default function AlertsManager() {
   };
 
   const handleDelete = async (id: string) => {
-    await deleteAlert(id);
-    load();
+    setDeletingAlertId(id);
+    try {
+      await deleteAlert(id);
+      load();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setDeletingAlertId(null);
+    }
   };
 
   const renderAlertDescription = (a: AlertRule) => {
@@ -133,9 +150,15 @@ export default function AlertsManager() {
               </button>
               <button
                 onClick={() => handleDelete(a.id)}
-                className="text-slate-600 hover:text-rose-400 text-sm transition-colors"
+                disabled={deletingAlertId !== null}
+                className="text-slate-600 hover:text-rose-400 text-sm transition-colors disabled:opacity-50"
               >
-                🗑
+                {deletingAlertId === a.id ? (
+                  <svg className="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                ) : '🗑'}
               </button>
             </div>
           </div>
@@ -189,9 +212,16 @@ export default function AlertsManager() {
           <div className="flex gap-2 pt-1">
             <button
               onClick={handleCreate}
-              className="px-4 py-2 bg-violet-600 hover:bg-violet-500 rounded-lg text-white text-sm"
+              disabled={creatingAlert}
+              className="px-4 py-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 rounded-lg text-white text-sm flex items-center gap-2"
             >
-              Create Alert
+              {creatingAlert && (
+                <svg className="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+              )}
+              {creatingAlert ? 'Creating...' : 'Create Alert'}
             </button>
             <button
               onClick={() => setCreating(false)}

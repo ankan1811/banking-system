@@ -60,8 +60,11 @@ export default function ChallengesManager() {
 
   useEffect(() => { load(); loadSuggestions(); }, []);
 
+  const [creatingChallenge, setCreatingChallenge] = useState(false);
+
   const handleCreate = async () => {
     if (!form.title || !form.description) return;
+    setCreatingChallenge(true);
     try {
       await createChallenge({
         title: form.title,
@@ -75,11 +78,16 @@ export default function ChallengesManager() {
       setForm({ title: '', description: '', type: 'category_limit', category: 'Food & Dining', targetAmount: '', duration: 'monthly' });
       load();
     } catch (err) {
-      console.error(err);
+      setError(err instanceof Error ? err.message : 'Failed to create challenge');
+    } finally {
+      setCreatingChallenge(false);
     }
   };
 
-  const acceptSuggestion = async (s: AiChallengeSuggestion) => {
+  const [acceptingIdx, setAcceptingIdx] = useState<number | null>(null);
+
+  const acceptSuggestion = async (s: AiChallengeSuggestion, idx: number) => {
+    setAcceptingIdx(idx);
     try {
       await createChallenge({
         title: s.title,
@@ -92,7 +100,9 @@ export default function ChallengesManager() {
       });
       load();
     } catch (err) {
-      console.error(err);
+      setError(err instanceof Error ? err.message : 'Failed to accept challenge');
+    } finally {
+      setAcceptingIdx(null);
     }
   };
 
@@ -214,10 +224,11 @@ export default function ChallengesManager() {
                 </div>
               </div>
               <button
-                onClick={() => acceptSuggestion(s)}
-                className="px-3 py-1.5 bg-violet-600/20 hover:bg-violet-600/40 border border-violet-500/30 text-violet-300 rounded-lg text-xs flex-shrink-0"
+                onClick={() => acceptSuggestion(s, i)}
+                disabled={acceptingIdx !== null}
+                className="px-3 py-1.5 bg-violet-600/20 hover:bg-violet-600/40 border border-violet-500/30 text-violet-300 rounded-lg text-xs flex-shrink-0 disabled:opacity-50"
               >
-                Accept
+                {acceptingIdx === i ? 'Accepting...' : 'Accept'}
               </button>
             </div>
           ))}
@@ -307,8 +318,18 @@ export default function ChallengesManager() {
           </div>
 
           <div className="flex gap-2 pt-1">
-            <button onClick={handleCreate} className="px-4 py-2 bg-violet-600 hover:bg-violet-500 rounded-lg text-white text-sm">
-              Start Challenge
+            <button
+              onClick={handleCreate}
+              disabled={creatingChallenge}
+              className="px-4 py-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 rounded-lg text-white text-sm flex items-center gap-2"
+            >
+              {creatingChallenge && (
+                <svg className="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+              )}
+              {creatingChallenge ? 'Creating...' : 'Start Challenge'}
             </button>
             <button onClick={() => setCreating(false)} className="px-4 py-2 text-slate-400 hover:text-slate-300 text-sm">
               Cancel
