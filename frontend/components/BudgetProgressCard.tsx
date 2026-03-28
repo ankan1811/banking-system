@@ -102,8 +102,8 @@ export default function BudgetProgressCard() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-slate-400">
-                    ${s.spent.toFixed(2)}
-                    {s.monthlyLimit !== null && ` / $${s.monthlyLimit.toFixed(2)}`}
+                    ${Number(s.spent).toFixed(2)}
+                    {s.monthlyLimit !== null && ` / $${Number(s.monthlyLimit).toFixed(2)}`}
                   </span>
                   {s.budgetId ? (
                     <>

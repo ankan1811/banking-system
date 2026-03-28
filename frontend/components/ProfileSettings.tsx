@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { updateProfile, deleteAccount, disconnectBank } from '@/lib/api/settings.api';
 import LogoutModal from './LogoutModal';
+import ConfirmModal from './ConfirmModal';
 
 interface Props {
   user: any;
@@ -25,6 +26,7 @@ export default function ProfileSettings({ user, accounts }: Props) {
   const [deleteConfirm, setDeleteConfirm] = useState('');
   const [deleting, setDeleting] = useState(false);
   const [showLogoutAll, setShowLogoutAll] = useState(false);
+  const [disconnectTarget, setDisconnectTarget] = useState<{ id: string; name: string } | null>(null);
 
   const handleSaveProfile = async () => {
     setSaving(true);
@@ -38,9 +40,10 @@ export default function ProfileSettings({ user, accounts }: Props) {
     }
   };
 
-  const handleDisconnect = async (bankRecordId: string, bankName: string) => {
-    if (!confirm(`Disconnect ${bankName}? This cannot be undone.`)) return;
-    await disconnectBank(bankRecordId);
+  const handleDisconnect = async () => {
+    if (!disconnectTarget) return;
+    await disconnectBank(disconnectTarget.id);
+    setDisconnectTarget(null);
     router.refresh();
   };
 
@@ -165,7 +168,7 @@ export default function ProfileSettings({ user, accounts }: Props) {
                   <p className="text-xs text-slate-500">****{acc.mask} · {acc.type}/{acc.subtype}</p>
                 </div>
                 <button
-                  onClick={() => handleDisconnect(acc.bankRecordId, acc.name)}
+                  onClick={() => setDisconnectTarget({ id: acc.bankRecordId, name: acc.name })}
                   className="px-3 py-1.5 text-xs text-rose-400 hover:text-rose-300 border border-rose-500/20 hover:border-rose-500/40 rounded-lg transition-colors"
                 >
                   Disconnect
@@ -226,6 +229,16 @@ export default function ProfileSettings({ user, accounts }: Props) {
       <p className="text-xs text-slate-600 text-center">
         Member since {new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
       </p>
+
+      <ConfirmModal
+        open={!!disconnectTarget}
+        onClose={() => setDisconnectTarget(null)}
+        onConfirm={handleDisconnect}
+        title="Disconnect bank?"
+        description={`"${disconnectTarget?.name}" will be removed along with all its transactions. This cannot be undone.`}
+        confirmText="Disconnect"
+        confirmingText="Disconnecting"
+      />
     </div>
   );
 }

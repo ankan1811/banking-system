@@ -22,7 +22,7 @@ const RightSidebar = ({ user, transactions, banks }: RightSidebarProps) => {
         <div className="profile">
           <div className="profile-img">
             <span className="text-5xl font-bold bg-gradient-to-br from-violet-400 to-cyan-400 bg-clip-text text-transparent">
-              {user.firstName[0]}
+              {user.firstName?.[0] || '?'}
             </span>
           </div>
 

@@ -34,7 +34,7 @@ export default function RecurringTransactionsCard() {
         <div>
           <h3 className="text-sm font-semibold text-white">Recurring & Subscriptions</h3>
           <p className="text-xs text-slate-500 mt-0.5">
-            {patterns.length} detected · ~${monthlyTotal.toFixed(2)}/mo committed
+            {patterns.length} detected · ~${Number(monthlyTotal).toFixed(2)}/mo committed
           </p>
         </div>
         <span className="text-slate-500 text-xs">{expanded ? '▲' : '▼'}</span>
@@ -59,7 +59,7 @@ export default function RecurringTransactionsCard() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs text-white">${p.normalizedAmount.toFixed(2)}</p>
+                  <p className="text-xs text-white">${Number(p.normalizedAmount).toFixed(2)}</p>
                   <p className={`text-xs ${daysUntil <= 7 ? 'text-amber-400' : 'text-slate-500'}`}>
                     {daysUntil > 0 ? `in ${daysUntil}d` : 'due now'}
                   </p>

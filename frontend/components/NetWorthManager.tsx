@@ -146,7 +146,7 @@ export default function NetWorthManager() {
             {changeArrow}${Math.abs(current.monthlyChange).toLocaleString('en-US', { minimumFractionDigits: 2 })}
           </p>
           <p className="text-[10px] text-slate-500 mt-1">
-            Monthly Change ({changeArrow}{current.monthlyChangePercent.toFixed(1)}%)
+            Monthly Change ({changeArrow}{Number(current.monthlyChangePercent).toFixed(1)}%)
           </p>
         </div>
       </div>

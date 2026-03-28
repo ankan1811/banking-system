@@ -146,11 +146,11 @@ export default function MonthlyDigestView() {
         <h3 className="text-sm font-semibold text-white mb-3">Income vs Expenses</h3>
         <div className="grid grid-cols-3 gap-3">
           <div className="text-center p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
-            <p className="text-lg font-bold text-emerald-400">${ie.totals.totalIncome.toFixed(0)}</p>
+            <p className="text-lg font-bold text-emerald-400">${Number(ie.totals.totalIncome).toFixed(0)}</p>
             <p className="text-xs text-slate-500">Income</p>
           </div>
           <div className="text-center p-3 bg-rose-500/10 border border-rose-500/20 rounded-lg">
-            <p className="text-lg font-bold text-rose-400">${ie.totals.totalExpenses.toFixed(0)}</p>
+            <p className="text-lg font-bold text-rose-400">${Number(ie.totals.totalExpenses).toFixed(0)}</p>
             <p className="text-xs text-slate-500">Expenses</p>
           </div>
           <div className={`text-center p-3 rounded-lg border ${
@@ -159,7 +159,7 @@ export default function MonthlyDigestView() {
               : 'bg-rose-500/10 border-rose-500/20'
           }`}>
             <p className={`text-lg font-bold ${ie.totals.totalNet >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-              ${Math.abs(ie.totals.totalNet).toFixed(0)}
+              ${Math.abs(Number(ie.totals.totalNet)).toFixed(0)}
             </p>
             <p className="text-xs text-slate-500">{ie.totals.totalNet >= 0 ? 'Saved' : 'Deficit'}</p>
           </div>
@@ -190,7 +190,7 @@ export default function MonthlyDigestView() {
                     <div className="flex justify-between text-xs mb-0.5">
                       <span className="text-slate-300">{b.category}</span>
                       <span className="text-slate-500">
-                        ${b.spent.toFixed(0)} / ${b.monthlyLimit!.toFixed(0)}
+                        ${Number(b.spent).toFixed(0)} / ${Number(b.monthlyLimit!).toFixed(0)}
                         {isOver && <span className="text-rose-400 ml-1">over!</span>}
                       </span>
                     </div>
@@ -221,7 +221,7 @@ export default function MonthlyDigestView() {
               <p className="text-xs text-slate-500">Completed</p>
             </div>
             <div className="text-center">
-              <p className="text-lg font-bold text-violet-400">${sections.goalProgress.totalSavedAmount.toFixed(0)}</p>
+              <p className="text-lg font-bold text-violet-400">${Number(sections.goalProgress.totalSavedAmount).toFixed(0)}</p>
               <p className="text-xs text-slate-500">Total Saved</p>
             </div>
           </div>
@@ -268,7 +268,7 @@ export default function MonthlyDigestView() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-white font-medium">${m.totalSpent.toFixed(2)}</p>
+                    <p className="text-xs text-white font-medium">${Number(m.totalSpent).toFixed(2)}</p>
                     {m.trend !== 0 && (
                       <p className={`text-[10px] ${m.trend > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
                         {m.trend > 0 ? '↑' : '↓'} {Math.abs(m.trend).toFixed(0)}%

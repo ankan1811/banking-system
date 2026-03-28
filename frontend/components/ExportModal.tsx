@@ -17,10 +17,16 @@ export default function ExportModal({ bankRecordId, accountName }: Props) {
   });
   const [to, setTo] = useState(() => new Date().toISOString().slice(0, 10));
 
+  const [exporting, setExporting] = useState<string | null>(null);
+
   const handleExport = (type: 'csv' | 'pdf') => {
+    setExporting(type);
     const url = buildExportUrl(type, bankRecordId, from, to);
     window.open(url, '_blank');
-    setOpen(false);
+    setTimeout(() => {
+      setExporting(null);
+      setOpen(false);
+    }, 1000);
   };
 
   return (
@@ -72,15 +78,17 @@ export default function ExportModal({ bankRecordId, accountName }: Props) {
             <div className="flex gap-2 pt-1">
               <button
                 onClick={() => handleExport('csv')}
-                className="flex-1 py-2 bg-emerald-600/20 hover:bg-emerald-600/40 border border-emerald-500/30 text-emerald-300 rounded-lg text-sm transition-colors"
+                disabled={exporting !== null}
+                className="flex-1 py-2 bg-emerald-600/20 hover:bg-emerald-600/40 border border-emerald-500/30 text-emerald-300 rounded-lg text-sm transition-colors disabled:opacity-50"
               >
-                CSV
+                {exporting === 'csv' ? 'Exporting...' : 'CSV'}
               </button>
               <button
                 onClick={() => handleExport('pdf')}
-                className="flex-1 py-2 bg-violet-600/20 hover:bg-violet-600/40 border border-violet-500/30 text-violet-300 rounded-lg text-sm transition-colors"
+                disabled={exporting !== null}
+                className="flex-1 py-2 bg-violet-600/20 hover:bg-violet-600/40 border border-violet-500/30 text-violet-300 rounded-lg text-sm transition-colors disabled:opacity-50"
               >
-                PDF Statement
+                {exporting === 'pdf' ? 'Exporting...' : 'PDF Statement'}
               </button>
             </div>
             <p className="text-xs text-slate-600 text-center">Opens as a download in a new tab</p>

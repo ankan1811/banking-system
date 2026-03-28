@@ -135,7 +135,7 @@ export default function BillCalendar() {
           <div className="text-center">
             <h3 className="text-sm font-semibold text-white">{formatMonth(currentMonth)}</h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              {billMap.size} bill days · ${monthTotal.toFixed(2)} committed
+              {billMap.size} bill days · ${Number(monthTotal).toFixed(2)} committed
             </p>
           </div>
           <button
@@ -228,7 +228,7 @@ export default function BillCalendar() {
                       <p className="text-xs text-slate-500">{e.pattern.category} · {e.pattern.frequency}</p>
                     </div>
                   </div>
-                  <span className="text-sm text-white font-medium">${e.pattern.normalizedAmount.toFixed(2)}</span>
+                  <span className="text-sm text-white font-medium">${Number(e.pattern.normalizedAmount).toFixed(2)}</span>
                 </div>
               );
             })}
@@ -247,7 +247,7 @@ export default function BillCalendar() {
                 <div key={i} className="flex items-center gap-1.5 text-xs text-slate-400">
                   <span className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
                   <span className="truncate max-w-[120px]">{p.name}</span>
-                  <span className="text-slate-600">${p.normalizedAmount.toFixed(2)}/{p.frequency === 'weekly' ? 'wk' : p.frequency === 'quarterly' ? 'qtr' : 'mo'}</span>
+                  <span className="text-slate-600">${Number(p.normalizedAmount).toFixed(2)}/{p.frequency === 'weekly' ? 'wk' : p.frequency === 'quarterly' ? 'qtr' : 'mo'}</span>
                 </div>
               );
             })}

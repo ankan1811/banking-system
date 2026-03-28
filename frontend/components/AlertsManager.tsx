@@ -71,7 +71,7 @@ export default function AlertsManager() {
 
   const renderAlertDescription = (a: AlertRule) => {
     const label = ALERT_TYPE_LABELS[a.type];
-    const threshold = `$${a.threshold.toFixed(2)}`;
+    const threshold = `$${Number(a.threshold).toFixed(2)}`;
     if (a.type === 'category_monthly_limit' && a.category) {
       return `${label} ${threshold} in ${a.category}`;
     }

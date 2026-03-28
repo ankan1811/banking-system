@@ -108,7 +108,7 @@ const SpendingInsightsCard = () => {
                 <div key={cat.category}>
                   <div className="flex justify-between text-xs mb-1">
                     <span className="text-slate-300">{cat.category}</span>
-                    <span className="text-slate-400">${cat.amount.toFixed(2)} ({cat.transactionCount} txns)</span>
+                    <span className="text-slate-400">${Number(cat.amount).toFixed(2)} ({cat.transactionCount} txns)</span>
                   </div>
                   <div className="h-1.5 bg-slate-700/50 rounded-full overflow-hidden">
                     <div

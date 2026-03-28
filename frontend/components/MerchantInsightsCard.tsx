@@ -55,7 +55,7 @@ export default function MerchantInsightsCard() {
         <div>
           <h3 className="text-sm font-semibold text-white">Top Merchants</h3>
           <p className="text-xs text-slate-400 mt-0.5">
-            {merchants.length} merchants · ${totalSpent.toFixed(2)} total
+            {merchants.length} merchants · ${Number(totalSpent).toFixed(2)} total
           </p>
         </div>
         <div className="flex gap-1">
@@ -103,13 +103,13 @@ export default function MerchantInsightsCard() {
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-white font-medium truncate">{m.name}</p>
                   <p className="text-[11px] text-slate-400">
-                    {m.category} · {m.transactionCount} txns · avg ${m.avgAmount.toFixed(2)}
+                    {m.category} · {m.transactionCount} txns · avg ${Number(m.avgAmount).toFixed(2)}
                   </p>
                 </div>
 
                 {/* Amount + trend */}
                 <div className="text-right shrink-0">
-                  <p className="text-xs text-white font-medium">${m.totalSpent.toFixed(2)}</p>
+                  <p className="text-xs text-white font-medium">${Number(m.totalSpent).toFixed(2)}</p>
                   <div className="flex items-center justify-end gap-1">
                     <span className="text-[11px] text-slate-400">{pct.toFixed(1)}%</span>
                     {m.trend !== 0 && (
@@ -147,7 +147,7 @@ export default function MerchantInsightsCard() {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-slate-400">{pct.toFixed(1)}%</span>
-                      <span className="text-xs text-white font-medium">${amount.toFixed(2)}</span>
+                      <span className="text-xs text-white font-medium">${Number(amount).toFixed(2)}</span>
                     </div>
                   </div>
                   <div className="h-2 rounded-full bg-slate-700/50 overflow-hidden">
