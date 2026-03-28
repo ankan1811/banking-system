@@ -66,7 +66,7 @@ router.post('/:bankRecordId/sync', async (req: Request, res: Response) => {
     await syncBankFromPlaid(bank as { id: string; accessToken: string; accountId: string });
 
     // Return updated account data
-    const result = await getAccount(bank.id, req.userId);
+    const result = await getAccount(bank.id, req.userId!);
     res.json(result);
   } catch (error) {
     console.error('Error syncing account:', error);

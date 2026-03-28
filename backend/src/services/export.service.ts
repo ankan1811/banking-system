@@ -18,8 +18,8 @@ function formatDate(dateStr: string): string {
   });
 }
 
-export async function exportCSV(bankRecordId: string, from: string, to: string): Promise<Buffer> {
-  const { data: account, transactions } = await getAccount(bankRecordId);
+export async function exportCSV(bankRecordId: string, from: string, to: string, userId: string): Promise<Buffer> {
+  const { data: account, transactions } = await getAccount(bankRecordId, userId);
   const filtered = filterByDateRange(transactions, from, to);
 
   const rows = [
@@ -41,9 +41,10 @@ export async function exportCSV(bankRecordId: string, from: string, to: string):
 export async function exportPDF(
   bankRecordId: string,
   from: string,
-  to: string
+  to: string,
+  userId: string
 ): Promise<Buffer> {
-  const { data: account, transactions } = await getAccount(bankRecordId);
+  const { data: account, transactions } = await getAccount(bankRecordId, userId);
   const filtered = filterByDateRange(transactions, from, to);
 
   return new Promise((resolve, reject) => {

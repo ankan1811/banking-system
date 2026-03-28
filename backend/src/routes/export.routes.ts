@@ -14,7 +14,7 @@ const querySchema = z.object({
 router.get('/csv', async (req: Request, res: Response) => {
   try {
     const { bankRecordId, from, to } = querySchema.parse(req.query);
-    const csv = await exportCSV(bankRecordId, from, to);
+    const csv = await exportCSV(bankRecordId, from, to, req.userId!);
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader('Content-Disposition', `attachment; filename="transactions-${from}-to-${to}.csv"`);
     res.send(csv);
@@ -32,7 +32,7 @@ router.get('/csv', async (req: Request, res: Response) => {
 router.get('/pdf', async (req: Request, res: Response) => {
   try {
     const { bankRecordId, from, to } = querySchema.parse(req.query);
-    const pdf = await exportPDF(bankRecordId, from, to);
+    const pdf = await exportPDF(bankRecordId, from, to, req.userId!);
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="statement-${from}-to-${to}.pdf"`);
     res.send(pdf);

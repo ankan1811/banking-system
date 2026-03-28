@@ -446,7 +446,7 @@ async function buildFinancialContext(userId: string): Promise<string> {
   const accountDetails = await Promise.all(
     accounts.slice(0, 3).map(async (account: any) => {
       try {
-        const { transactions } = await getAccount(account.bankRecordId);
+        const { transactions } = await getAccount(account.bankRecordId, userId);
         return {
           name: account.name,
           type: account.type,

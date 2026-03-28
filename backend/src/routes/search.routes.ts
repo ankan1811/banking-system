@@ -21,7 +21,7 @@ router.get('/', async (req: Request, res: Response) => {
   try {
     const params = searchSchema.parse(req.query);
     const { bankRecordId, ...searchParams } = params;
-    const result = await searchTransactions(bankRecordId, searchParams);
+    const result = await searchTransactions(bankRecordId, searchParams, req.userId!);
     res.json(result);
   } catch (error) {
     if (error instanceof z.ZodError) {

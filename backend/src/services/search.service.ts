@@ -11,8 +11,8 @@ export interface SearchParams {
   limit: number;
 }
 
-export async function searchTransactions(bankRecordId: string, params: SearchParams) {
-  const { transactions } = await getAccount(bankRecordId);
+export async function searchTransactions(bankRecordId: string, params: SearchParams, userId: string) {
+  const { transactions } = await getAccount(bankRecordId, userId);
 
   let filtered = [...transactions];
 
