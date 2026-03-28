@@ -1575,6 +1575,8 @@ Both use transactions. Drizzle's `sql` template for atomic increment avoids read
 
 > **This project uses Prisma** because it's a CRUD-heavy banking app where nested writes (goals + contributions, alerts + trigger logs) happen frequently, the team benefits from Studio for debugging, and the runtime overhead is negligible given the 5-minute caching layer on all Plaid/Gemini calls. If this were a high-throughput analytics pipeline or a serverless Edge function, Drizzle would be the better choice.
 
+> **Prisma Decimal gotcha:** Prisma returns PostgreSQL `DECIMAL`/`NUMERIC` columns as its own `Prisma.Decimal` type (based on `decimal.js`), which serializes to a **string** in JSON — not a JavaScript `number`. This means frontend code like `amount.toFixed(2)`, `sum + amount`, or `amount >= 100` will silently break (crashes, string concatenation, wrong comparisons). Always wrap with `Number()` before any operation. Drizzle does not have this problem — it returns `DECIMAL` as native JS `number` by default. For a banking app with values under a few million dollars, JavaScript's floating-point precision is never an issue. Prisma chose safety over ergonomics; Drizzle chose ergonomics over theoretical edge-case safety.
+
 ---
 
 ## License
