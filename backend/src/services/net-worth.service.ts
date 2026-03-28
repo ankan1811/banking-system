@@ -33,10 +33,8 @@ export async function updateManualAsset(
   assetId: string,
   data: { name?: string; category?: string; value?: number; notes?: string | null }
 ) {
-  const asset = await prisma.manualAsset.findFirst({ where: { id: assetId, userId } });
-  if (!asset) throw new Error('Asset not found');
-  return prisma.manualAsset.update({
-    where: { id: assetId },
+  const updated = await prisma.manualAsset.updateMany({
+    where: { id: assetId, userId },
     data: {
       ...(data.name !== undefined && { name: data.name }),
       ...(data.category !== undefined && { category: data.category }),
@@ -44,12 +42,14 @@ export async function updateManualAsset(
       ...(data.notes !== undefined && { notes: data.notes }),
     },
   });
+  if (updated.count === 0) throw new Error('Asset not found');
+  return prisma.manualAsset.findUnique({ where: { id: assetId } });
 }
 
 export async function deleteManualAsset(userId: string, assetId: string) {
-  const asset = await prisma.manualAsset.findFirst({ where: { id: assetId, userId } });
-  if (!asset) throw new Error('Asset not found');
-  return prisma.manualAsset.delete({ where: { id: assetId } });
+  const deleted = await prisma.manualAsset.deleteMany({ where: { id: assetId, userId } });
+  if (deleted.count === 0) throw new Error('Asset not found');
+  return deleted;
 }
 
 // ─── Manual Liabilities CRUD ────────────────────────────────
@@ -75,10 +75,8 @@ export async function updateManualLiability(
   liabilityId: string,
   data: { name?: string; category?: string; value?: number; notes?: string | null }
 ) {
-  const liability = await prisma.manualLiability.findFirst({ where: { id: liabilityId, userId } });
-  if (!liability) throw new Error('Liability not found');
-  return prisma.manualLiability.update({
-    where: { id: liabilityId },
+  const updated = await prisma.manualLiability.updateMany({
+    where: { id: liabilityId, userId },
     data: {
       ...(data.name !== undefined && { name: data.name }),
       ...(data.category !== undefined && { category: data.category }),
@@ -86,12 +84,14 @@ export async function updateManualLiability(
       ...(data.notes !== undefined && { notes: data.notes }),
     },
   });
+  if (updated.count === 0) throw new Error('Liability not found');
+  return prisma.manualLiability.findUnique({ where: { id: liabilityId } });
 }
 
 export async function deleteManualLiability(userId: string, liabilityId: string) {
-  const liability = await prisma.manualLiability.findFirst({ where: { id: liabilityId, userId } });
-  if (!liability) throw new Error('Liability not found');
-  return prisma.manualLiability.delete({ where: { id: liabilityId } });
+  const deleted = await prisma.manualLiability.deleteMany({ where: { id: liabilityId, userId } });
+  if (deleted.count === 0) throw new Error('Liability not found');
+  return deleted;
 }
 
 // ─── Net Worth Calculation ──────────────────────────────────

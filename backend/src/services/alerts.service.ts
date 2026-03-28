@@ -24,21 +24,21 @@ export async function createAlert(
 }
 
 export async function updateAlert(userId: string, alertId: string, data: { enabled?: boolean; threshold?: number }) {
-  const rule = await prisma.alertRule.findFirst({ where: { id: alertId, userId } });
-  if (!rule) throw new Error('Alert not found');
-  return prisma.alertRule.update({
-    where: { id: alertId },
+  const updated = await prisma.alertRule.updateMany({
+    where: { id: alertId, userId },
     data: {
       ...(data.enabled !== undefined && { enabled: data.enabled }),
       ...(data.threshold !== undefined && { threshold: data.threshold }),
     },
   });
+  if (updated.count === 0) throw new Error('Alert not found');
+  return prisma.alertRule.findUnique({ where: { id: alertId } });
 }
 
 export async function deleteAlert(userId: string, alertId: string) {
-  const rule = await prisma.alertRule.findFirst({ where: { id: alertId, userId } });
-  if (!rule) throw new Error('Alert not found');
-  return prisma.alertRule.delete({ where: { id: alertId } });
+  const deleted = await prisma.alertRule.deleteMany({ where: { id: alertId, userId } });
+  if (deleted.count === 0) throw new Error('Alert not found');
+  return deleted;
 }
 
 // ─── Evaluation ───────────────────────────────────────────────
@@ -91,14 +91,33 @@ export async function evaluateAlerts(
     monthlySpending[cat] = (monthlySpending[cat] || 0) + Math.abs(t.amount);
   }
 
+  // Batch-fetch all recent triggers instead of querying per rule
+  const oldestThreshold = new Date(Date.now() - Math.max(threshold28Days, threshold1Hour));
+  const recentTriggers = await prisma.alertTriggerLog.findMany({
+    where: {
+      ruleId: { in: rules.map((r) => r.id) },
+      triggeredAt: { gte: oldestThreshold },
+    },
+    select: { ruleId: true, triggeredAt: true },
+  });
+  const triggersByRule = new Map<string, Date[]>();
+  for (const t of recentTriggers) {
+    const arr = triggersByRule.get(t.ruleId) || [];
+    arr.push(t.triggeredAt);
+    triggersByRule.set(t.ruleId, arr);
+  }
+  const hasRecentTriggerBatch = (ruleId: string, withinMs: number) => {
+    const since = Date.now() - withinMs;
+    return (triggersByRule.get(ruleId) || []).some((d) => d.getTime() >= since);
+  };
+
   for (const rule of rules) {
     const threshold = parseFloat(rule.threshold.toString());
 
     if (rule.type === 'category_monthly_limit' && rule.category) {
       const spent = monthlySpending[rule.category] || 0;
       if (spent >= threshold) {
-        const alreadySent = await hasRecentTrigger(rule.id, threshold28Days);
-        if (!alreadySent) {
+        if (!hasRecentTriggerBatch(rule.id, threshold28Days)) {
           await logAndEmail(
             rule.id,
             userEmail,
@@ -117,8 +136,7 @@ export async function evaluateAlerts(
         .slice(0, 1);
 
       for (const t of recent) {
-        const alreadySent = await hasRecentTrigger(rule.id, threshold1Hour);
-        if (!alreadySent) {
+        if (!hasRecentTriggerBatch(rule.id, threshold1Hour)) {
           await logAndEmail(
             rule.id,
             userEmail,

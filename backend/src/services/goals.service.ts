@@ -41,11 +41,8 @@ export async function updateGoal(
     status?: string;
   }
 ) {
-  const goal = await prisma.savingsGoal.findFirst({ where: { id: goalId, userId } });
-  if (!goal) throw new Error('Goal not found');
-
-  return prisma.savingsGoal.update({
-    where: { id: goalId },
+  const updated = await prisma.savingsGoal.updateMany({
+    where: { id: goalId, userId },
     data: {
       ...(data.name !== undefined && { name: data.name }),
       ...(data.targetAmount !== undefined && { targetAmount: data.targetAmount }),
@@ -55,12 +52,14 @@ export async function updateGoal(
       ...(data.status !== undefined && { status: data.status }),
     },
   });
+  if (updated.count === 0) throw new Error('Goal not found');
+  return prisma.savingsGoal.findUnique({ where: { id: goalId } });
 }
 
 export async function deleteGoal(userId: string, goalId: string) {
-  const goal = await prisma.savingsGoal.findFirst({ where: { id: goalId, userId } });
-  if (!goal) throw new Error('Goal not found');
-  return prisma.savingsGoal.delete({ where: { id: goalId } });
+  const deleted = await prisma.savingsGoal.deleteMany({ where: { id: goalId, userId } });
+  if (deleted.count === 0) throw new Error('Goal not found');
+  return deleted;
 }
 
 export async function addContribution(
@@ -93,8 +92,8 @@ export async function addContribution(
 }
 
 export async function getContributions(userId: string, goalId: string) {
-  const goal = await prisma.savingsGoal.findFirst({ where: { id: goalId, userId } });
-  if (!goal) throw new Error('Goal not found');
+  const goalExists = await prisma.savingsGoal.count({ where: { id: goalId, userId } });
+  if (!goalExists) throw new Error('Goal not found');
 
   return prisma.goalContribution.findMany({
     where: { goalId },

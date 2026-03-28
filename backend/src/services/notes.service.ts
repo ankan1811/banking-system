@@ -50,11 +50,10 @@ export async function upsertNote(
 }
 
 export async function deleteNote(userId: string, transactionHash: string) {
-  const existing = await prisma.transactionNote.findUnique({
-    where: { transactionHash_userId: { transactionHash, userId } },
+  const deleted = await prisma.transactionNote.deleteMany({
+    where: { transactionHash, userId },
   });
-  if (!existing) throw new Error('Note not found');
-  await prisma.transactionNote.delete({ where: { id: existing.id } });
+  if (deleted.count === 0) throw new Error('Note not found');
   await invalidateNotesCache(userId);
 }
 

@@ -32,10 +32,10 @@ export async function logoutAccount() {
   return apiRequest('/api/auth/logout', { method: 'POST' });
 }
 
-export async function googleSignIn(idToken: string) {
+export async function googleSignIn(accessToken: string) {
   return apiRequest('/api/auth/google', {
     method: 'POST',
-    body: JSON.stringify({ idToken }),
+    body: JSON.stringify({ accessToken }),
   });
 }
 

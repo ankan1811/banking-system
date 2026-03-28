@@ -22,6 +22,29 @@ export async function verifyGoogleToken(idToken: string) {
   };
 }
 
+export async function fetchGoogleUserInfo(accessToken: string) {
+  const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch Google user info');
+  }
+
+  const payload = await response.json();
+
+  if (!payload.sub || !payload.email) {
+    throw new Error('Invalid Google user info');
+  }
+
+  return {
+    googleId: payload.sub,
+    email: payload.email,
+    firstName: payload.given_name || '',
+    lastName: payload.family_name || '',
+  };
+}
+
 export async function findOrCreateGoogleUser(googlePayload: {
   googleId: string;
   email: string;

@@ -27,7 +27,7 @@ import netWorthRoutes from './routes/net-worth.routes.js';
 import challengesRoutes from './routes/challenges.routes.js';
 import statementUploadRoutes from './routes/statement-upload.routes.js';
 import { requireAuth } from './middleware/auth.js';
-import { accountsRateLimit, aiRateLimit, exportRateLimit, analyticsRateLimit } from './middleware/rateLimit.js';
+import { accountsRateLimit, aiRateLimit, exportRateLimit } from './middleware/rateLimit.js';
 
 const app = express();
 const PORT = process.env.PORT || 8787;
@@ -49,18 +49,18 @@ app.use('/api/plaid', requireAuth, plaidRoutes);
 app.use('/api/transfers', requireAuth, transfersRoutes);
 app.use('/api/ai', requireAuth, aiRateLimit, aiRoutes);
 app.use('/api/chat', requireAuth, chatRoutes); // chatRateLimit applied inside chat.routes.ts
-app.use('/api/budgets', requireAuth, analyticsRateLimit, budgetsRoutes);
+app.use('/api/budgets', requireAuth, budgetsRoutes);
 app.use('/api/goals', requireAuth, goalsRoutes);
 app.use('/api/export', requireAuth, exportRateLimit, exportRoutes);
-app.use('/api/analytics', requireAuth, analyticsRateLimit, analyticsRoutes);
+app.use('/api/analytics', requireAuth, analyticsRoutes);
 app.use('/api/alerts', requireAuth, alertsRoutes);
 app.use('/api/search', requireAuth, accountsRateLimit, searchRoutes);
 app.use('/api/notes', requireAuth, notesRoutes);
-app.use('/api/health-score', requireAuth, analyticsRateLimit, healthScoreRoutes);
-app.use('/api/reports', requireAuth, analyticsRateLimit, reportsRoutes);
+app.use('/api/health-score', requireAuth, healthScoreRoutes);
+app.use('/api/reports', requireAuth, reportsRoutes);
 app.use('/api/splits', requireAuth, splitsRoutes);
 app.use('/api/net-worth', requireAuth, accountsRateLimit, netWorthRoutes);
-app.use('/api/challenges', requireAuth, analyticsRateLimit, challengesRoutes);
+app.use('/api/challenges', requireAuth, challengesRoutes);
 app.use('/api/statements', requireAuth, statementUploadRoutes);
 
 // Health check

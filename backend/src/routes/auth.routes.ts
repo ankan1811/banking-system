@@ -4,7 +4,7 @@ import { prisma } from '../lib/db.js';
 import { sendOtp, verifyOtp } from '../services/otp.service.js';
 import { createSession, destroySession, setUserInfoCookie, clearUserInfoCookie } from '../services/auth.service.js';
 import { getUserInfo, createUser, updateProfile, deleteUser } from '../services/user.service.js';
-import { verifyGoogleToken, findOrCreateGoogleUser } from '../services/google.service.js';
+import { verifyGoogleToken, fetchGoogleUserInfo, findOrCreateGoogleUser } from '../services/google.service.js';
 import { requireAuth } from '../middleware/auth.js';
 
 const router = Router();
@@ -155,9 +155,16 @@ router.post('/verify-signup-otp', async (req: Request, res: Response) => {
 // POST /api/auth/google
 router.post('/google', async (req: Request, res: Response) => {
   try {
-    const { idToken } = z.object({ idToken: z.string() }).parse(req.body);
+    const { idToken, accessToken } = z.object({
+      idToken: z.string().optional(),
+      accessToken: z.string().optional(),
+    }).refine(data => data.idToken || data.accessToken, {
+      message: 'Either idToken or accessToken is required',
+    }).parse(req.body);
 
-    const googlePayload = await verifyGoogleToken(idToken);
+    const googlePayload = accessToken
+      ? await fetchGoogleUserInfo(accessToken)
+      : await verifyGoogleToken(idToken!);
     const user = await findOrCreateGoogleUser(googlePayload);
 
     await createSession(res, user.id, user.tokenVersion);

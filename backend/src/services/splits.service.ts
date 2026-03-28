@@ -35,35 +35,25 @@ export async function createSplit(
     return { email: p.email, name: p.name, amount };
   });
 
-  const [group] = await prisma.$transaction(async (tx) => {
-    const group = await tx.splitGroup.create({
-      data: {
-        userId,
-        title: data.title,
-        totalAmount: data.totalAmount,
-        transactionId: data.transactionId || null,
-        splitType: data.splitType,
+  return prisma.splitGroup.create({
+    data: {
+      userId,
+      title: data.title,
+      totalAmount: data.totalAmount,
+      transactionId: data.transactionId || null,
+      splitType: data.splitType,
+      participants: {
+        createMany: {
+          data: participantData.map((p) => ({
+            email: p.email,
+            name: p.name,
+            amount: p.amount,
+          })),
+        },
       },
-    });
-
-    await tx.splitParticipant.createMany({
-      data: participantData.map((p) => ({
-        splitGroupId: group.id,
-        email: p.email,
-        name: p.name,
-        amount: p.amount,
-      })),
-    });
-
-    const full = await tx.splitGroup.findUnique({
-      where: { id: group.id },
-      include: { participants: true },
-    });
-
-    return [full!];
+    },
+    include: { participants: true },
   });
-
-  return group;
 }
 
 export async function updateParticipantStatus(
@@ -72,69 +62,57 @@ export async function updateParticipantStatus(
   participantId: string,
   isPaid: boolean
 ) {
-  const split = await prisma.splitGroup.findFirst({ where: { id: splitId, userId } });
-  if (!split) throw new Error('Split not found');
+  return prisma.$transaction(async (tx) => {
+    const split = await tx.splitGroup.findFirst({ where: { id: splitId, userId } });
+    if (!split) throw new Error('Split not found');
 
-  await prisma.splitParticipant.update({
-    where: { id: participantId },
-    data: { isPaid, paidAt: isPaid ? new Date() : null },
-  });
-
-  // Check if all participants are paid -> auto-settle
-  const participants = await prisma.splitParticipant.findMany({
-    where: { splitGroupId: splitId },
-  });
-  const allPaid = participants.every((p) => p.id === participantId ? isPaid : p.isPaid);
-
-  if (allPaid && split.status === 'pending') {
-    await prisma.splitGroup.update({
-      where: { id: splitId },
-      data: { status: 'settled' },
+    await tx.splitParticipant.update({
+      where: { id: participantId },
+      data: { isPaid, paidAt: isPaid ? new Date() : null },
     });
-  } else if (!allPaid && split.status === 'settled') {
-    await prisma.splitGroup.update({
-      where: { id: splitId },
-      data: { status: 'pending' },
-    });
-  }
 
-  return prisma.splitGroup.findUnique({
-    where: { id: splitId },
-    include: { participants: true },
+    // Check if all participants are paid -> auto-settle
+    const unpaidCount = await tx.splitParticipant.count({
+      where: { splitGroupId: splitId, isPaid: false, id: { not: participantId } },
+    });
+    const allPaid = isPaid && unpaidCount === 0;
+
+    if (allPaid && split.status === 'pending') {
+      await tx.splitGroup.update({ where: { id: splitId }, data: { status: 'settled' } });
+    } else if (!allPaid && split.status === 'settled') {
+      await tx.splitGroup.update({ where: { id: splitId }, data: { status: 'pending' } });
+    }
+
+    return tx.splitGroup.findUnique({
+      where: { id: splitId },
+      include: { participants: true },
+    });
   });
 }
 
 export async function deleteSplit(userId: string, splitId: string) {
-  const split = await prisma.splitGroup.findFirst({ where: { id: splitId, userId } });
-  if (!split) throw new Error('Split not found');
-  return prisma.splitGroup.delete({ where: { id: splitId } });
+  const deleted = await prisma.splitGroup.deleteMany({
+    where: { id: splitId, userId },
+  });
+  if (deleted.count === 0) throw new Error('Split not found');
+  return deleted;
 }
 
 export async function getSplitSummary(userId: string) {
-  const splits = await prisma.splitGroup.findMany({
-    where: { userId },
-    include: { participants: true },
-  });
-
-  let totalOwedToYou = 0;
-  let pendingCount = 0;
-  let settledCount = 0;
-
-  for (const split of splits) {
-    if (split.status === 'pending') {
-      pendingCount++;
-      for (const p of split.participants) {
-        if (!p.isPaid) {
-          totalOwedToYou += parseFloat(p.amount.toString());
-        }
-      }
-    } else {
-      settledCount++;
-    }
-  }
+  const [pendingCount, settledCount, owedResult] = await Promise.all([
+    prisma.splitGroup.count({ where: { userId, status: 'pending' } }),
+    prisma.splitGroup.count({ where: { userId, status: 'settled' } }),
+    prisma.splitParticipant.aggregate({
+      _sum: { amount: true },
+      where: {
+        isPaid: false,
+        splitGroup: { userId, status: 'pending' },
+      },
+    }),
+  ]);
 
   return {
-    totalOwedToYou: Math.round(totalOwedToYou * 100) / 100,
+    totalOwedToYou: Math.round(parseFloat(owedResult._sum.amount?.toString() || '0') * 100) / 100,
     pendingCount,
     settledCount,
   };

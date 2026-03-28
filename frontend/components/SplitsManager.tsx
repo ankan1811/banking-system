@@ -58,8 +58,11 @@ export default function SplitsManager({ initialSplits = [], initialSummary = nul
     setForm({ ...form, participants: updated });
   };
 
+  const [submitting, setSubmitting] = useState(false);
+
   const handleCreate = async () => {
     if (!form.title || !form.totalAmount || form.participants.some((p) => !p.name || !p.email)) return;
+    setSubmitting(true);
     try {
       await createSplit({
         title: form.title,
@@ -76,6 +79,8 @@ export default function SplitsManager({ initialSplits = [], initialSummary = nul
       load();
     } catch (err) {
       console.error(err);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -103,7 +108,7 @@ export default function SplitsManager({ initialSplits = [], initialSummary = nul
       {summary && (
         <div className="grid grid-cols-3 gap-3">
           <div className="glass-card p-4 text-center">
-            <p className="text-lg font-bold text-emerald-400">${summary.totalOwedToYou.toFixed(2)}</p>
+            <p className="text-lg font-bold text-emerald-400">${Number(summary.totalOwedToYou).toFixed(2)}</p>
             <p className="text-[10px] text-slate-500 mt-1">Owed to You</p>
           </div>
           <div className="glass-card p-4 text-center">
@@ -228,9 +233,16 @@ export default function SplitsManager({ initialSplits = [], initialSummary = nul
           <div className="flex gap-2 pt-1">
             <button
               onClick={handleCreate}
-              className="px-4 py-2 bg-violet-600 hover:bg-violet-500 rounded-lg text-white text-sm"
+              disabled={submitting}
+              className="px-4 py-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-white text-sm flex items-center gap-2"
             >
-              Create Split
+              {submitting && (
+                <svg className="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+              )}
+              {submitting ? 'Creating...' : 'Create Split'}
             </button>
             <button
               onClick={() => setCreating(false)}

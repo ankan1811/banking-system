@@ -131,7 +131,7 @@ export default function NetWorthChart({
           <Line data={chartData} options={options as any} />
         ) : (
           <div className="h-full flex items-center justify-center">
-            <p className="text-xs text-slate-600">Add more monthly snapshots to see trends</p>
+            <p className="text-xs text-slate-600">Add more monthly snapshots to see trends!</p>
           </div>
         )}
       </div>

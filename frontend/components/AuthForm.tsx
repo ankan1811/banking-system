@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useState, useEffect, useCallback, useRef } from 'react'
-import Script from 'next/script'
+import { useGoogleLogin } from '@react-oauth/google'
 
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -45,11 +45,6 @@ const AuthForm = ({ type }: { type: string }) => {
   // OTP input refs and state
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [otpValues, setOtpValues] = useState(['', '', '', '', '', '']);
-
-  // Check if script is already loaded (e.g. client-side navigation)
-  const [googleScriptLoaded, setGoogleScriptLoaded] = useState(
-    () => typeof window !== 'undefined' && !!(window as any).google
-  );
 
   const formSchema = authFormSchema(type);
 
@@ -141,28 +136,32 @@ const AuthForm = ({ type }: { type: string }) => {
     }
   }
 
-  // Google Sign-In handler
-  const handleGoogleResponse = useCallback(async (response: any) => {
-    setIsGoogleLoading(true);
-    setError(null);
-    try {
-      const result: any = await googleSignIn(response.credential);
-      // Profile incomplete (new Google user) — collect missing fields regardless of sign-in/sign-up
-      if (!result.address1) {
-        setSavedFormData(result);
-        setStep('complete-profile');
-      } else if (type === 'sign-in') {
-        window.location.href = '/';
-      } else {
-        setUser(result);
+  // Google Sign-In via @react-oauth/google
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setIsGoogleLoading(true);
+      setError(null);
+      try {
+        const result: any = await googleSignIn(tokenResponse.access_token);
+        if (!result.address1) {
+          setSavedFormData(result);
+          setStep('complete-profile');
+        } else if (type === 'sign-in') {
+          window.location.href = '/';
+        } else {
+          setUser(result);
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Google sign-in failed';
+        setError(message);
+      } finally {
+        setIsGoogleLoading(false);
       }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Google sign-in failed';
-      setError(message);
-    } finally {
-      setIsGoogleLoading(false);
-    }
-  }, [type]);
+    },
+    onError: () => {
+      setError('Google sign-in failed. Please try again.');
+    },
+  });
 
   const onSubmitCompleteProfile = async (data: z.infer<typeof completeProfileSchema>) => {
     setIsLoading(true);
@@ -197,30 +196,6 @@ const AuthForm = ({ type }: { type: string }) => {
     }
   };
 
-  const googleBtnRef = useRef<HTMLDivElement>(null);
-  const googleInitialized = useRef(false);
-
-  // Initialize and render Google button when script loads and form is ready
-  useEffect(() => {
-    if (step === 'form' && googleScriptLoaded && !googleInitialized.current) {
-      if (typeof window === 'undefined' || !(window as any).google) return;
-      if (!googleBtnRef.current) return;
-      (window as any).google.accounts.id.initialize({
-        client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-        callback: handleGoogleResponse,
-        ux_mode: 'popup',
-      });
-      googleBtnRef.current.innerHTML = '';
-      (window as any).google.accounts.id.renderButton(googleBtnRef.current, {
-        theme: 'filled_black',
-        size: 'large',
-        width: googleBtnRef.current.offsetWidth,
-        text: type === 'sign-in' ? 'signin_with' : 'signup_with',
-      });
-      googleInitialized.current = true;
-    }
-  }, [step, googleScriptLoaded, handleGoogleResponse, type]);
-
   // Step 2: Verify OTP
   const onSubmitOtp = async (data: z.infer<typeof otpSchema>) => {
     setIsLoading(true);
@@ -252,11 +227,6 @@ const AuthForm = ({ type }: { type: string }) => {
 
   return (
     <section className="auth-form">
-      <Script
-        src="https://accounts.google.com/gsi/client"
-        onLoad={() => setGoogleScriptLoaded(true)}
-      />
-
       <header className='flex flex-col gap-5 md:gap-8'>
           <Link href="/" className="cursor-pointer flex items-center gap-2">
             <Image
@@ -591,11 +561,24 @@ const AuthForm = ({ type }: { type: string }) => {
           </div>
 
           {/* Google Sign-In button */}
-          <div
-            ref={googleBtnRef}
-            className="w-full flex items-center justify-center rounded-xl overflow-hidden [&_iframe]:!rounded-xl"
-            style={{ minHeight: '44px' }}
-          />
+          <button
+            type="button"
+            onClick={() => googleLogin()}
+            disabled={isGoogleLoading}
+            className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl
+              bg-white/[0.04] border border-white/[0.08] backdrop-blur-xl
+              text-white font-semibold text-16
+              hover:bg-white/[0.07] hover:border-white/[0.12] hover:-translate-y-0.5
+              transition-all duration-300
+              disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isGoogleLoading ? (
+              <Loader2 size={20} className="animate-spin" />
+            ) : (
+              <Image src="/icons/google.svg" width={20} height={20} alt="Google" />
+            )}
+            {type === 'sign-in' ? 'Sign in with Google' : 'Sign up with Google'}
+          </button>
           <footer className="flex justify-center gap-1">
             <p className="text-14 font-normal text-slate-400">
               {type === 'sign-in'

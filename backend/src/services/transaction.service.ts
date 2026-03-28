@@ -20,20 +20,15 @@ export const createTransaction = async (transaction: CreateTransactionProps) => 
 };
 
 export const getTransactionsByBankId = async (bankId: string) => {
-  const senderTransactions = await prisma.transaction.findMany({
-    where: { senderBankId: bankId },
-  });
+  const [senderTransactions, receiverTransactions] = await Promise.all([
+    prisma.transaction.findMany({ where: { senderBankId: bankId } }),
+    prisma.transaction.findMany({ where: { receiverBankId: bankId } }),
+  ]);
 
-  const receiverTransactions = await prisma.transaction.findMany({
-    where: { receiverBankId: bankId },
-  });
-
-  const transactions = {
+  return {
     total: senderTransactions.length + receiverTransactions.length,
     documents: [...senderTransactions, ...receiverTransactions],
   };
-
-  return transactions;
 };
 
 export const getTransferAdjustments = async (bankIds: string[]): Promise<Map<string, number>> => {

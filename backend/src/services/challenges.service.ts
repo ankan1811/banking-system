@@ -65,12 +65,12 @@ export async function createChallenge(
 }
 
 export async function abandonChallenge(userId: string, challengeId: string) {
-  const challenge = await prisma.spendingChallenge.findFirst({ where: { id: challengeId, userId } });
-  if (!challenge) throw new Error('Challenge not found');
-  return prisma.spendingChallenge.update({
-    where: { id: challengeId },
+  const updated = await prisma.spendingChallenge.updateMany({
+    where: { id: challengeId, userId },
     data: { status: 'abandoned' },
   });
+  if (updated.count === 0) throw new Error('Challenge not found');
+  return prisma.spendingChallenge.findUnique({ where: { id: challengeId } });
 }
 
 // ─── Progress Calculation ───────────────────────────────────
@@ -371,8 +371,10 @@ function getDefaultSuggestions(): AiChallengeSuggestion[] {
 // ─── Streak & Badges ────────────────────────────────────────
 
 export async function getStreakAndBadges(userId: string): Promise<{ streak: ChallengeStreak; badges: Badge[] }> {
-  const streakRecord = await prisma.challengeStreak.findUnique({ where: { userId } });
-  const badges = await prisma.badge.findMany({ where: { userId }, orderBy: { earnedAt: 'desc' } });
+  const [streakRecord, badges] = await Promise.all([
+    prisma.challengeStreak.findUnique({ where: { userId } }),
+    prisma.badge.findMany({ where: { userId }, orderBy: { earnedAt: 'desc' } }),
+  ]);
 
   const streak: ChallengeStreak = streakRecord
     ? { currentStreak: streakRecord.currentStreak, longestStreak: streakRecord.longestStreak, totalCompleted: streakRecord.totalCompleted }
@@ -390,10 +392,13 @@ export async function getStreakAndBadges(userId: string): Promise<{ streak: Chal
 
 async function updateStreak(userId: string) {
   // Count consecutive completed challenges (most recent first, no failed/abandoned in between)
-  const challenges = await prisma.spendingChallenge.findMany({
-    where: { userId, status: { in: ['completed', 'failed'] } },
-    orderBy: { endDate: 'desc' },
-  });
+  const [challenges, existing] = await Promise.all([
+    prisma.spendingChallenge.findMany({
+      where: { userId, status: { in: ['completed', 'failed'] } },
+      orderBy: { endDate: 'desc' },
+    }),
+    prisma.challengeStreak.findUnique({ where: { userId } }),
+  ]);
 
   let currentStreak = 0;
   for (const c of challenges) {
@@ -405,8 +410,6 @@ async function updateStreak(userId: string) {
   }
 
   const totalCompleted = challenges.filter((c) => c.status === 'completed').length;
-
-  const existing = await prisma.challengeStreak.findUnique({ where: { userId } });
   const longestStreak = existing ? Math.max(existing.longestStreak, currentStreak) : currentStreak;
 
   await prisma.challengeStreak.upsert({

@@ -1,4 +1,5 @@
 import ColdStartScreen from "@/components/ColdStartScreen";
+import GoogleOAuthWrapper from "@/components/GoogleOAuthWrapper";
 
 const API_URL = process.env.API_URL || 'http://localhost:8787';
 
@@ -26,7 +27,9 @@ export default async function AuthLayout({
 
   return (
     <main className="auth-bg flex min-h-screen items-center justify-center p-4">
-      {children}
+      <GoogleOAuthWrapper>
+        {children}
+      </GoogleOAuthWrapper>
     </main>
   );
 }
