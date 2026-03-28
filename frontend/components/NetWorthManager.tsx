@@ -125,25 +125,25 @@ export default function NetWorthManager() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div className="glass-card p-4">
           <p className="text-lg font-bold text-emerald-400">
-            ${current.totalAssets.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            ${Number(current.totalAssets).toLocaleString('en-US', { minimumFractionDigits: 2 })}
           </p>
           <p className="text-[10px] text-slate-500 mt-1">Total Assets</p>
         </div>
         <div className="glass-card p-4">
           <p className="text-lg font-bold text-rose-400">
-            ${current.totalLiabilities.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            ${Number(current.totalLiabilities).toLocaleString('en-US', { minimumFractionDigits: 2 })}
           </p>
           <p className="text-[10px] text-slate-500 mt-1">Total Liabilities</p>
         </div>
         <div className="glass-card p-4">
           <p className="text-lg font-bold text-violet-400">
-            ${current.netWorth.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            ${Number(current.netWorth).toLocaleString('en-US', { minimumFractionDigits: 2 })}
           </p>
           <p className="text-[10px] text-slate-500 mt-1">Net Worth</p>
         </div>
         <div className="glass-card p-4">
           <p className={`text-lg font-bold ${changeColor}`}>
-            {changeArrow}${Math.abs(current.monthlyChange).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            {changeArrow}${Math.abs(Number(current.monthlyChange)).toLocaleString('en-US', { minimumFractionDigits: 2 })}
           </p>
           <p className="text-[10px] text-slate-500 mt-1">
             Monthly Change ({changeArrow}{Number(current.monthlyChangePercent).toFixed(1)}%)
@@ -180,7 +180,7 @@ export default function NetWorthManager() {
                 <div key={i} className="flex items-center justify-between py-1.5">
                   <span className="text-sm text-white">{a.name}</span>
                   <span className="text-sm font-medium text-emerald-400">
-                    ${a.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    ${Number(a.balance).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                   </span>
                 </div>
               ))}

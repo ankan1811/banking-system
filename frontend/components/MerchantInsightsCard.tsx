@@ -40,10 +40,10 @@ export default function MerchantInsightsCard() {
     ? merchants.filter((m) => m.name.toLowerCase().includes(search.toLowerCase()))
     : merchants;
 
-  const totalSpent = merchants.reduce((s, m) => s + m.totalSpent, 0);
+  const totalSpent = merchants.reduce((s, m) => s + Number(m.totalSpent), 0);
 
   const categoryTotals = merchants.reduce<Record<string, number>>((acc, m) => {
-    acc[m.category] = (acc[m.category] || 0) + m.totalSpent;
+    acc[m.category] = (acc[m.category] || 0) + Number(m.totalSpent);
     return acc;
   }, {});
   const sortedCategories = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1]);

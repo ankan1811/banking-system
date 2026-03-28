@@ -21,7 +21,7 @@ export default function RecurringTransactionsCard() {
 
   const monthlyTotal = patterns
     .filter((p) => p.frequency === 'monthly')
-    .reduce((sum, p) => sum + p.normalizedAmount, 0);
+    .reduce((sum, p) => sum + Number(p.normalizedAmount), 0);
 
   const shown = expanded ? patterns : patterns.slice(0, 4);
 

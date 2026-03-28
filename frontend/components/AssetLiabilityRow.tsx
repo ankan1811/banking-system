@@ -96,7 +96,7 @@ export default function AssetLiabilityRow({
       </div>
       <div className="flex items-center gap-2 flex-shrink-0">
         <span className={`text-sm font-medium ${type === 'asset' ? 'text-emerald-400' : 'text-rose-400'}`}>
-          ${item.value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          ${Number(item.value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </span>
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           <button onClick={() => setEditing(true)} className="text-[10px] text-slate-500 hover:text-violet-400">Edit</button>

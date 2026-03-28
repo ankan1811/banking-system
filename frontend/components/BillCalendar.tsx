@@ -89,7 +89,7 @@ export default function BillCalendar() {
   const monthTotal = useMemo(() => {
     let total = 0;
     for (const [, entries] of billMap) {
-      for (const e of entries) total += e.pattern.normalizedAmount;
+      for (const e of entries) total += Number(e.pattern.normalizedAmount);
     }
     return total;
   }, [billMap]);
