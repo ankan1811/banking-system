@@ -26,8 +26,7 @@ export function createRateLimit(windowMs: number, maxRequests: number) {
 }
 
 // Pre-built rate limiters for different endpoint tiers
-export const chatRateLimit = createRateLimit(60_000, 10);       // 10/min — AI chat
-export const aiRateLimit = createRateLimit(60_000, 5);          // 5/min  — Gemini insights
+export const chatRateLimit = createRateLimit(60_000, 3);        // 3/min  — Gemini chat
+export const aiRateLimit = createRateLimit(60_000, 3);          // 3/min  — Gemini insights
 export const accountsRateLimit = createRateLimit(60_000, 30);   // 30/min — Plaid account fetches
-export const analyticsRateLimit = createRateLimit(60_000, 15);  // 15/min — analytics endpoints
 export const exportRateLimit = createRateLimit(60_000, 5);      // 5/min  — PDF/CSV exports
