@@ -51,19 +51,26 @@ const PlaidLinkButton = ({ token, variant }: { token: string; variant: string })
 
 const PlaidLink = ({ user, variant }: PlaidLinkProps) => {
   const [token, setToken] = useState<string | null>(null);
+  const [linkError, setLinkError] = useState(false);
 
   useEffect(() => {
     const getLinkToken = async () => {
       try {
         const data = await createLinkToken() as { linkToken?: string };
         if (data?.linkToken) setToken(data.linkToken);
-      } catch (err) {
-        console.error('Failed to create Plaid link token:', err);
+      } catch {
+        setLinkError(true);
       }
     }
 
     if (user) getLinkToken();
   }, [user]);
+
+  if (linkError) {
+    return (
+      <p className="text-xs text-rose-400">Failed to connect to Plaid. Please try again later.</p>
+    );
+  }
 
   // Don't mount the Plaid hook until the token is ready
   if (!token) {

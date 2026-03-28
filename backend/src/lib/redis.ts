@@ -37,7 +37,10 @@ export async function redisGet(key: string): Promise<string | null> {
   }
 
   const entry = fallback.get(key);
-  if (entry && entry.expiresAt > Date.now()) return entry.value;
+  if (entry) {
+    if (entry.expiresAt > Date.now()) return entry.value;
+    fallback.delete(key); // clean up expired entry
+  }
   return null;
 }
 

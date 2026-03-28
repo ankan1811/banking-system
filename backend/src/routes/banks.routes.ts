@@ -18,7 +18,7 @@ router.get('/', async (req: Request, res: Response) => {
 router.get('/by-account/:accountId', async (req: Request, res: Response) => {
   try {
     const accountId = req.params.accountId as string;
-    const bank = await getBankByAccountId(accountId);
+    const bank = await getBankByAccountId(accountId, req.userId!);
 
     if (!bank) {
       res.status(404).json({ error: 'Bank not found' });
@@ -36,7 +36,7 @@ router.get('/by-account/:accountId', async (req: Request, res: Response) => {
 router.get('/:id', async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
-    const bank = await getBank(id);
+    const bank = await getBank(id, req.userId!);
 
     if (!bank) {
       res.status(404).json({ error: 'Bank not found' });

@@ -10,5 +10,27 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/my-banks', '/payment-transfer', '/transaction-history'],
+  matcher: [
+    '/',
+    '/my-banks',
+    '/payment-transfer',
+    '/transaction-history',
+    '/budgets',
+    '/goals',
+    '/alerts',
+    '/net-worth',
+    '/challenges',
+    '/splits',
+    '/analytics',
+    '/trends',
+    '/income-expense',
+    '/merchants',
+    '/reports',
+    '/health-score',
+    '/insights',
+    '/settings',
+    '/calendar',
+    '/transfers',
+    '/upload-statement',
+  ],
 };

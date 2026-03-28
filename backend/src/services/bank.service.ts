@@ -165,8 +165,8 @@ export const getAccounts = async (userId: string) => {
 
 // ─── getAccount (DB-only reads) ──────────────────────────────
 
-export const getAccount = async (bankRecordId: string, userId?: string) => {
-  const bank = await getBankFromDb(bankRecordId);
+export const getAccount = async (bankRecordId: string, userId: string) => {
+  const bank = await prisma.bank.findFirst({ where: { id: bankRecordId, userId } });
   if (!bank) throw new Error('Bank not found');
 
   // Build account data from DB columns

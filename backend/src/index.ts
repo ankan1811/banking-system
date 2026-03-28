@@ -27,7 +27,7 @@ import netWorthRoutes from './routes/net-worth.routes.js';
 import challengesRoutes from './routes/challenges.routes.js';
 import statementUploadRoutes from './routes/statement-upload.routes.js';
 import { requireAuth } from './middleware/auth.js';
-import { accountsRateLimit, aiRateLimit, exportRateLimit } from './middleware/rateLimit.js';
+import { accountsRateLimit, aiRateLimit, exportRateLimit, authRateLimit } from './middleware/rateLimit.js';
 
 const app = express();
 const PORT = process.env.PORT || 8787;
@@ -41,7 +41,7 @@ app.use(cookieParser());
 app.use(express.json());
 
 // Routes (rate limits applied to external-call-heavy endpoints)
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRateLimit, authRoutes);
 app.use('/api/accounts', requireAuth, accountsRateLimit, accountsRoutes);
 app.use('/api/banks', requireAuth, banksRoutes);
 app.use('/api/transactions', requireAuth, transactionsRoutes);

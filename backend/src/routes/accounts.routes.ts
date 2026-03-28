@@ -56,7 +56,7 @@ router.get('/:bankRecordId', async (req: Request, res: Response) => {
 // POST /api/accounts/:bankRecordId/sync — manual resync with bank
 router.post('/:bankRecordId/sync', async (req: Request, res: Response) => {
   try {
-    const bank = await getBank(req.params.bankRecordId as string);
+    const bank = await getBank(req.params.bankRecordId as string, req.userId!);
     if (!bank) {
       res.status(404).json({ error: 'Bank not found' });
       return;

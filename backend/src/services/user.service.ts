@@ -100,17 +100,17 @@ export const getBanks = async (userId: string) => {
   return banks;
 };
 
-export const getBank = async (documentId: string) => {
-  const bank = await prisma.bank.findUnique({
-    where: { id: documentId },
+export const getBank = async (documentId: string, userId: string) => {
+  const bank = await prisma.bank.findFirst({
+    where: { id: documentId, userId },
   });
 
   return bank;
 };
 
-export const getBankByAccountId = async (accountId: string) => {
+export const getBankByAccountId = async (accountId: string, userId: string) => {
   const bank = await prisma.bank.findFirst({
-    where: { accountId },
+    where: { accountId, userId },
   });
 
   return bank || null;

@@ -37,6 +37,7 @@ const formSchema = z.object({
 const PaymentTransferForm = ({ accounts }: PaymentTransferFormProps) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [transferError, setTransferError] = useState('');
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -86,7 +87,7 @@ const PaymentTransferForm = ({ accounts }: PaymentTransferFormProps) => {
         }
       }
     } catch (error) {
-      console.error("Submitting create transfer request failed: ", error);
+      setTransferError(error instanceof Error ? error.message : 'Transfer failed. Please try again.');
     }
 
     setIsLoading(false);
@@ -243,6 +244,12 @@ const PaymentTransferForm = ({ accounts }: PaymentTransferFormProps) => {
             )}
           />
         </div>
+
+        {transferError && (
+          <div className="bg-rose-500/10 border border-rose-500/30 text-rose-400 px-4 py-3 rounded-xl text-14">
+            {transferError}
+          </div>
+        )}
 
         <div className="payment-transfer_btn-box">
           <Button type="submit" disabled={isLoading} className="form-btn">
