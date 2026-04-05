@@ -281,8 +281,8 @@ export default function ColdStartScreen() {
                   className="absolute inset-0 rounded-2xl overflow-hidden"
                   style={{
                     background:
-                      'conic-gradient(from var(--border-angle), #8b5cf630, #22d3ee80, #8b5cf630, #8b5cf615)',
-                    animation: 'border-spin 4s linear infinite',
+                      'conic-gradient(from var(--border-angle), #8b5cf618, #22d3ee35, #8b5cf618, #8b5cf60a)',
+                    animation: 'border-spin 8s linear infinite',
                   }}
                 />
               )}
