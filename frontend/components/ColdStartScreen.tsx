@@ -4,19 +4,20 @@ import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import {
   TrendingUp, Target, BarChart3, Trophy, CreditCard, Bell,
-  CheckCircle2, Swords, Shield,
+  CheckCircle2, Swords, Shield, Landmark, Zap, RefreshCw, Globe, Sparkles,
+  type LucideIcon,
 } from 'lucide-react';
 import SnakeGame from './SnakeGame';
 import CircuitCanvas from './CircuitCanvas';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
-const STATUS_MESSAGES = [
-  { at: 0,   text: 'Booting the financial servers',                       emoji: '🏦' },
-  { at: 10,  text: 'Fetching your account data',                          emoji: '💳' },
-  { at: 20,  text: 'Almost connected',                                    emoji: '⚡' },
-  { at: 40,  text: 'Syncing with the database',                           emoji: '🔄' },
-  { at: 120, text: 'Taking longer than expected. Please try again later', emoji: '🌐' },
+const STATUS_MESSAGES: { at: number; text: string; Icon: LucideIcon }[] = [
+  { at: 0,   text: 'Booting the financial servers',                       Icon: Landmark   },
+  { at: 10,  text: 'Fetching your account data',                          Icon: CreditCard },
+  { at: 20,  text: 'Almost connected',                                    Icon: Zap        },
+  { at: 40,  text: 'Syncing with the database',                           Icon: RefreshCw  },
+  { at: 120, text: 'Taking longer than expected. Please try again later', Icon: Globe      },
 ];
 
 const TIPS = [
@@ -339,7 +340,7 @@ export default function ColdStartScreen() {
                         <span className="bg-gradient-to-r from-violet-300 via-white to-cyan-300 bg-clip-text text-transparent">
                           {status.text}
                         </span>
-                        <span className="ml-2">{status.emoji}</span>
+                        <status.Icon size={28} className="ml-2 inline-block text-violet-400" />
                         <span className="dot-pulse">
                           <span className="inline-block mx-[1px]">.</span>
                           <span className="inline-block mx-[1px]">.</span>
@@ -419,9 +420,7 @@ export default function ColdStartScreen() {
                             transition: 'opacity 0.2s ease',
                           }}
                         >
-                          <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent mr-1.5">
-                            &#10024;
-                          </span>
+                          <Sparkles size={14} className="inline-block text-violet-400 mr-1.5" />
                           {TIPS[tipIndex]}
                         </p>
                       </div>
@@ -483,7 +482,7 @@ export default function ColdStartScreen() {
                           <span className="text-sm font-space-grotesk font-semibold tracking-tight bg-gradient-to-r from-violet-300 to-cyan-300 bg-clip-text text-transparent">
                             Warm up while you wait
                           </span>
-                          <span className="text-sm">⚡</span>
+                          <Zap size={14} className="text-amber-400" />
                         </div>
                       </div>
                       <SnakeGame />

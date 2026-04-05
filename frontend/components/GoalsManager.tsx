@@ -1,13 +1,12 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Target, Coins, Bot } from 'lucide-react';
 import { getGoals, createGoal } from '@/lib/api/goals.api';
 import { generatePlan } from '@/lib/api/ai.api';
 import type { SavingsGoal, FinancialPlan } from '@shared/types';
 import GoalCard from './GoalCard';
-
-const EMOJI_OPTIONS = ['🎯', '🏠', '✈️', '🚗', '💍', '📱', '💻', '🎓', '💊', '🌴', '💰', '🐾'];
+import { GOAL_ICON_OPTIONS, IconRenderer, pickGoalIcon } from '@/lib/iconMap';
 const COLOR_OPTIONS = ['#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#f43f5e', '#6366f1', '#22c55e'];
 
 const PLAN_SUGGESTIONS = [
@@ -32,7 +31,7 @@ export default function GoalsManager() {
     name: '',
     targetAmount: '',
     targetDate: '',
-    emoji: '🎯',
+    emoji: 'target',
     color: '#8b5cf6',
   });
 
@@ -64,7 +63,7 @@ export default function GoalsManager() {
       color: form.color,
     });
     setCreating(false);
-    setForm({ name: '', targetAmount: '', targetDate: '', emoji: '🎯', color: '#8b5cf6' });
+    setForm({ name: '', targetAmount: '', targetDate: '', emoji: 'target', color: '#8b5cf6' });
     load();
   };
 
@@ -91,7 +90,7 @@ export default function GoalsManager() {
         name: plan.goalName,
         targetAmount: plan.targetAmount,
         targetDate: plan.targetDate || undefined,
-        emoji: plan.suggestedEmoji || '🎯',
+        emoji: pickGoalIcon(plan.goalName),
         color: plan.suggestedColor || '#8b5cf6',
       });
       setPlan(null);
@@ -200,7 +199,7 @@ export default function GoalsManager() {
                   {/* Header */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl">{plan.suggestedEmoji}</span>
+                      <IconRenderer name={pickGoalIcon(plan.goalName)} size={24} className="text-violet-400" />
                       <h4 className="text-sm font-semibold text-white">{plan.goalName}</h4>
                     </div>
                     {feasibilityStyle && (
@@ -312,17 +311,17 @@ export default function GoalsManager() {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <div className="p-3 bg-slate-800/30 border border-slate-700/30 rounded-lg text-center">
-              <span className="text-lg">🎯</span>
+              <Target size={20} className="text-violet-400 mx-auto" />
               <p className="text-[11px] text-slate-400 mt-1">Set a target</p>
               <p className="text-[10px] text-slate-500">e.g. Save $5,000 for a trip</p>
             </div>
             <div className="p-3 bg-slate-800/30 border border-slate-700/30 rounded-lg text-center">
-              <span className="text-lg">💰</span>
+              <Coins size={20} className="text-violet-400 mx-auto" />
               <p className="text-[11px] text-slate-400 mt-1">Track contributions</p>
               <p className="text-[10px] text-slate-500">Add savings as you go</p>
             </div>
             <div className="p-3 bg-slate-800/30 border border-slate-700/30 rounded-lg text-center">
-              <span className="text-lg">🤖</span>
+              <Bot size={20} className="text-violet-400 mx-auto" />
               <p className="text-[11px] text-slate-400 mt-1">AI financial plan</p>
               <p className="text-[10px] text-slate-500">Get a personalized roadmap</p>
             </div>
@@ -357,19 +356,19 @@ export default function GoalsManager() {
             />
           </div>
 
-          {/* Emoji picker */}
+          {/* Icon picker */}
           <div>
             <p className="text-xs text-slate-500 mb-1.5">Icon</p>
             <div className="flex flex-wrap gap-1.5">
-              {EMOJI_OPTIONS.map((e) => (
+              {GOAL_ICON_OPTIONS.map(({ key, Icon }) => (
                 <button
-                  key={e}
-                  onClick={() => setForm({ ...form, emoji: e })}
-                  className={`w-8 h-8 rounded-lg text-base transition-colors ${
-                    form.emoji === e ? 'bg-violet-600/40 border border-violet-500/50' : 'bg-slate-700/50 hover:bg-slate-600/50'
+                  key={key}
+                  onClick={() => setForm({ ...form, emoji: key })}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+                    form.emoji === key ? 'bg-violet-600/40 border border-violet-500/50' : 'bg-slate-700/50 hover:bg-slate-600/50'
                   }`}
                 >
-                  {e}
+                  <Icon size={16} className="text-slate-300" />
                 </button>
               ))}
             </div>

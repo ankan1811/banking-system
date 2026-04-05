@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import type { SavingsGoal } from '@shared/types';
+import { Trash2 } from 'lucide-react';
 import { addContribution, deleteGoal, updateGoal } from '@/lib/api/goals.api';
+import { IconRenderer } from '@/lib/iconMap';
 import ConfirmModal from './ConfirmModal';
 
 interface Props {
@@ -81,8 +83,8 @@ export default function GoalCard({ goal, onUpdate }: Props) {
                 style={{ transition: 'stroke-dasharray 0.5s ease' }}
               />
             </svg>
-            <span className="absolute inset-0 flex items-center justify-center text-xl">
-              {goal.emoji || '🎯'}
+            <span className="absolute inset-0 flex items-center justify-center">
+              <IconRenderer name={goal.emoji} size={24} className="text-slate-200" />
             </span>
           </div>
 
@@ -133,7 +135,7 @@ export default function GoalCard({ goal, onUpdate }: Props) {
               className="p-1.5 text-slate-700 hover:text-rose-400 rounded text-xs"
               title="Delete"
             >
-              🗑
+              <Trash2 size={14} />
             </button>
           )}
         </div>

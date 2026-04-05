@@ -11,7 +11,7 @@ const createSchema = z.object({
   name: z.string().min(1).max(100),
   targetAmount: z.number().positive(),
   targetDate: z.string().optional(),
-  emoji: z.string().max(4).optional(),
+  emoji: z.string().max(20).optional(),
   color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
 });
 
@@ -19,7 +19,7 @@ const updateSchema = z.object({
   name: z.string().min(1).max(100).optional(),
   targetAmount: z.number().positive().optional(),
   targetDate: z.string().nullable().optional(),
-  emoji: z.string().max(4).nullable().optional(),
+  emoji: z.string().max(20).nullable().optional(),
   color: z.string().regex(/^#[0-9a-fA-F]{6}$/).nullable().optional(),
   status: z.enum(['active', 'completed', 'abandoned']).optional(),
 });

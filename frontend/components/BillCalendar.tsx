@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
+import { Search, CalendarDays, Banknote } from 'lucide-react';
 import { getRecurring } from '@/lib/api/analytics.api';
 import { aiCategoryColors } from '@/constants';
 import type { RecurringPattern } from '@shared/types';
@@ -269,17 +270,17 @@ export default function BillCalendar() {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <div className="p-3 bg-slate-800/30 border border-slate-700/30 rounded-lg text-center">
-              <span className="text-lg">🔍</span>
+              <Search size={20} className="text-violet-400 mx-auto" />
               <p className="text-[11px] text-slate-400 mt-1">Auto-detected</p>
               <p className="text-[10px] text-slate-500">We scan your transactions</p>
             </div>
             <div className="p-3 bg-slate-800/30 border border-slate-700/30 rounded-lg text-center">
-              <span className="text-lg">📅</span>
+              <CalendarDays size={20} className="text-violet-400 mx-auto" />
               <p className="text-[11px] text-slate-400 mt-1">Calendar view</p>
               <p className="text-[10px] text-slate-500">See upcoming bills by date</p>
             </div>
             <div className="p-3 bg-slate-800/30 border border-slate-700/30 rounded-lg text-center">
-              <span className="text-lg">💸</span>
+              <Banknote size={20} className="text-violet-400 mx-auto" />
               <p className="text-[11px] text-slate-400 mt-1">Monthly committed</p>
               <p className="text-[10px] text-slate-500">Track total recurring spend</p>
             </div>

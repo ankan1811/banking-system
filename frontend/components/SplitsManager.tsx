@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from 'react';
+import { UtensilsCrossed, Home, CircleCheck } from 'lucide-react';
 import { getSplits, getSplitSummary, createSplit } from '@/lib/api/splits.api';
 import type { SplitGroup, SplitSummary } from '@shared/types';
 import SplitCard from './SplitCard';
@@ -157,17 +158,17 @@ export default function SplitsManager({ initialSplits = [], initialSummary = nul
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <div className="p-3 bg-slate-800/30 border border-slate-700/30 rounded-lg text-center">
-                <span className="text-lg">🍽</span>
+                <UtensilsCrossed size={20} className="text-violet-400 mx-auto" />
                 <p className="text-[11px] text-slate-400 mt-1">Split a dinner</p>
                 <p className="text-[10px] text-slate-500">Divide equally or custom</p>
               </div>
               <div className="p-3 bg-slate-800/30 border border-slate-700/30 rounded-lg text-center">
-                <span className="text-lg">🏠</span>
+                <Home size={20} className="text-violet-400 mx-auto" />
                 <p className="text-[11px] text-slate-400 mt-1">Share rent</p>
                 <p className="text-[10px] text-slate-500">Custom amounts per person</p>
               </div>
               <div className="p-3 bg-slate-800/30 border border-slate-700/30 rounded-lg text-center">
-                <span className="text-lg">✅</span>
+                <CircleCheck size={20} className="text-violet-400 mx-auto" />
                 <p className="text-[11px] text-slate-400 mt-1">Track payments</p>
                 <p className="text-[10px] text-slate-500">Mark who has paid back</p>
               </div>

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react';
+import { BarChart3, CreditCard, Landmark, Trash2 } from 'lucide-react';
 import { getAlerts, createAlert, updateAlert, deleteAlert } from '@/lib/api/alerts.api';
 import { AI_CATEGORIES } from '@shared/types';
 import type { AlertRule, AICategory } from '@shared/types';
@@ -123,17 +124,17 @@ export default function AlertsManager() {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <div className="p-3 bg-slate-800/30 border border-slate-700/30 rounded-lg text-center">
-              <span className="text-lg">📊</span>
+              <BarChart3 size={20} className="text-violet-400 mx-auto" />
               <p className="text-[11px] text-slate-400 mt-1">Monthly category limit</p>
               <p className="text-[10px] text-slate-500">e.g. Food & Dining over $200</p>
             </div>
             <div className="p-3 bg-slate-800/30 border border-slate-700/30 rounded-lg text-center">
-              <span className="text-lg">💳</span>
+              <CreditCard size={20} className="text-violet-400 mx-auto" />
               <p className="text-[11px] text-slate-400 mt-1">Large transaction</p>
               <p className="text-[10px] text-slate-500">e.g. Any charge over $500</p>
             </div>
             <div className="p-3 bg-slate-800/30 border border-slate-700/30 rounded-lg text-center">
-              <span className="text-lg">🏦</span>
+              <Landmark size={20} className="text-violet-400 mx-auto" />
               <p className="text-[11px] text-slate-400 mt-1">Low balance</p>
               <p className="text-[10px] text-slate-500">e.g. Balance below $1,000</p>
             </div>
@@ -151,8 +152,8 @@ export default function AlertsManager() {
             }`}
           >
             <div className="flex items-center gap-3 min-w-0">
-              <span className="text-lg shrink-0">
-                {a.type === 'category_monthly_limit' ? '📊' : a.type === 'single_transaction' ? '💳' : '🏦'}
+              <span className="shrink-0 text-violet-400">
+                {a.type === 'category_monthly_limit' ? <BarChart3 size={20} /> : a.type === 'single_transaction' ? <CreditCard size={20} /> : <Landmark size={20} />}
               </span>
               <div className="min-w-0">
                 <p className="text-sm text-white truncate">{renderAlertDescription(a)}</p>
@@ -183,7 +184,7 @@ export default function AlertsManager() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
-                ) : '🗑'}
+                ) : <Trash2 size={14} />}
               </button>
             </div>
           </div>

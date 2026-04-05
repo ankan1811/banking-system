@@ -326,7 +326,6 @@ Respond ONLY with valid JSON:
   "milestones": [{ "month": "YYYY-MM", "targetSaved": number, "action": "what to do this month" }],
   "tips": ["actionable tip 1", "actionable tip 2", "actionable tip 3"],
   "feasibility": "easy|moderate|challenging|very_challenging",
-  "suggestedEmoji": "single emoji",
   "suggestedColor": "hex color string"
 }
 
@@ -351,7 +350,7 @@ Rules:
       milestones: parsed.milestones || [],
       tips: parsed.tips || [],
       feasibility: parsed.feasibility || 'moderate',
-      suggestedEmoji: parsed.suggestedEmoji || '🎯',
+      suggestedEmoji: parsed.suggestedEmoji || 'target',
       suggestedColor: parsed.suggestedColor || '#8b5cf6',
       generatedAt: new Date().toISOString(),
     };
@@ -419,7 +418,7 @@ Rules:
       milestones,
       tips,
       feasibility,
-      suggestedEmoji: '🎯',
+      suggestedEmoji: 'target',
       suggestedColor: '#8b5cf6',
       generatedAt: new Date().toISOString(),
     };

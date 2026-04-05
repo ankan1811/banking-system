@@ -5,6 +5,7 @@ import { getMonthlyDigest, buildDigestPdfUrl } from '@/lib/api/reports.api';
 import { aiCategoryColors } from '@/constants';
 import type { MonthlyDigest } from '@shared/types';
 import { Sparkles } from 'lucide-react';
+import { IconRenderer } from '@/lib/iconMap';
 
 export default function MonthlyDigestView() {
   const [digest, setDigest] = useState<MonthlyDigest | null>(null);
@@ -234,7 +235,10 @@ export default function MonthlyDigestView() {
                 return (
                   <div key={g.id}>
                     <div className="flex justify-between text-xs mb-0.5">
-                      <span className="text-slate-300">{g.emoji || '🎯'} {g.name}</span>
+                      <span className="text-slate-300 flex items-center gap-1.5">
+                        <IconRenderer name={g.emoji} size={14} className="text-violet-400 shrink-0" />
+                        {g.name}
+                      </span>
                       <span className="text-slate-500">{pct.toFixed(0)}%</span>
                     </div>
                     <div className="h-1.5 bg-slate-700/50 rounded-full overflow-hidden">
