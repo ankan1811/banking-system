@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react';
+import { Wallet, PieChart, ShieldAlert, X, Trash2, Plus } from 'lucide-react';
 import { getBudgetStatus, upsertBudget, deleteBudget } from '@/lib/api/budgets.api';
 import { aiCategoryColors } from '@/constants';
 import { AI_CATEGORIES } from '@shared/types';
@@ -78,7 +79,33 @@ export default function BudgetProgressCard() {
       </div>
 
       {statuses.length === 0 && !addingNew && (
-        <p className="text-sm text-slate-500">No budgets set. Add one to start tracking.</p>
+        <div className="space-y-5">
+          <div className="text-center space-y-2">
+            <div className="mx-auto w-12 h-12 rounded-full bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
+              <Wallet size={20} className="text-violet-400" />
+            </div>
+            <h3 className="text-sm font-semibold text-white">No budgets set yet</h3>
+            <p className="text-xs text-slate-500">Set monthly spending limits for each category and track your progress.</p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <div className="p-3 bg-slate-800/30 border border-slate-700/30 rounded-lg text-center">
+              <Wallet size={20} className="text-violet-400 mx-auto" />
+              <p className="text-[11px] text-slate-400 mt-1">Category limits</p>
+              <p className="text-[10px] text-slate-500">Set a cap per spending category</p>
+            </div>
+            <div className="p-3 bg-slate-800/30 border border-slate-700/30 rounded-lg text-center">
+              <PieChart size={20} className="text-violet-400 mx-auto" />
+              <p className="text-[11px] text-slate-400 mt-1">Track progress</p>
+              <p className="text-[10px] text-slate-500">See how much you've spent vs limit</p>
+            </div>
+            <div className="p-3 bg-slate-800/30 border border-slate-700/30 rounded-lg text-center">
+              <ShieldAlert size={20} className="text-violet-400 mx-auto" />
+              <p className="text-[11px] text-slate-400 mt-1">Over-budget warnings</p>
+              <p className="text-[10px] text-slate-500">Visual alerts when you exceed limits</p>
+            </div>
+          </div>
+        </div>
       )}
 
       <div className="space-y-4">
@@ -127,7 +154,7 @@ export default function BudgetProgressCard() {
                             onClick={() => setEditingCategory(null)}
                             className="text-slate-500 hover:text-slate-400 text-xs"
                           >
-                            ✕
+                            <X size={12} />
                           </button>
                         </div>
                       ) : (
@@ -142,7 +169,7 @@ export default function BudgetProgressCard() {
                             onClick={() => handleDelete(s.budgetId!)}
                             className="text-slate-600 hover:text-rose-400 text-xs"
                           >
-                            ✕
+                            <Trash2 size={12} />
                           </button>
                         </>
                       )}
@@ -152,7 +179,7 @@ export default function BudgetProgressCard() {
                       onClick={() => { setEditingCategory(s.category); setEditValue(''); setAddingNew(false); }}
                       className="text-slate-500 hover:text-violet-400 text-xs"
                     >
-                      + Set budget
+                      <Plus size={12} className="inline" /> Set budget
                     </button>
                   )}
                 </div>
@@ -235,7 +262,7 @@ export default function BudgetProgressCard() {
             onClick={() => setAddingNew(true)}
             className="w-full text-xs text-slate-500 hover:text-violet-400 border border-dashed border-slate-700/50 hover:border-violet-500/30 rounded-lg py-2 transition-colors"
           >
-            + Add budget for a category
+            <Plus size={12} className="inline" /> Add budget for a category
           </button>
         )
       )}
