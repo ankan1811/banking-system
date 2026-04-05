@@ -646,3 +646,43 @@ body {
   animation: orbit 8s linear infinite;
   opacity: 0.7;
 }
+
+/* ===== TICKER STRIP ===== */
+@keyframes ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes ticker-dot-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.7); }
+}
+
+/* ===== EXIT OVERLAY ===== */
+@keyframes overlay-fade-in {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes exit-icon-pop {
+  0%   { opacity: 0; transform: scale(0.3); filter: blur(8px); }
+  60%  { opacity: 1; transform: scale(1.15); filter: blur(0); }
+  100% { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+
+/* ===== SCANNING CARD BORDER ===== */
+@property --border-angle {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: 0deg;
+}
+
+@keyframes border-spin {
+  to { --border-angle: 360deg; }
+}
+
+/* ===== SERVER STATUS LEDs ===== */
+@keyframes led-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
