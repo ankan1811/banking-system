@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   title: "Ankan's Bank",
   description: "A modern banking platform for managing your finances, tracking spending, and achieving your goals.",
   icons: {
-    icon: '/icons/logo.svg'
+    icon: '/icon.svg'
   },
   openGraph: {
     title: "Ankan's Bank",
