@@ -53,7 +53,7 @@ async function logAndEmail(ruleId: string, userEmail: string, subject: string, h
     data: { ruleId, details: JSON.stringify({ subject }) },
   });
 
-  await sendEmail(userEmail, subject, html).catch((err) => console.error('Alert email send failed:', err));
+  sendEmail(userEmail, subject, html);
 }
 
 export async function evaluateAlerts(

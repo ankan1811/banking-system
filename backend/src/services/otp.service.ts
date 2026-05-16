@@ -27,7 +27,7 @@ export async function sendOtp(email: string): Promise<void> {
     return;
   }
 
-  await sendEmail(
+  sendEmail(
     email,
     "Your Ankan's Bank login code",
     otpEmailTemplate(otp, OTP_EXPIRY_MINUTES),
