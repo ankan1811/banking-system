@@ -1,11 +1,27 @@
-// import { Resend } from 'resend';
+import { Resend } from 'resend';
 import nodemailer from 'nodemailer';
 
 async function sendEmailAsync(to: string, subject: string, html: string): Promise<void> {
+  if (process.env.RESEND_API_KEY) {
+    try {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      await resend.emails.send({
+        from: process.env.EMAIL_FROM || "Ankan's Bank <noreply@example.com>",
+        to,
+        subject,
+        html,
+      });
+      console.log(`Email sent via Resend to ${to}`);
+      return;
+    } catch (err) {
+      console.error(`Resend failed:`, err);
+    }
+  }
+
   const transport = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
+    port: 587,
+    secure: false,
     auth: {
       user: process.env.GMAIL_USER!,
       pass: process.env.GMAIL_APP_PASSWORD!,
