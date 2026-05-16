@@ -1,10 +1,7 @@
 import { prisma } from '../lib/db.js';
-import { Resend } from 'resend';
+import { sendEmail } from '../lib/mailer.js';
+import { budgetAlertEmailTemplate, largeTransactionEmailTemplate } from '../lib/emailTemplates.js';
 import type { AICategory } from '@shared/types';
-
-function getResend() {
-  return new Resend(process.env.RESEND_API_KEY || '');
-}
 
 // ─── CRUD ─────────────────────────────────────────────────────
 
@@ -51,22 +48,12 @@ async function hasRecentTrigger(ruleId: string, withinMs: number): Promise<boole
   return !!log;
 }
 
-async function logAndEmail(ruleId: string, userEmail: string, subject: string, body: string) {
+async function logAndEmail(ruleId: string, userEmail: string, subject: string, html: string) {
   await prisma.alertTriggerLog.create({
-    data: { ruleId, details: JSON.stringify({ subject, body }) },
+    data: { ruleId, details: JSON.stringify({ subject }) },
   });
 
-  if (process.env.RESEND_API_KEY) {
-    const resend = getResend();
-    await resend.emails.send({
-      from: process.env.EMAIL_FROM || "Ankan's Bank <noreply@example.com>",
-      to: userEmail,
-      subject,
-      text: body,
-    }).catch((err) => console.error('Alert email send failed:', err));
-  } else {
-    console.log(`[DEV ALERT] To: ${userEmail}\nSubject: ${subject}\n${body}`);
-  }
+  await sendEmail(userEmail, subject, html).catch((err) => console.error('Alert email send failed:', err));
 }
 
 export async function evaluateAlerts(
@@ -122,7 +109,7 @@ export async function evaluateAlerts(
             rule.id,
             userEmail,
             `Budget Alert: ${rule.category} spending limit reached`,
-            `Hi,\n\nYou've spent $${spent.toFixed(2)} on ${rule.category} this month, which exceeds your alert threshold of $${threshold.toFixed(2)}.\n\nConsider reviewing your spending in this category.\n\n— Ankan's Bank`,
+            budgetAlertEmailTemplate(rule.category, spent, threshold),
           );
         }
       }
@@ -141,7 +128,7 @@ export async function evaluateAlerts(
             rule.id,
             userEmail,
             `Large Transaction Alert: $${Math.abs(t.amount).toFixed(2)}`,
-            `Hi,\n\nA transaction of $${Math.abs(t.amount).toFixed(2)} was detected for "${t.name}" on ${t.date || t.createdAt}.\n\nThis exceeds your alert threshold of $${threshold.toFixed(2)}.\n\n— Ankan's Bank`,
+            largeTransactionEmailTemplate(t.name, Math.abs(t.amount), t.date || t.createdAt, threshold),
           );
         }
       }

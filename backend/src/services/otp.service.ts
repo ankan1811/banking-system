@@ -1,12 +1,9 @@
 import crypto from 'crypto';
 import { prisma } from '../lib/db.js';
-import { Resend } from 'resend';
+import { sendEmail } from '../lib/mailer.js';
+import { otpEmailTemplate } from '../lib/emailTemplates.js';
 
 const OTP_EXPIRY_MINUTES = parseInt(process.env.OTP_EXPIRY_MINUTES || '5', 10);
-
-function getResendClient() {
-  return new Resend(process.env.RESEND_API_KEY || '');
-}
 
 function generateOtp(): string {
   return crypto.randomInt(100000, 999999).toString();
@@ -30,13 +27,11 @@ export async function sendOtp(email: string): Promise<void> {
     return;
   }
 
-  const resend = getResendClient();
-  await resend.emails.send({
-    from: process.env.EMAIL_FROM || "Ankan's Bank <noreply@example.com>",
-    to: email,
-    subject: "Your Ankan's Bank login code",
-    text: `Your verification code is: ${otp}. It expires in ${OTP_EXPIRY_MINUTES} minutes.`,
-  });
+  await sendEmail(
+    email,
+    "Your Ankan's Bank login code",
+    otpEmailTemplate(otp, OTP_EXPIRY_MINUTES),
+  );
 }
 
 export async function verifyOtp(email: string, submittedOtp: string): Promise<boolean> {
