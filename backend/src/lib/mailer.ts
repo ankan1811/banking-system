@@ -5,14 +5,18 @@ async function sendEmailAsync(to: string, subject: string, html: string): Promis
   if (process.env.RESEND_API_KEY) {
     try {
       const resend = new Resend(process.env.RESEND_API_KEY);
-      await resend.emails.send({
+      const result = await resend.emails.send({
         from: process.env.EMAIL_FROM || "Ankan's Bank <noreply@example.com>",
         to,
         subject,
         html,
       });
-      console.log(`Email sent via Resend to ${to}`);
-      return;
+      if (result.error) {
+        console.error(`Resend error:`, result.error);
+      } else {
+        console.log(`Email sent via Resend to ${to}, ID: ${result.data?.id}`);
+        return;
+      }
     } catch (err) {
       console.error(`Resend failed:`, err);
     }
